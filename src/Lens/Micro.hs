@@ -8,7 +8,48 @@
     , ScopedTypeVariables
   #-}
 
-module Lens.Micro where
+module Lens.Micro
+(
+  -- * Getter
+  Getting,
+  Getter,
+  (^.),
+  view,
+  use,
+  -- * Setter
+  ASetter,
+  sets,
+  mapped,
+  over,
+  set,
+  (.~), (%~),
+  (.=), (%=),
+  assign,
+  -- * Lens
+  (&),
+  lens,
+  Lens, Lens',
+  -- * Traversal
+  both,
+  Traversal, Traversal',
+  -- * Fold
+  Fold,
+  toListOf,
+  (^..),
+  (^?),
+  (^?!),
+  folded,
+  -- * Prism
+  _Left, _Right,
+  _Just, _Nothing,
+  -- * Tuple
+  Field1(..),
+  Field2(..),
+  Field3(..),
+  Field4(..),
+  Field5(..),
+)
+where
 
 import Control.Applicative
 import Control.Monad.Identity
