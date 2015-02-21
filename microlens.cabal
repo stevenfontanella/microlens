@@ -1,16 +1,41 @@
 name:                microlens
 version:             0.1.0.0
-synopsis:            A tiny part of the 'lens' library which you can depend upon.
--- description:         
+synopsis:            A tiny part of the ‘lens’ library which you can depend upon.
+description:
+  This is a minimal extract from the @lens@ library (with only 1
+  dependency). It's not a toy lenses library, unsuitable for “real world”,
+  but merely a minimal one. It is compatible with @lens@, and should have
+  same performance.
+  .
+  Use this library:
+  .
+    * if you want to define lenses or traversals in your own library, but
+      don't want to depend on @lens@
+    * if you are new to lenses and want a small library to play with,
+      but don't want to use something “inferior” or have to relearn things
+      when you switch to @lens@
+  .
+  Don't use this library:
+  .
+    * if you need @Iso@s, @Prism@s, indexed traversals, @at@, @ix@,
+      or actually anything else which isn't defined here
+    * if you think lenses compose “in the wrong order” (in which case
+      you're looking for @fclabels@)
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom
-maintainer:          yom@artyom.me
+maintainer:          Artyom <yom@artyom.me>
+homepage:            http://github.com/Aelve/microlens
+bug-reports:         http://github.com/Aelve/microlens/issues
 -- copyright:           
 category:            Data, Lenses
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
+
+source-repository head
+  type:                git
+  location:            git://github.com/Aelve/microlens.git
 
 library
   exposed-modules:     Lens.Micro
