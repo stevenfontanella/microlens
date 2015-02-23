@@ -67,137 +67,36 @@ import Control.Monad.State.Class
 import Data.Foldable
 import Data.Monoid
 
+{- |
+@'ASetter' s t a b@ is something that turns a function modifying a value into
+a function modifying a /structure/. If you ignore 'Identity' (as @'Identity'
+a@ is the same thing as @a@), the type is:
 
--- $intro
---
--- Documentation for this module is also a tutorial, explaining how lenses
--- (and all functions in the module) work and what you can do with them. If:
---
---   * your time is limited
---
---   * or you are very good at recognising and memorising patterns without
---     having to understand the underlying structure
---
---   * or you have to just once write/understand code which uses lenses
---     (but you've no intention to use them as a general-purpose tool)
---
---   * or you just forgot how to do something with lenses
---
--- you should look at "Lens.Micro.Cookbook" instead.
+@
+type ASetter s t a b = (a -> b) -> s -> t
+@
 
--- |
--- (This isn't the main type of this library, but it's the easiest to understand.)
---
--- First of all, you can ignore 'Identity': @'Identity' a@ is the same thing
--- as @a@, and you can always get @a@ from @'Identity' a@ and wrap it back:
---
--- >>> Identity 3
--- Identity 3
---
--- >>> runIdentity (Identity 3)
--- 3
---
--- The reason 'Identity' is used here will be apparent later.
---
--- Okay, if we ignore 'Identity', we've seen functions which fit the
--- 'ASetter' pattern before. For instance, 'map':
---
--- @
--- map :: (a -> b) -> [a] -> [b]
---
--- ASetter [a] [b] a b = (a -> Identity b) -> [a] -> Identity [b]
--- @
---
--- 'map' takes a function which applies to one element of the list, and
--- applies it to the whole list:
---
--- >>> map (+1) [1,2,3]
--- [2,3,4]
---
--- What you might not have seen, however, is how easily such "function
--- modifiers" can be combined. Let's say you want to apply a function to
--- every element in a list of lists. You can do it like this:
---
--- >>> map (map (+1)) [[1,2],[3,4],[5,6]]
--- [[2,3],[4,5],[6,7]]
---
--- But instead you could treat 'map' as a /single-argument/ function -- that
--- is, a function which makes a list-modifying function out of an
--- element-modifying function. This sentence might be hard to swallow, so
--- just watch:
---
--- @
--- (+1) :: Int -> Int                      -- adds 1 to a single element
---
--- map (+1)   :: [Int] -> [Int]            -- adds 1 to each element
--- map $ (+1) :: [Int] -> [Int]            -- just making it easier to see
---
--- map (map (+1))   :: [[Int]] -> [[Int]]  -- adds 1 to each element of each list
--- map $ map $ (+1) :: [[Int]] -> [[Int]]  -- same
--- map . map $ (+1) :: [[Int]] -> [[Int]]  -- same
--- @
---
--- Again, in English:
---
---  * 1st application of 'map' to @(+1)@ makes it a function on lists.
---  * 2nd application of 'map' makes it a function on lists of lists.
---  * 3rd application of 'map' makes it a function on lists of lists of
---    lists... and so on.
---
--- 'map' isn't the only function like this, but one of the most useful
--- ones. Let's define another one:
---
--- >>> let first f (a, b) = (f a, b)
---
--- (By the way, it's already defined in "Control.Arrow", but people often
--- reinvent it anyway.)
---
--- What does @first@ do? It applies a function to the 1st element of a
--- tuple. Compare it with 'map':
---
--- @
--- first :: (a -> b) -> (a,x) -> (b,x)
--- map   :: (a -> b) -> [a] -> [b]
--- @
---
--- And, the same way as with 'map', you can use @first@ several times to
--- apply a function to the 1st element of the 1st element of...
---
--- @
--- first.first.first $ (+1)  ::  (((Int,x),y),z)  ->  (((Int,x),y),z)
--- @
---
--- Moreover, since @first@ and 'map' have the same "shape", you can use them
--- together to create even more complicated functions:
---
--- @
--- map.first.first $ (+1)  ::  [ ((Int,x),y) ]  ->  [ ((Int,x),y) ]
--- @
---
--- Each function in the chain here "peels" a layer, until we're left with a
--- bare 'Int'. Notice how it'd be more obvious if we used prefix syntax:
---
--- @
--- map.first.first $ (+1)  ::  []  ((,x)  ((,y)  Int))
---                         ->  []  ((,x)  ((,y)  Int))
--- @
---
--- So, this is what you should have understood so far:
---
---   * There are functions like 'map' of @first@ which turn /functions on
---   elements/ into /functions on structures containing those elements/,
---   where "structures" can mean pretty much anything -- a tuple, a list,
---   etc.
---
---   * Those functions can be composed -- used as building blocks -- to
---   create functions which "point" at things deep inside more complicated
---   structures, such as lists of lists of lists or lists of tuples of tuples
---   or whatever.
---
---   * None of those functions is actually an 'ASetter', because for whatever
---   stupid reason 'ASetter' requires function results to be wrapped in
---   'Identity', which by itself seems as useless as anything could be.
---
+This means that examples of setters you might've already seen are:
+
+  * @'map' :: (a -> b) -> [a] -> [b]@
+
+  * @'fmap' :: 'Functor' f => (a -> b) -> f a -> f b@, which corresponds to
+    'mapped'
+
+  * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@, which
+    corresponds to '_1'
+
+  * @'Control.Arrow.left' :: (a -> b) -> 'Either' a x -> 'Either' b x@, which
+    corresponds to '_Left'
+
+The reason 'Identity' is used here is for 'ASetter' to be composable with
+other types, such as 'Lens'.
+
+Technically, if you're writing a library, you shouldn't use this type for
+setters you are exporting from your library; the right type to use is
+@Setter@, but it is not provided by microlens. It's completely alright,
+however, to export functions which take an 'ASetter' as an argument.
+-}
 type ASetter s t a b = (a -> Identity b) -> s -> Identity t
 
 -- |
