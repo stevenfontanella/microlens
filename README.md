@@ -64,7 +64,11 @@ So, don't write `Of` functions yet, it's not their time. Also, this suffix is ug
 
 All those `+=` and `<<&&=` operators aren't included. My opinion is that they shouldn't exist, and that all code for which it's "really nice" to have all those operators available should either be using normal operators instead (if it's an open-source project with code meant to be read by others), or should define them locally (if it's production code), or *at least* import them implicitly from some module called `Weird.Operators`. (It's a pity Haskell doesn't have something like "operator modifiers"; it would solve this problem nicely, as well as "let's have lifted versions of `==` and stuff because `liftA2 (==)` is too long" and other similar ones. You can use Hayoo to find out how many different versions of `==` there are on Hackage.)
 
-An exception could probably be made for `+=`, `-=`, `*=`, `+~`, `-~` and `*~`, since the former 3 are known to mostly everyone from C-like languages, and the latter 3 are similar enough. However, `microlens` doesn't follow the "consistency above all` principle, and so you won't see `&&~` or `**~`. (Probably. I mean, I can be persuaded about anything given good enough arguments.)
+Moreover, `+=` and friends steal lots of nice operator names. A search for `+=` over Github shows that pretty much the only package which uses it in the `lens` meaning is `lens` itself.
+
+`.=` conflicts with pretty much everything (especially `aeson`).
+
+For these reasons, operators are available from `Lens.Micro.Extras`, but not from the main module. (Not the full `lens` set, just the most useful ones.) The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
 
 ---
 
@@ -74,7 +78,7 @@ An exception could probably be made for `+=`, `-=`, `*=`, `+~`, `-~` and `*~`, s
 
 Nothing indexed is included.
 
-~~~ haskell
+~~~
 class ( Choice p
       , Corepresentable p
       , Comonad (Corep p)
@@ -106,6 +110,10 @@ Perhaps it is for the best.
 ---
 
 `zoom` isn't included yet, but should be.
+
+---
+
+The module with extra functions and operators is called `Lens.Micro.Extras` instead of `Lens.Micro.Extra`, as plurals seem to be more common on Hackage than singulars (e.g. look for `Type` vs. `Types`). Moreover, the corresponding module of `lens` is named `Control.Lens.Extras`.
 
 ## Motivation
 
