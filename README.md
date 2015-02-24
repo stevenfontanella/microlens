@@ -6,11 +6,11 @@
 
   * Essential lenses and traversals.
 
-  * Fucking awesome documentation explaining everything you can possibly do with lenses and traversals you're given.
+  * Nice, comprehensive documentation; a tutorial for people who haven't ever seen lenses before (like the embedded tutorial in the pipes package); and a complementary set of exercises at School Of Haskell (still in progress).
 
   * Compatibility with `lens`. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear. (Documentation for `Lens` and `Traversal` here refers the user to `lens` package as well, which is done so that you wouldn't have to explain that while you're depending on `microlens`, you're probably intending your lenses to be used with `lens`, which is more powerful.)
 
-  * Only **1** dependency (`mtl`). And the whole package builds in ~2s on my laptop.
+  * Only **1** dependency (`mtl`). And the whole package builds in ~4s on my laptop. (There are plans to get rid even of this single dependency, however.)
 
   * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of `lens`.
 
@@ -171,7 +171,7 @@ Agreed.
 
 It definitely doesn't make much sense to create `lens` and leave TH bits out, just as it doesn't make sense to produce a 2000$ tv set where you can't switch between sound tracks when watching a file from a usb stick. Fuck you, Philips, so much.
 
-It makes sense, however, to leave TH bits out when they account for a 300% increase in build time, and they do in my case. So I moved them into a separate package.
+It makes sense, however, to leave TH bits out when they account for a 200% increase in build time, and they do in my case. So I moved them into a separate package.
 
 > I used to think I wanted a simple lens library. Then I threw the doors open to everyone to tug on it in different directions and I found that the simple library I wanted wasn't so simple any more and I let it reshape itself to meet everyone's contradictory demands.
 
