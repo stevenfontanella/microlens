@@ -11,46 +11,40 @@
 
 module Lens.Micro
 (
-  -- $intro
-
-  -- * Setting
+  -- * Setting (applying a function to values)
   ASetter,
   sets,
-  -- $toy-setters
-  mapped,
-  over,
-  (%~),
-  -- $reverse-application
+  (%~), over,
+  (.~), set,
   (&),
-  set,
-  (.~),
-  -- $record-def
-  -- $state-examples
-  -- $record-examples
+  mapped,
 
-  -- * Getter
+  -- * Getting (retrieving a value)
   Getting,
   Getter,
-  (^.),
-  view,
+  (^.), view,
   use,
-  -- * Lens
-  lens,
+
+  -- * Lenses (things which are both setters and getters)
   Lens, Lens',
-  -- * Traversal
-  both,
+  lens,
+
+  -- * Traversals (lenses which have multiple targets)
   Traversal, Traversal',
-  -- * Fold
+  both,
+
+  -- * Folds
   Fold,
-  toListOf,
-  (^..),
+  (^..), toListOf,
   (^?),
   (^?!),
   folded,
-  -- * Prism
+
+  -- * Prisms
   _Left, _Right,
   _Just, _Nothing,
-  -- * Tuple
+
+  -- * Tuples
   Field1(..),
   Field2(..),
   Field3(..),
