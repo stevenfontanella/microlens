@@ -67,6 +67,8 @@ import Control.Monad.State.Class
 import Data.Foldable
 import Data.Monoid
 
+infixr 4 %~, .~
+
 {- |
 @'ASetter' s t a b@ is something that turns a function modifying a value into
 a function modifying a /structure/. If you ignore 'Identity' (as @'Identity'
@@ -99,92 +101,59 @@ however, to export functions which take an 'ASetter' as an argument.
 -}
 type ASetter s t a b = (a -> Identity b) -> s -> Identity t
 
--- |
--- To make producing 'ASetter's from ordinary functions easy, there's
--- 'sets'. It simply unwraps @'Identity' b@ (the result of the original
--- function) and rewraps @t@ (the result of the modified function):
---
--- @
--- sets f = \g -> Identity . f (runIdentity . g)
--- @
---
--- @g@ is the function given to 'ASetter', of type @a -> 'Identity' b@.
--- @'runIdentity' . g@ gets us @a -> b@, then we pass it to @f@ to get
--- @s -> t@, and then we compose 'Identity' with it to get
--- @s -> 'Identity' t@, which is what the result of 'ASetter' has to be.
---
+{- |
+'sets' creates an 'ASetter' from an ordinary function. (The only thing it
+does is wrapping and unwrapping 'Identity'.)
+-}
 sets :: ((a -> b) -> s -> t) -> ASetter s t a b
 sets f g = Identity . f (runIdentity . g)
 {-# INLINE sets #-}
 
--- $toy-setters
---
--- Let's make some setters to make it easier to illustrate things later:
---
--- >>> let _1 = sets first
---
--- >>> let _2 = sets second
---
--- >>> let both = sets (\f (a, b) -> (f a, f b))
---
--- >>> let mapped = sets fmap  -- because 'fmap' is more general than 'map'
---
--- And I'll spell out what they do in English, just in case:
---
---   * @_1@ makes a function work on the 1st element of a tuple.
---   * @_2@ makes a function work on the 2nd element of a tuple.
---   * @both@ makes a function work on /both/ elements of a tuple (if they
---     are of the same type, of course).
---   * 'mapped' makes a function work on any 'Functor' (that is, a list, or
---     'Maybe', or even 'IO').
+{- |
+'mapped' is a setter for everything contained in a 'Functor'. You can use it
+to map over lists, 'Maybe', or even 'IO' (which is something you can't do
+with 'traversed' or 'each').
 
--- |
--- In reality only 'mapped' is an 'ASetter' (the rest can be used as setters
--- too, but they're actually more general, but ignore this for now).
+Here 'mapped' is used to turn a value to all non-`Nothing` values in a list:
+
+>>> [Just 3,Nothing,Just 5] & 'mapped'.'mapped' '.~' 0
+[Just 0,Nothing,Just 0]
+-}
 mapped :: Functor f => ASetter (f a) (f b) a b
 mapped = sets fmap
 {-# INLINE mapped #-}
 
--- |
--- 'over' is a dual of 'sets'; it takes an 'ASetter' and makes an ordinary
--- function back from it:
---
--- @
--- over _1 === over (sets first) === first
--- @
---
--- The implementation is symmetrical as well; just switch 'Identity' and
--- 'runIdentity' in the definition of 'sets'.
---
--- @
--- over l = \f -> runIdentity . l (Identity . f)
--- @
---
--- With 'over', we can apply compositions of 'ASetter's just as we were
--- applying compositions of "ordinary functions" before:
---
--- @
--- over (mapped._1._1) === map.first.first
--- @
---
-over :: ASetter s t a b -> (a -> b) -> s -> t
-over l f = runIdentity . l (Identity . f)
-{-# INLINE over #-}
+{- |
+'%~' applies a function to the target; an alternative explanation is that it
+is an inverse of 'sets', which turns a setter into an ordinary
+function. @'mapped' '%~' 'reverse'@ is the same thing as @'fmap' 'reverse'@.
 
--- |
--- And this is an operator version of 'over'. Some examples:
---
--- >>> (_1 %~ (+1)) (1,2)
--- (2,2)
---
--- >>> (mapped %~ reverse) ["hello","world"]
--- ["olleh","dlrow"]
---
+In this example we negate the 1st element of a pair:
+
+>>> (1,2) '&' '_1' '%~' 'negate'
+(-1,2)
+
+In this example we upper-case all `Left`s in a list:
+
+>>> ('mapped'.'_Left'.'mapped' %~ 'Data.Char.toUpper') [Left "foo", Right "bar"]
+[Left "FOO", Right "bar"]
+-}
 (%~) :: ASetter s t a b -> (a -> b) -> s -> t
 (%~) = over
 {-# INLINE (%~) #-}
 
-infixr 4 %~
+{- |
+'over' is a synonym for '%~'.
+
+In this example @'over' '_2'@ is used as a replacement for
+'Control.Arrow.second':
+
+>>> 'over' '_2' 'show' (10,20)
+(10,"20")
+-}
+over :: ASetter s t a b -> (a -> b) -> s -> t
+over l f = runIdentity . l (Identity . f)
+{-# INLINE over #-}
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
@@ -269,8 +238,6 @@ set l b = runIdentity . l (\_ -> Identity b)
 (.~) :: ASetter s t a b -> b -> s -> t
 (.~) = set
 {-# INLINE (.~) #-}
-
-infixr 4 .~
 
 -- $record-def
 --
