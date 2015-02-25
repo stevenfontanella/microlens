@@ -122,6 +122,8 @@ mapped = sets fmap
 is an inverse of 'sets', which turns a setter into an ordinary
 function. @'mapped' '%~' 'reverse'@ is the same thing as @'fmap' 'reverse'@.
 
+See 'over' if you want a non-operator synonym.
+
 In this example we negate the 1st element of a pair:
 
 >>> (1,2) '&' '_1' '%~' 'negate'
@@ -138,6 +140,20 @@ In this example we upper-case all `Left`s in a list:
 
 {- |
 'over' is a synonym for '%~'.
+
+Getting 'fmap' in a roundabout way:
+
+@
+'over' 'mapped' :: 'Functor' f => (a -> b) -> f a -> f b
+'over' 'mapped' = 'fmap'
+@
+
+Applying a function to both components of a pair:
+
+@
+'over' 'both' :: (a -> b) -> (a, a) -> (b, b)
+'over' 'both' = \f t -> (f (fst t), f (snd t))
+@
 
 In this example @'over' '_2'@ is used as a replacement for
 'Control.Arrow.second':
@@ -160,10 +176,38 @@ a & f = f a
 infixl 1 &
 #endif
 
+{- |
+'.~' assigns a value to the target; @l '.~' x@ is equivalent to @l '%~'
+'const' x@.
+
+See 'set' if you want a non-operator synonym.
+
+Here it is used to change 2 fields of a 3-tuple:
+
+>>> (0,0,0)  '&'  '_1' '.~' 1  '&'  '_3' '.~' 3
+(1,0,3)
+-}
 (.~) :: ASetter s t a b -> b -> s -> t
 (.~) = set
 {-# INLINE (.~) #-}
 
+{- |
+'set' is a synonym for '.~'.
+
+Setting the 1st component of a pair:
+
+@
+'set' '_1' :: x -> (a, b) -> (x, b)
+'set' '_1' = \x t -> (x, snd t)
+@
+
+Using it to rewrite 'Data.Functor.<$':
+
+@
+'set' 'mapped' :: 'Functor' f => a -> f b -> f a
+'set' 'mapped' = ('Data.Functor.<$')
+@
+-}
 set :: ASetter s t a b -> b -> s -> t
 set l b = runIdentity . l (\_ -> Identity b)
 {-# INLINE set #-}
