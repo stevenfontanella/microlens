@@ -24,7 +24,7 @@
 
 ## Tutorial for newcomers to the whole lens thing
 
-Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro.html>.
+Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutorial.html>.
 
 ## Design decisions
 
