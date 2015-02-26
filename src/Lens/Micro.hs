@@ -41,6 +41,7 @@ module Lens.Micro
   folded,
 
   -- * Prisms
+  -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
 
@@ -328,25 +329,131 @@ folded :: Foldable f => Fold (f a) a
 folded f = Const . getConst . getFolding . foldMap (Folding . f)
 {-# INLINE folded #-}
 
--- Prism.hs
+{- $prisms-note
 
--- We can't have @Prism@s, because they depend on something profunctor-y.
+Prisms are traversals which always target 0 or 1 values. Moreover, it's
+possible to /reverse/ a prism, using it to construct a structure instead of
+peeking into it. Here's an example from the lens library:
 
+@
+>>> over _Left (+1) (Left 2)
+Left 3
+
+>>> _Left # 5
+Left 5
+@
+
+However, it's not possible for minilens to export prisms, because their type
+depends on @Choice@, which resides in the profunctors library, which is a
+somewhat huge dependency. So, all prisms included here are traversals
+instead.
+-}
+
+{- |
+'_Left' targets the value contained in an 'Either', provided it's a 'Left'.
+
+Gathering all @Left@s in a structure (like the 'Data.Either.lefts' function):
+
+@
+'toListOf' ('each' . '_Left') :: ['Either' a b] -> [a]
+'toListOf' ('each' . '_Left') = 'Data.Either.lefts'
+@
+
+Checking whether an 'Either' is a 'Left' (like 'Data.Either.isLeft'):
+
+>>> has _Left (Left 1)
+True
+
+>>> has _Left (Right 1)
+False
+
+Extracting a value (if you're sure it's a 'Left'):
+
+>>> Left 1 ^?! _Left
+1
+
+Mapping over all @Left@s:
+
+>>> (each._Left %~ map toUpper) [Left "foo", Right "bar"]
+[Left "FOO",Right "bar"]
+
+Implementation:
+
+@
+'_Left' f (Left a)  = 'Left' '<$>' f a
+'_Left' _ (Right b) = 'pure' ('Right' b)
+@
+-}
 _Left :: Traversal (Either a b) (Either a' b) a a'
 _Left f (Left a) = Left <$> f a
 _Left _ (Right b) = pure (Right b)
 {-# INLINE _Left #-}
 
+{- |
+'_Right' targets the value contained in an 'Either', provided it's a 'Right'.
+
+See documentation for '_Left'.
+-}
 _Right :: Traversal (Either a b) (Either a b') b b'
 _Right f (Right b) = Right <$> f b
 _Right _ (Left a) = pure (Left a)
 {-# INLINE _Right #-}
 
+{- |
+'_Just' targets the value contained in a 'Maybe', provided it's a 'Just'.
+
+See documentation for '_Left' (as these 2 are pretty similar). In particular,
+it can be used to write these:
+
+  * Unsafely extracting a value from a 'Just':
+
+    @
+    'Data.Maybe.fromJust' = ('^?!' '_Just')
+    @
+
+  * Checking whether a value is a 'Just':
+
+    @
+    'Data.Maybe.isJust' = 'has' '_Just'
+    @
+
+  * Converting a 'Maybe' to a list (empty or consisting of a single element):
+
+    @
+    'Data.Maybe.maybeToList' = ('^..' '_Just')
+    @
+
+  * Gathering all @Just@s in a list:
+
+    @
+    'Data.Maybe.catMaybes' = ('^..' 'each' . '_Just')
+    @
+-}
 _Just :: Traversal (Maybe a) (Maybe a') a a'
 _Just f (Just a) = Just <$> f a
 _Just _ Nothing = pure Nothing
 {-# INLINE _Just #-}
 
+{- |
+'_Nothing' targets a @()@ if the 'Maybe' is a 'Nothing', and doesn't target
+anything otherwise:
+
+>>> Just 1 ^.. _Nothing
+[]
+
+>>> Nothing ^.. _Nothing
+[()]
+
+It's not particularly useful (unless you want to use @'has' '_Nothing'@ as a
+replacement for 'Data.Maybe.isNothing'), and provided mainly for consistency.
+
+Implementation:
+
+@
+'_Nothing' f Nothing = 'const' 'Nothing' '<$>' f ()
+'_Nothing' _ j       = 'pure' j
+@
+-}
 _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
