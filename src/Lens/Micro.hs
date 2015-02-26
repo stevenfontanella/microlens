@@ -340,12 +340,48 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 
--- Tuple.hs
-
 -- Commented instances amount to ~0.8s of building time.
 
--- | Provides access to 1st field of a tuple.
 class Field1 s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+Gives access to the 1st field of a tuple (up to 5-tuples).
+
+Getting the 1st component:
+
+>>> (1,2,3,4,5) ^. _1
+1
+
+Setting the 1st component:
+
+>>> (1,2,3) & _1 .~ 10
+(10,2,3)
+
+Note that this lens is lazy, and can set fields even of 'undefined':
+
+>>> set _1 10 undefined :: (Int, Int)
+(10,*** Exception: Prelude.undefined
+
+This is done to avoid violating a lens law stating that you can get
+back what you put:
+
+>>> view _1 . set _1 10 $ (undefined :: (Int, Int))
+10
+
+The implementation (for 2-tuples) is:
+
+@
+'_1' f t = (,) '<$>' f    (fst t)
+             '<*>' 'pure' (snd t)
+@
+
+or, alternatively,
+
+@
+'_1' f ~(a,b) = (\\a' -> (a',b)) '<$>' f a
+@
+
+(where @~@ means a lazy pattern).
+  -}
   _1 :: Lens s t a b
 
 instance Field1 (a,b) (a',b) a a' where
@@ -384,8 +420,12 @@ instance Field1 (a,b,c,d,e,f,g,h,i) (a',b,c,d,e,f,g,h,i) a a' where
 
 -}
 
--- | Provides access to the 2nd field of a tuple.
 class Field2 s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+Gives access to the 2nd field of a tuple (up to 5-tuples).
+
+See documentation for '_1'.
+  -}
   _2 :: Lens s t a b
 
 instance Field2 (a,b) (a,b') b b' where
@@ -424,8 +464,12 @@ instance Field2 (a,b,c,d,e,f,g,h,i) (a,b',c,d,e,f,g,h,i) b b' where
 
 -}
 
--- | Provides access to the 3rd field of a tuple.
 class Field3 s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+Gives access to the 3rd field of a tuple (up to 5-tuples).
+
+See documentation for '_1'.
+  -}
   _3 :: Lens s t a b
 
 instance Field3 (a,b,c) (a,b,c') c c' where
@@ -460,8 +504,12 @@ instance Field3 (a,b,c,d,e,f,g,h,i) (a,b,c',d,e,f,g,h,i) c c' where
 
 -}
 
--- | Provide access to the 4th field of a tuple.
 class Field4 s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+Gives access to the 4th field of a tuple (up to 5-tuples).
+
+See documentation for '_1'.
+  -}
   _4 :: Lens s t a b
 
 instance Field4 (a,b,c,d) (a,b,c,d') d d' where
@@ -492,8 +540,12 @@ instance Field4 (a,b,c,d,e,f,g,h,i) (a,b,c,d',e,f,g,h,i) d d' where
 
 -}
 
--- | Provides access to the 5th field of a tuple.
 class Field5 s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+Gives access to the 5th field of a tuple (only for 5-tuples).
+
+See documentation for '_1'.
+  -}
   _5 :: Lens s t a b
 
 instance Field5 (a,b,c,d,e) (a,b,c,d,e') e e' where
