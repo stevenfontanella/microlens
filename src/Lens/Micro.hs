@@ -327,18 +327,22 @@ folded f = Const . getConst . getFolding . foldMap (Folding . f)
 _Left :: Traversal (Either a b) (Either a' b) a a'
 _Left f (Left a) = Left <$> f a
 _Left _ (Right b) = pure (Right b)
+{-# INLINE _Left #-}
 
 _Right :: Traversal (Either a b) (Either a b') b b'
 _Right f (Right b) = Right <$> f b
 _Right _ (Left a) = pure (Left a)
+{-# INLINE _Right #-}
 
 _Just :: Traversal (Maybe a) (Maybe a') a a'
 _Just f (Just a) = Just <$> f a
 _Just _ Nothing = pure Nothing
+{-# INLINE _Just #-}
 
 _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
+{-# INLINE _Nothing #-}
 
 -- Commented instances amount to ~0.8s of building time.
 
