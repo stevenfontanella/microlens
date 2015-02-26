@@ -63,10 +63,16 @@ import Data.Monoid
 
 infixr 4 %~, .~
 
+
+{- $setup
+-- >>> import Data.Char (toUpper)
+-- >>> import Control.Arrow (first, second, left, right)
+-}
+
 {- |
-@'ASetter' s t a b@ is something that turns a function modifying a value into
-a function modifying a /structure/. If you ignore 'Identity' (as @'Identity'
-a@ is the same thing as @a@), the type is:
+@ASetter s t a b@ is something that turns a function modifying a value into a
+function modifying a /structure/. If you ignore 'Identity' (as @Identity a@
+is the same thing as @a@), the type is:
 
 @
 type ASetter s t a b = (a -> b) -> s -> t
@@ -76,14 +82,19 @@ This means that examples of setters you might've already seen are:
 
   * @'map' :: (a -> b) -> [a] -> [b]@
 
-  * @'fmap' :: 'Functor' f => (a -> b) -> f a -> f b@, which corresponds to
-    'mapped'
+    (which corresponds to 'mapped')
 
-  * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@, which
-    corresponds to '_1'
+  * @'fmap' :: 'Functor' f => (a -> b) -> f a -> f b@
 
-  * @'Control.Arrow.left' :: (a -> b) -> 'Either' a x -> 'Either' b x@, which
-    corresponds to '_Left'
+    (which corresponds to 'mapped' as well)
+
+  * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@
+
+    (which corresponds to '_1')
+
+  * @'Control.Arrow.left' :: (a -> b) -> Either a x -> Either b x@
+
+    (which corresponds to '_Left')
 
 The reason 'Identity' is used here is for 'ASetter' to be composable with
 other types, such as 'Lens'.
@@ -104,13 +115,13 @@ sets f g = Identity . f (runIdentity . g)
 {-# INLINE sets #-}
 
 {- |
-'mapped' is a setter for everything contained in a 'Functor'. You can use it
-to map over lists, 'Maybe', or even 'IO' (which is something you can't do
+'mapped' is a setter for everything contained in a functor. You can use it
+to map over lists, @Maybe@, or even @IO@ (which is something you can't do
 with 'traversed' or 'each').
 
-Here 'mapped' is used to turn a value to all non-`Nothing` values in a list:
+Here 'mapped' is used to turn a value to all non-@Nothing@ values in a list:
 
->>> [Just 3,Nothing,Just 5] & 'mapped'.'mapped' '.~' 0
+>>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
 [Just 0,Nothing,Just 0]
 -}
 mapped :: Functor f => ASetter (f a) (f b) a b
@@ -120,19 +131,19 @@ mapped = sets fmap
 {- |
 '%~' applies a function to the target; an alternative explanation is that it
 is an inverse of 'sets', which turns a setter into an ordinary
-function. @'mapped' '%~' 'reverse'@ is the same thing as @'fmap' 'reverse'@.
+function. @'mapped' '%~' reverse@ is the same thing as @'fmap' reverse@.
 
 See 'over' if you want a non-operator synonym.
 
 In this example we negate the 1st element of a pair:
 
->>> (1,2) '&' '_1' '%~' 'negate'
+>>> (1,2) & _1 %~ negate
 (-1,2)
 
-In this example we upper-case all `Left`s in a list:
+In this example we upper-case all @Left@s in a list:
 
->>> ('mapped'.'_Left'.'mapped' %~ 'Data.Char.toUpper') [Left "foo", Right "bar"]
-[Left "FOO", Right "bar"]
+>>> (mapped._Left.mapped %~ toUpper) [Left "foo", Right "bar"]
+[Left "FOO",Right "bar"]
 -}
 (%~) :: ASetter s t a b -> (a -> b) -> s -> t
 (%~) = over
@@ -152,13 +163,13 @@ Applying a function to both components of a pair:
 
 @
 'over' 'both' :: (a -> b) -> (a, a) -> (b, b)
-'over' 'both' = \f t -> (f (fst t), f (snd t))
+'over' 'both' = \\f t -> (f (fst t), f (snd t))
 @
 
 In this example @'over' '_2'@ is used as a replacement for
 'Control.Arrow.second':
 
->>> 'over' '_2' 'show' (10,20)
+>>> over _2 show (10,20)
 (10,"20")
 -}
 over :: ASetter s t a b -> (a -> b) -> s -> t
@@ -177,14 +188,18 @@ infixl 1 &
 #endif
 
 {- |
-'.~' assigns a value to the target; @l '.~' x@ is equivalent to @l '%~'
-'const' x@.
+'.~' assigns a value to the target. These are equivalent:
+
+@
+l '.~' x
+l '%~' 'const' x
+@
 
 See 'set' if you want a non-operator synonym.
 
 Here it is used to change 2 fields of a 3-tuple:
 
->>> (0,0,0)  '&'  '_1' '.~' 1  '&'  '_3' '.~' 3
+>>> (0,0,0) & _1 .~ 1 & _3 .~ 3
 (1,0,3)
 -}
 (.~) :: ASetter s t a b -> b -> s -> t
@@ -198,7 +213,7 @@ Setting the 1st component of a pair:
 
 @
 'set' '_1' :: x -> (a, b) -> (x, b)
-'set' '_1' = \x t -> (x, snd t)
+'set' '_1' = \\x t -> (x, snd t)
 @
 
 Using it to rewrite 'Data.Functor.<$':
