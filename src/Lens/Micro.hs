@@ -123,6 +123,14 @@ Here 'mapped' is used to turn a value to all non-@Nothing@ values in a list:
 
 >>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
 [Just 0,Nothing,Just 0]
+
+Keep in mind that while 'mapped' is a more powerful setter than 'each', it is
+absolutely powerless as a getter! This won't work (and will fail with a type
+error):
+
+@
+[(1,2),(3,4),(5,6)] '^..' 'mapped' . 'both'
+@
 -}
 mapped :: Functor f => ASetter (f a) (f b) a b
 mapped = sets fmap
