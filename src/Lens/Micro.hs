@@ -39,6 +39,7 @@ module Lens.Micro
   (^?),
   (^?!),
   folded,
+  has,
 
   -- * Prisms
   -- $prisms-note
@@ -328,6 +329,26 @@ foldMapOf l f = getConst . l (Const . f)
 folded :: Foldable f => Fold (f a) a
 folded f = Const . getConst . getFolding . foldMap (Folding . f)
 {-# INLINE folded #-}
+
+{- |
+'has' checks whether a getter (any getter, including lenses, traversals, and
+folds) returns at least 1 value.
+
+Checking whether a list is non-empty:
+
+>>> has each []
+False
+
+You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a
+replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other
+@isConstructorName@:
+
+>>> has _Left (Left 1)
+True
+-}
+has :: Getting Any s a -> s -> Bool
+has l = getAny . foldMapOf l (\_ -> Any True)
+{-# INLINE has #-}
 
 {- $prisms-note
 
