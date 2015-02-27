@@ -63,13 +63,14 @@ import Control.Monad.State.Class
 import Data.Foldable
 import Data.Monoid
 
-infixr 4 %~, .~
-
 
 {- $setup
 -- >>> import Data.Char (toUpper)
 -- >>> import Control.Arrow (first, second, left, right)
 -}
+
+
+infixr 4 %~, .~
 
 {- |
 @ASetter s t a b@ is something that turns a function modifying a value into a
