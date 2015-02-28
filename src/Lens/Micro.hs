@@ -365,7 +365,7 @@ Left 3
 Left 5
 @
 
-However, it's not possible for minilens to export prisms, because their type
+However, it's not possible for microlens to export prisms, because their type
 depends on @Choice@, which resides in the profunctors library, which is a
 somewhat huge dependency. So, all prisms included here are traversals
 instead.
