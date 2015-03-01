@@ -259,17 +259,121 @@ use :: MonadState s m => Getting a s a -> m a
 use l = gets (view l)
 {-# INLINE use #-}
 
--- Setter.hs
+{- |
+@Lens s t a b@ is the lowest common denominator of a setter and a getter,
+something that has the power of both; it has a 'Functor' constraint, and
+since both 'Const' and 'Identity' are functors, it can be used whenever a
+getter or a setter is needed.
 
--- Lens.hs
+  * @a@ is the type of the value inside of structure
+  * @b@ is the type of the replaced value
+  * @s@ is the type of the whole structure
+  * @t@ is the type of the structure after replacing @a@ in it with @b@
 
+A 'Lens' can only point at a single value inside a structure (unlike a
+'Traversal').
+
+It is easy to write lenses manually. The generic template is:
+
+@
+somelens :: Lens s t a b
+
+-- "f" is the "a -> f b" function, "s" is the structure.
+somelens f s =
+  let
+    a = ...                 -- Extract the value from "s".
+    rebuildWith b = ...     -- Write a function which would
+                            -- combine "s" and modified value
+                            -- to produce new structure.
+  in
+    rebuildWith '<$>' f a     -- Apply the structure-producing
+                            -- function to the modified value.
+@
+
+Here's the '_1' lens:
+
+@
+_1 :: Lens (a, x) (b, x) a b
+_1 f (a, x) = (\\b -> (b, x)) <$> f a
+@
+
+Here's a more complicated lens, which extracts /several/ values from a
+structure (in a tuple):
+
+@
+type Age     = Int
+type City    = String
+type Country = String
+
+data Person = Person Age City Country
+
+-- This lens lets you access all location-related information about a person.
+location :: 'Lens'' Person (City, Country)
+location f (Person age city country) =
+  (\\(city', country') -> Person age city' country') <$> f (city, country)
+@
+
+You even can choose to use a lens to present /all/ information contained in
+the structure (in a different way). Such lenses are called @Iso@ in lens's
+terminology. For instance (assuming you don't mind functions that can error
+out), here's a lens which lets you act on the string representation of a
+value:
+
+@
+string :: (Read a, Show a) => 'Lens'' a String
+string f s = read <$> f (show s)
+@
+
+Using it to reverse a number:
+
+@
+>>> 123 & string %~ reverse
+321
+@
+-}
+type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
+
+{- |
+This is a type alias for monomorphic lenses which don't change the type of
+the container (or of the value inside).
+-}
+type Lens' s a = Lens s s a a
+
+{- |
+'lens' creates a 'Lens' from a getter and a setter. The resulting lens isn't
+the most effective one (because of having to traverse the structure twice
+when modifying), but it shouldn't matter much.
+
+A (partial) lens for list indexing:
+
+@
+ix :: Int -> 'Lens'' [a] a
+ix i = 'lens' ('!!' i)                                   -- getter
+            (\\s b -> take i s ++ b : drop (i+1) s)   -- setter
+@
+
+Usage:
+
+@
+>>> [1..9] '^.' ix 3
+4
+
+>>> [1..9] & ix 3 '%~' negate
+[1,2,3,-4,5,6,7,8,9]
+@
+
+When getting, the setter is completely unused. When setting, the getter is
+unused. Both are used only when the value is being modified.
+
+Here's an example of using a lens targeting the head of a list. The getter is
+replaced with 'undefined' to make sure it's not used:
+
+>>> [1,2,3] & lens undefined (\s b -> b : tail s) .~ 10
+[10,2,3]
+-}
 lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
-
-type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
-
-type Lens' s a = Lens s s a a
 
 -- Traversal.hs
 
