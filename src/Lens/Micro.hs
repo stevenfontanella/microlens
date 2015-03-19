@@ -20,8 +20,8 @@ module Lens.Micro
   mapped,
 
   -- * Getting (retrieving a value)
+  -- $getters-note
   Getting,
-  Getter,
   (^.), view,
   use,
 
@@ -238,23 +238,64 @@ set :: ASetter s t a b -> b -> s -> t
 set l b = runIdentity . l (\_ -> Identity b)
 {-# INLINE set #-}
 
+{- $getters-note
 
--- Getter.hs
+Getters are a not-entirely-obvious way to use (supposedly) /value-changing/
+traversals to /carry out/ information from a structure. For details, see the
+documentation for 'Getting'.
+
+Exporting @Getter@ is impossible, as then microlens would have to depend on
+contravariant.
+-}
 
 infixl 8 ^.
 
+{- |
+@Getting r s a@ is, in a way, equivalent to @s -> a@. Since @'Const' r a@ is
+the same as @r@, 'Getting' is actually @(a -> r) -> s -> r@, which is just
+CPS-transformed @s -> a@. The reason 'Const' and CPS are used is that we want
+getters to have the same shape as lenses (which we achieve because 'Const' is
+a functor).
+-}
 type Getting r s a = (a -> Const r a) -> s -> Const r s
 
-type Getter s a = forall r. (a -> Const r a) -> s -> Const r s
+{- |
+'^.' applies a getter to a value; in other words, it gets a value out of a
+structure using a getter (which can be a lens, traversal, fold, etc.).
 
-view :: MonadReader s m => Getting a s a -> m a
-view l = asks (getConst . l Const)
-{-# INLINE view #-}
+Getting 1st field of a tuple:
 
+@
+('^.' '_1') :: (a, b) -> a
+('^.' '_1') = 'fst'
+@
+
+When '^.' is used with a traversal, it combines all results using the
+'Monoid' instance for the resulting type. For instance, for lists it would be
+simple concatenation:
+
+>>> ("str","ing") ^. each
+"string"
+
+The reason for this is that traversals use 'Applicative', and the
+'Applicative' instance for 'Const' uses monoid concatenation to combine
+“effects” of 'Const'.
+-}
 (^.) :: s -> Getting a s a -> a
 s ^. l = getConst (l Const s)
 {-# INLINE (^.) #-}
 
+{- |
+'view' is a synonym for '^.', generalised for 'MonadReader' (since functions
+are instances of the 'MonadReader' class).
+-}
+view :: MonadReader s m => Getting a s a -> m a
+view l = asks (getConst . l Const)
+{-# INLINE view #-}
+
+{- |
+'use' is 'view' which implicitly operates on the state.
+-}
 use :: MonadState s m => Getting a s a -> m a
 use l = gets (view l)
 {-# INLINE use #-}
