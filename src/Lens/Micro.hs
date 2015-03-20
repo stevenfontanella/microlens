@@ -416,15 +416,23 @@ lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
 
--- Traversal.hs
-
-both :: Traversal (a, a) (b, b) a b
-both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
-{-# INLINE both #-}
-
 type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
 
 type Traversal' s a = Traversal s s a a
+
+{- |
+'both' traverses both fields of a tuple. Unlike @both@ from lens, it only
+works for pairs – not for triples or 'Either'.
+
+>>> ("str","ing") ^. both
+"string"
+
+>>> ("str","ing") & both %~ reverse
+("rts","gni")
+-}
+both :: Traversal (a, a) (b, b) a b
+both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
+{-# INLINE both #-}
 
 -- Fold.hs
 
