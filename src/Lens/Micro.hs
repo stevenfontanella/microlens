@@ -464,6 +464,28 @@ toListOf l = foldrOf l (:) []
 s ^.. l = toListOf l s
 {-# INLINE (^..) #-}
 
+{- |
+@s ^? l@ returns the 1st traversed element of @s@, or 'Nothing' if there are
+no traversed elements.
+
+Safe 'head':
+
+>>> [] ^? each
+Nothing
+
+>>> [1..3] ^? each
+Just 1
+
+Converting 'Either' to 'Maybe':
+
+>>> Left 1 ^? _Right
+Nothing
+
+>>> Right 1 ^? _Right
+Just 1
+
+It's trivially implemented by passing 'First' to the traversal.
+-}
 (^?) :: s -> Getting (First a) s a -> Maybe a
 s ^? l = getFirst (foldMapOf l (First . Just) s)
 {-# INLINE (^?) #-}
