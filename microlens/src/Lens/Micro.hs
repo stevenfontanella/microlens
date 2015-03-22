@@ -34,7 +34,6 @@ module Lens.Micro
   both,
 
   -- * Folds
-  Fold,
   (^..), toListOf,
   (^?),
   (^?!),
@@ -438,15 +437,6 @@ both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 
 infixl 8 ^.., ^?, ^?!
 
--- type Fold s a = forall f. (Contravariant f, Applicative f)
---               => (a -> f a) -> s -> f s
---
--- We don't want to depend on contravariant, and the only instance of it
--- we're going to use is 'Const a' anyway.
-
-type Fold s a = forall r. (Applicative (Const r))
-                => (a -> Const r a) -> s -> Const r s
-
 -- | A 'Monoid' for a 'Contravariant' 'Applicative'.
 newtype Folding f a = Folding { getFolding :: f a }
 
@@ -502,7 +492,7 @@ foldMapOf :: Getting r s a -> (a -> r) -> s -> r
 foldMapOf l f = getConst . l (Const . f)
 {-# INLINE foldMapOf #-}
 
-folded :: Foldable f => Fold (f a) a
+folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
 folded f = Const . getConst . getFolding . foldMap (Folding . f)
 {-# INLINE folded #-}
 

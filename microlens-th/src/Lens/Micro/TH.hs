@@ -1,4 +1,9 @@
-{-# LANGUAGE CPP, TemplateHaskell, RankNTypes #-}
+{-# LANGUAGE
+      CPP
+    , TemplateHaskell
+    , RankNTypes
+    , FlexibleContexts
+  #-}
 
 #ifndef MIN_VERSION_template_haskell
 #define MIN_VERSION_template_haskell(x,y,z) (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 706)
@@ -10,6 +15,9 @@
 
 module Lens.Micro.TH
 (
+  -- $compatnote
+  Getter,
+  Fold,
   -- * Make lenses
   makeLenses,
   makeLensesWith,
@@ -46,6 +54,19 @@ import           Data.Maybe
 import           Data.Traversable (traverse, sequenceA)
 import           Lens.Micro
 import           Language.Haskell.TH
+
+{- $compatnote
+
+When updates aren't allowed, or when a field simply can't be updated (for
+instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we
+generate 'Getter' and 'Fold'. These aren't true @Getter@ and @Fold@ from lens
+– they're not sufficiently polymorphic. Beware. (Still, they're compatible,
+it's just that you can't do some things with them that you can do with
+original ones.)
+-}
+
+type Getter s a = forall r. Getting r s a
+type Fold s a = forall r. Applicative (Const r) => Getting r s a
 
 --
 -- Lens functions which would've been in Lens.Micro if it wasn't "micro".
