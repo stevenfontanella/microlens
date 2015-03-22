@@ -13,16 +13,20 @@ infix  4 .=, %=
 infix  4 +=, -=, *=, //=
 infixr 4 +~, -~, *~, //~
 
+-- |
+-- Assign value to the target. This is '.~' which works in 'State'.
+--
+-- @
+-- l '.=' b = 'modify' (l '.~' b)
+-- @
 (.=) :: MonadState s m => ASetter s s a b -> b -> m ()
 l .= b = modify (l .~ b)
 {-# INLINE (.=) #-}
 
 -- |
--- This is a 'State' version of ('%~'), the same way ('.=') is a 'State'
--- version of ('.~'). It modifies state using the setter and function it's
--- given.
+-- Apply a function to the target. This is '%~' which works in 'State'.
 --
--- >>> 'execState' (do _1 %= (+1); _2 %= reverse) (1,"hello")
+-- >>> execState (do _1 %= (+1); _2 %= reverse) (1,"hello")
 -- (2,"olleh")
 --
 (%=) :: (MonadState s m) => ASetter s s a b -> (a -> b) -> m ()
