@@ -1,0 +1,29 @@
+name:                microlens-each
+version:             0.1.0.0
+synopsis:            'each' for microlens
+description:
+  This package contains @Each@ type class and the @each@ traversal.
+license:             BSD3
+license-file:        LICENSE
+author:              Artyom
+maintainer:          Artyom <yom@artyom.me>
+homepage:            http://github.com/aelve/microlens-each
+bug-reports:         http://github.com/aelve/microlens-each/issues
+-- copyright:           
+category:            Data, Lenses
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+source-repository head
+  type:                git
+  location:            git://github.com/aelve/microlens-each.git
+
+library
+  exposed-modules:     Lens.Micro.Each
+  -- other-modules:       
+  -- other-extensions:    
+  build-depends:       base >=4.4 && <5
+                     , microlens ==0.1.*
+  hs-source-dirs:      src
+  default-language:    Haskell2010

@@ -6,9 +6,22 @@ ghc:
   - 7.8
 
 install:
- - cabal install --only-dependencies
+ - echo "Doing nothing."
 
 script:
- - cabal configure
- - cabal build --ghc-options=-Werror
+ - cd microlens
  - cabal check
+ - cabal install --ghc-options=-Werror
+ - cd ..
+
+ - cd microlens-each
+ - cabal check
+ - cabal install --ghc-options=-Werror
+ - cd ..
+
+ - cd microlens-th
+ - cabal check
+ - cabal install --ghc-options=-Werror
+ - cd ..
+
+
