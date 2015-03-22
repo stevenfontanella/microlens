@@ -1,6 +1,6 @@
 # microlens
 
-[![Build status](https://secure.travis-ci.org/Aelve/microlens.svg)](http://travis-ci.org/Aelve/microlens)
+[![Build status](https://secure.travis-ci.org/aelve/microlens.svg)](http://travis-ci.org/aelve/microlens)
 
 *A tiny part of the `lens` library which you can depend upon.*
 
