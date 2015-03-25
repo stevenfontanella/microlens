@@ -247,8 +247,6 @@ Exporting @Getter@ is impossible, as then microlens would have to depend on
 contravariant.
 -}
 
-infixl 8 ^.
-
 {- |
 @Getting r s a@ is, in a way, equivalent to @s -> a@. Since @'Const' r a@ is
 the same as @r@, 'Getting' is actually @(a -> r) -> s -> r@, which is just
@@ -283,6 +281,8 @@ The reason for this is that traversals use 'Applicative', and the
 (^.) :: s -> Getting a s a -> a
 s ^. l = getConst (l Const s)
 {-# INLINE (^.) #-}
+
+infixl 8 ^.
 
 {- |
 'view' is a synonym for '^.', generalised for 'MonadReader' (since functions
