@@ -300,6 +300,11 @@ use l = gets (view l)
 {-# INLINE use #-}
 
 {- |
+Lenses in a nutshell: use '^.' to get, '.~' to set, '%~' to modify. '.'
+composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of in
+@B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses
+with 'lens', or you can write them by hand (see below).
+
 @Lens s t a b@ is the lowest common denominator of a setter and a getter,
 something that has the power of both; it has a 'Functor' constraint, and
 since both 'Const' and 'Identity' are functors, it can be used whenever a
