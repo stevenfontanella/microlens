@@ -420,8 +420,56 @@ lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
 
+{- |
+Traversals in a nutshell: they're like lenses but they can point at multiple
+values. Use '^..' (not '^.') to get all values, '^?' to get the 1st value,
+'.~' to set values, '%~' to modify them. '.' composes traversals just as it
+composes lenses.
+
+@Traversal s t a b@ is a generalisation of 'Lens' which allows many targets
+(possibly 0). It's achieved by changing the constraint to 'Applicative'
+instead of 'Functor' – indeed, the point of 'Applicative' is that you can
+combine effects, which is just what we need to have many targets.
+
+Traversals don't differ from lenses when it comes to setting – you can use
+usual '%~' and '.~' to modify and set values. Getting is a bit different,
+because you have to decide what to do in the case of multiple values. In
+particular, you can use these combinators (as well as everything else in the
+“Folds” section):
+
+  * '^..' gets a list of values
+  * '^?' gets the 1st value (or 'Nothing' if there are no values)
+  * '^?!' gets the 1st value and throws an exception if there are no values
+
+In addition, '^.' works for traversals as well – it combines traversed values
+using the '<>' operation (if the values are instances of 'Monoid').
+
+Traversing any value twice is a violation of traversal laws. You can,
+however, traverse values in any order.
+
+Ultimately, traversals should follow 2 laws:
+
+@
+t pure ≡ pure
+fmap (t f) . t g ≡ getCompose . t (Compose . fmap f . g)
+@
+
+The 1st law states that you can't change the shape of the structure or do
+anything funny with elements (traverse elements which aren't in the
+structure, create new elements out of thin air, etc.). The 2nd law states
+that you should be able to fuse 2 identical traversals into one. For a more
+detailed explanation of the laws, see
+<http://artyom.me/lens-over-tea-2#traversal-laws this blog post> (if you
+prefer rambling blog posts), or
+<https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence
+Of The Iterator Pattern> (if you prefer papers).
+-}
 type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
 
+{- |
+This is a type alias for monomorphic traversals which don't change the type
+of the container (or of the values inside).
+-}
 type Traversal' s a = Traversal s s a a
 
 {- |
