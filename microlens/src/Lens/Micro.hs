@@ -11,12 +11,13 @@
 
 module Lens.Micro
 (
+  (&),
+
   -- * Setting (applying a function to values)
   ASetter,
   sets,
   (%~), over,
   (.~), set,
-  (&),
   mapped,
 
   -- * Getting (retrieving a value)
@@ -25,6 +26,13 @@ module Lens.Micro
   (^.), view,
   use,
 
+  -- * Folds (getters which return multiple elements)
+  (^..), toListOf,
+  (^?),
+  (^?!),
+  folded,
+  has,
+
   -- * Lenses (things which are both setters and getters)
   Lens, Lens',
   lens,
@@ -32,13 +40,6 @@ module Lens.Micro
   -- * Traversals (lenses which have multiple targets)
   Traversal, Traversal',
   both,
-
-  -- * Folds
-  (^..), toListOf,
-  (^?),
-  (^?!),
-  folded,
-  has,
 
   -- * Prisms
   -- $prisms-note
@@ -62,6 +63,10 @@ import Control.Monad.State.Class
 import Data.Foldable
 import Data.Monoid
 
+#if __GLASGOW_HASKELL__ >= 710
+import Data.Function ((&))
+#endif
+
 
 {- $setup
 -- >>> import Data.Char (toUpper)
@@ -69,7 +74,14 @@ import Data.Monoid
 -}
 
 
-infixr 4 %~, .~
+#if __GLASGOW_HASKELL__ < 710
+(&) :: a -> (a -> b) -> b
+a & f = f a
+{-# INLINE (&) #-}
+infixl 1 &
+#endif
+
+-- Setting -----------------------------------------------------------------
 
 {- |
 @ASetter s t a b@ is something that turns a function modifying a value into a
@@ -117,40 +129,18 @@ sets f g = Identity . f (runIdentity . g)
 {-# INLINE sets #-}
 
 {- |
-'mapped' is a setter for everything contained in a functor. You can use it
-to map over lists, @Maybe@, or even @IO@ (which is something you can't do
-with 'traversed' or 'each').
-
-Here 'mapped' is used to turn a value to all non-@Nothing@ values in a list:
-
->>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
-[Just 0,Nothing,Just 0]
-
-Keep in mind that while 'mapped' is a more powerful setter than 'each', it is
-absolutely powerless as a getter! This won't work (and will fail with a type
-error):
-
-@
-[(1,2),(3,4),(5,6)] '^..' 'mapped' . 'both'
-@
--}
-mapped :: Functor f => ASetter (f a) (f b) a b
-mapped = sets fmap
-{-# INLINE mapped #-}
-
-{- |
 '%~' applies a function to the target; an alternative explanation is that it
 is an inverse of 'sets', which turns a setter into an ordinary
 function. @'mapped' '%~' reverse@ is the same thing as @'fmap' reverse@.
 
 See 'over' if you want a non-operator synonym.
 
-In this example we negate the 1st element of a pair:
+Negating the 1st element of a pair:
 
 >>> (1,2) & _1 %~ negate
 (-1,2)
 
-In this example we upper-case all @Left@s in a list:
+Turning all @Left@s in a list to upper case:
 
 >>> (mapped._Left.mapped %~ toUpper) [Left "foo", Right "bar"]
 [Left "FOO",Right "bar"]
@@ -158,6 +148,8 @@ In this example we upper-case all @Left@s in a list:
 (%~) :: ASetter s t a b -> (a -> b) -> s -> t
 (%~) = over
 {-# INLINE (%~) #-}
+
+infixr 4 %~
 
 {- |
 'over' is a synonym for '%~'.
@@ -176,8 +168,7 @@ Applying a function to both components of a pair:
 'over' 'both' = \\f t -> (f (fst t), f (snd t))
 @
 
-In this example @'over' '_2'@ is used as a replacement for
-'Control.Arrow.second':
+Using @'over' '_2'@ as a replacement for 'Control.Arrow.second':
 
 >>> over _2 show (10,20)
 (10,"20")
@@ -185,17 +176,6 @@ In this example @'over' '_2'@ is used as a replacement for
 over :: ASetter s t a b -> (a -> b) -> s -> t
 over l f = runIdentity . l (Identity . f)
 {-# INLINE over #-}
-
-#if __GLASGOW_HASKELL__ >= 710
-import Data.Function ((&))
-#endif
-
-#if __GLASGOW_HASKELL__ < 710
-(&) :: a -> (a -> b) -> b
-a & f = f a
-{-# INLINE (&) #-}
-infixl 1 &
-#endif
 
 {- |
 '.~' assigns a value to the target. These are equivalent:
@@ -215,6 +195,8 @@ Here it is used to change 2 fields of a 3-tuple:
 (.~) :: ASetter s t a b -> b -> s -> t
 (.~) = set
 {-# INLINE (.~) #-}
+
+infixr 4 .~
 
 {- |
 'set' is a synonym for '.~'.
@@ -236,6 +218,29 @@ Using it to rewrite 'Data.Functor.<$':
 set :: ASetter s t a b -> b -> s -> t
 set l b = runIdentity . l (\_ -> Identity b)
 {-# INLINE set #-}
+
+{- |
+'mapped' is a setter for everything contained in a functor. You can use it
+to map over lists, @Maybe@, or even @IO@ (which is something you can't do
+with 'traversed' or 'each').
+
+Here 'mapped' is used to turn a value to all non-@Nothing@ values in a list:
+
+>>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
+[Just 0,Nothing,Just 0]
+
+Keep in mind that while 'mapped' is a more powerful setter than 'each', it
+can't be used as a getter! This won't work (and will fail with a type error):
+
+@
+[(1,2),(3,4),(5,6)] '^..' 'mapped' . 'both'
+@
+-}
+mapped :: Functor f => ASetter (f a) (f b) a b
+mapped = sets fmap
+{-# INLINE mapped #-}
+
+-- Getting -----------------------------------------------------------------
 
 {- $getters-note
 
@@ -298,6 +303,110 @@ view l = asks (getConst . l Const)
 use :: MonadState s m => Getting a s a -> m a
 use l = gets (view l)
 {-# INLINE use #-}
+
+-- Folds -------------------------------------------------------------------
+
+-- | A 'Monoid' for a 'Contravariant' 'Applicative'.
+newtype Folding f a = Folding { getFolding :: f a }
+
+instance (Applicative (Const r)) => Monoid (Folding (Const r) a) where
+  mempty = Folding (Const . getConst $ pure ())
+  {-# INLINE mempty #-}
+  Folding fr `mappend` Folding fs = Folding (fr *> fs)
+  {-# INLINE mappend #-}
+
+{- |
+@s ^.. t@ returns the list of all values that @t@ gets from @s@.
+
+Turning a 'Maybe' into a list (either empty or having 1 element – that's what
+'Data.Maybe.maybeToList' does):
+
+>>> Just 3 ^.. _Just
+[3]
+
+
+-}
+(^..) :: s -> Getting (Endo [a]) s a -> [a]
+s ^.. l = toListOf l s
+{-# INLINE (^..) #-}
+
+infixl 8 ^..
+
+toListOf :: Getting (Endo [a]) s a -> s -> [a]
+toListOf l = foldrOf l (:) []
+{-# INLINE toListOf #-}
+
+{- |
+@s ^? t@ returns the 1st element @t@ returns, or 'Nothing' if @t@ doesn't
+return anything.
+
+Safe 'head':
+
+>>> [] ^? each
+Nothing
+
+>>> [1..3] ^? each
+Just 1
+
+Converting 'Either' to 'Maybe':
+
+>>> Left 1 ^? _Right
+Nothing
+
+>>> Right 1 ^? _Right
+Just 1
+
+It's trivially implemented by passing 'First' to the getter.
+-}
+(^?) :: s -> Getting (First a) s a -> Maybe a
+s ^? l = getFirst (foldMapOf l (First . Just) s)
+{-# INLINE (^?) #-}
+
+infixl 8 ^?
+
+{- |
+'^?!' is an unsafe variant of '^?' – instead of using 'Nothing' to indicate
+that there were no elements returned, it throws an exception.
+-}
+(^?!) :: s -> Getting (Endo a) s a -> a
+s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
+{-# INLINE (^?!) #-}
+
+infixl 8 ^?!
+
+foldrOf :: Getting (Endo r) s a -> (a -> r -> r) -> r -> s -> r
+foldrOf l f z = flip appEndo z . foldMapOf l (Endo . f)
+{-# INLINE foldrOf #-}
+
+foldMapOf :: Getting r s a -> (a -> r) -> s -> r
+foldMapOf l f = getConst . l (Const . f)
+{-# INLINE foldMapOf #-}
+
+folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
+folded f = Const . getConst . getFolding . foldMap (Folding . f)
+{-# INLINE folded #-}
+
+{- |
+'has' checks whether a getter (any getter, including lenses, traversals, and
+folds) returns at least 1 value.
+
+Checking whether a list is non-empty:
+
+>>> has each []
+False
+
+You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a
+replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other
+@isConstructorName@:
+
+>>> has _Left (Left 1)
+True
+-}
+has :: Getting Any s a -> s -> Bool
+has l = getAny . foldMapOf l (\_ -> Any True)
+{-# INLINE has #-}
+
+-- Lenses ------------------------------------------------------------------
 
 {- |
 Lenses in a nutshell: use '^.' to get, '.~' to set, '%~' to modify. '.'
@@ -420,6 +529,8 @@ lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
 
+-- Traversals --------------------------------------------------------------
+
 {- |
 Traversals in a nutshell: they're like lenses but they can point at multiple
 values. Use '^..' (not '^.') to get all values, '^?' to get the 1st value,
@@ -486,88 +597,7 @@ both :: Traversal (a, a) (b, b) a b
 both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 {-# INLINE both #-}
 
--- Fold.hs
-
-infixl 8 ^.., ^?, ^?!
-
--- | A 'Monoid' for a 'Contravariant' 'Applicative'.
-newtype Folding f a = Folding { getFolding :: f a }
-
-instance (Applicative (Const r)) => Monoid (Folding (Const r) a) where
-  mempty = Folding (Const . getConst $ pure ())
-  {-# INLINE mempty #-}
-  Folding fr `mappend` Folding fs = Folding (fr *> fs)
-  {-# INLINE mappend #-}
-
-toListOf :: Getting (Endo [a]) s a -> s -> [a]
-toListOf l = foldrOf l (:) []
-{-# INLINE toListOf #-}
-
-(^..) :: s -> Getting (Endo [a]) s a -> [a]
-s ^.. l = toListOf l s
-{-# INLINE (^..) #-}
-
-{- |
-@s ^? l@ returns the 1st traversed element of @s@, or 'Nothing' if there are
-no traversed elements.
-
-Safe 'head':
-
->>> [] ^? each
-Nothing
-
->>> [1..3] ^? each
-Just 1
-
-Converting 'Either' to 'Maybe':
-
->>> Left 1 ^? _Right
-Nothing
-
->>> Right 1 ^? _Right
-Just 1
-
-It's trivially implemented by passing 'First' to the traversal.
--}
-(^?) :: s -> Getting (First a) s a -> Maybe a
-s ^? l = getFirst (foldMapOf l (First . Just) s)
-{-# INLINE (^?) #-}
-
-(^?!) :: s -> Getting (Endo a) s a -> a
-s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
-{-# INLINE (^?!) #-}
-
-foldrOf :: Getting (Endo r) s a -> (a -> r -> r) -> r -> s -> r
-foldrOf l f z = flip appEndo z . foldMapOf l (Endo . f)
-{-# INLINE foldrOf #-}
-
-foldMapOf :: Getting r s a -> (a -> r) -> s -> r
-foldMapOf l f = getConst . l (Const . f)
-{-# INLINE foldMapOf #-}
-
-folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
-folded f = Const . getConst . getFolding . foldMap (Folding . f)
-{-# INLINE folded #-}
-
-{- |
-'has' checks whether a getter (any getter, including lenses, traversals, and
-folds) returns at least 1 value.
-
-Checking whether a list is non-empty:
-
->>> has each []
-False
-
-You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a
-replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other
-@isConstructorName@:
-
->>> has _Left (Left 1)
-True
--}
-has :: Getting Any s a -> s -> Bool
-has l = getAny . foldMapOf l (\_ -> Any True)
-{-# INLINE has #-}
+-- Prisms ------------------------------------------------------------------
 
 {- $prisms-note
 
@@ -698,6 +728,8 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
+
+-- Tuples ------------------------------------------------------------------
 
 -- Commented instances amount to ~0.8s of building time.
 
