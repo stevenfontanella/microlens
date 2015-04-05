@@ -392,6 +392,10 @@ foldMapOf :: Getting r s a -> (a -> r) -> s -> r
 foldMapOf l f = getConst . l (Const . f)
 {-# INLINE foldMapOf #-}
 
+{- |
+'folded' is a fold for anything 'Foldable'. In a way, it's an opposite of
+'mapped' – the most powerful getter, but can't be used as a setter.
+-}
 folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
 folded f = Const . getConst . getFolding . foldMap (Folding . f)
 {-# INLINE folded #-}
