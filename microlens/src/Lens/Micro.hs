@@ -318,12 +318,15 @@ instance (Applicative (Const r)) => Monoid (Folding (Const r) a) where
 {- |
 @s ^.. t@ returns the list of all values that @t@ gets from @s@.
 
-Turning a 'Maybe' into a list (either empty or having 1 element – that's what
-'Data.Maybe.maybeToList' does):
+A 'Maybe' contains either 0 or 1 values:
 
 >>> Just 3 ^.. _Just
 [3]
 
+Gathering all values in a list of tuples:
+
+>>> [(1,2),(3,4)] ^.. each.each
+[1,2,3,4]
 
 -}
 (^..) :: s -> Getting (Endo [a]) s a -> [a]
