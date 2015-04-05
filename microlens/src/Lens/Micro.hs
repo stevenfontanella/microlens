@@ -335,6 +335,9 @@ s ^.. l = toListOf l s
 
 infixl 8 ^..
 
+{- |
+'toListOf' is a synonym for '^..'.
+-}
 toListOf :: Getting (Endo [a]) s a -> s -> [a]
 toListOf l = foldrOf l (:) []
 {-# INLINE toListOf #-}
