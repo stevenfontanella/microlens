@@ -89,9 +89,10 @@ infixl 1 &
 -- Setting -----------------------------------------------------------------
 
 {- |
-@ASetter s t a b@ is something that turns a function modifying a value into a
-function modifying a /structure/. If you ignore 'Identity' (as @Identity a@
-is the same thing as @a@), the type is:
+@ASetter s t a b@ is something that turns a function modifying a value
+into a function modifying a /structure/. If you ignore
+'Control.Monad.Identity.Identity' (as @Identity a@ is the same thing as @a@),
+the type is:
 
 @
 type ASetter s t a b = (a -> b) -> s -> t
@@ -115,8 +116,8 @@ This means that examples of setters you might've already seen are:
 
     (which corresponds to '_Left')
 
-The reason 'Identity' is used here is for 'ASetter' to be composable with
-other types, such as 'Lens'.
+The reason 'Control.Monad.Identity.Identity' is used here is for 'ASetter' to
+be composable with other types, such as 'Lens'.
 
 Technically, if you're writing a library, you shouldn't use this type for
 setters you are exporting from your library; the right type to use is
@@ -127,15 +128,15 @@ type ASetter s t a b = (a -> Identity b) -> s -> Identity t
 
 {- |
 'sets' creates an 'ASetter' from an ordinary function. (The only thing it
-does is wrapping and unwrapping 'Identity'.)
+does is wrapping and unwrapping 'Control.Monad.Identity.Identity'.)
 -}
 sets :: ((a -> b) -> s -> t) -> ASetter s t a b
 sets f g = Identity . f (runIdentity . g)
 {-# INLINE sets #-}
 
 {- |
-'%~' applies a function to the target; an alternative explanation is that it
-is an inverse of 'sets', which turns a setter into an ordinary
+('%~') applies a function to the target; an alternative explanation is that
+it is an inverse of 'sets', which turns a setter into an ordinary
 function. @'mapped' '%~' reverse@ is the same thing as @'fmap' reverse@.
 
 See 'over' if you want a non-operator synonym.
@@ -157,7 +158,7 @@ Turning all @Left@s in a list to upper case:
 infixr 4 %~
 
 {- |
-'over' is a synonym for '%~'.
+'over' is a synonym for ('%~').
 
 Getting 'fmap' in a roundabout way:
 
@@ -183,7 +184,7 @@ over l f = runIdentity . l (Identity . f)
 {-# INLINE over #-}
 
 {- |
-'.~' assigns a value to the target. These are equivalent:
+('.~') assigns a value to the target. These are equivalent:
 
 @
 l '.~' x
@@ -204,7 +205,7 @@ Here it is used to change 2 fields of a 3-tuple:
 infixr 4 .~
 
 {- |
-'set' is a synonym for '.~'.
+'set' is a synonym for ('.~').
 
 Setting the 1st component of a pair:
 
@@ -213,7 +214,7 @@ Setting the 1st component of a pair:
 'set' '_1' = \\x t -> (x, snd t)
 @
 
-Using it to rewrite 'Data.Functor.<$':
+Using it to rewrite ('Data.Functor.<$'):
 
 @
 'set' 'mapped' :: 'Functor' f => a -> f b -> f a
@@ -229,7 +230,7 @@ set l b = runIdentity . l (\_ -> Identity b)
 to map over lists, @Maybe@, or even @IO@ (which is something you can't do
 with 'traversed' or 'each').
 
-Here 'mapped' is used to turn a value to all non-@Nothing@ values in a list:
+Here 'mapped' is used to turn a value to all non-'Nothing' values in a list:
 
 >>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
 [Just 0,Nothing,Just 0]
@@ -267,7 +268,7 @@ a functor).
 type Getting r s a = (a -> Const r a) -> s -> Const r s
 
 {- |
-'^.' applies a getter to a value; in other words, it gets a value out of a
+('^.') applies a getter to a value; in other words, it gets a value out of a
 structure using a getter (which can be a lens, traversal, fold, etc.).
 
 Getting 1st field of a tuple:
@@ -277,7 +278,7 @@ Getting 1st field of a tuple:
 ('^.' '_1') = 'fst'
 @
 
-When '^.' is used with a traversal, it combines all results using the
+When ('^.') is used with a traversal, it combines all results using the
 'Monoid' instance for the resulting type. For instance, for lists it would be
 simple concatenation:
 
@@ -295,8 +296,8 @@ s ^. l = getConst (l Const s)
 infixl 8 ^.
 
 {- |
-'view' is a synonym for '^.', generalised for 'MonadReader' (since functions
-are instances of the 'MonadReader' class).
+'view' is a synonym for ('^.'), generalised for 'MonadReader' (since
+functions are instances of the 'MonadReader' class).
 -}
 view :: MonadReader s m => Getting a s a -> m a
 view l = asks (getConst . l Const)
@@ -332,7 +333,6 @@ Gathering all values in a list of tuples:
 
 >>> [(1,2),(3,4)] ^.. each.each
 [1,2,3,4]
-
 -}
 (^..) :: s -> Getting (Endo [a]) s a -> [a]
 s ^.. l = toListOf l s
@@ -341,7 +341,7 @@ s ^.. l = toListOf l s
 infixl 8 ^..
 
 {- |
-'toListOf' is a synonym for '^..'.
+'toListOf' is a synonym for ('^..').
 -}
 toListOf :: Getting (Endo [a]) s a -> s -> [a]
 toListOf l = foldrOf l (:) []
@@ -349,7 +349,8 @@ toListOf l = foldrOf l (:) []
 
 {- |
 @s ^? t@ returns the 1st element @t@ returns, or 'Nothing' if @t@ doesn't
-return anything.
+return anything. It's trivially implemented by passing the 'First' monoid to
+the getter.
 
 Safe 'head':
 
@@ -366,8 +367,6 @@ Nothing
 
 >>> Right 1 ^? _Right
 Just 1
-
-It's trivially implemented by passing 'First' to the getter.
 -}
 (^?) :: s -> Getting (First a) s a -> Maybe a
 s ^? l = getFirst (foldMapOf l (First . Just) s)
@@ -376,8 +375,8 @@ s ^? l = getFirst (foldMapOf l (First . Just) s)
 infixl 8 ^?
 
 {- |
-'^?!' is an unsafe variant of '^?' – instead of using 'Nothing' to indicate
-that there were no elements returned, it throws an exception.
+('^?!') is an unsafe variant of ('^?') – instead of using 'Nothing' to
+indicate that there were no elements returned, it throws an exception.
 -}
 (^?!) :: s -> Getting (Endo a) s a -> a
 s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
@@ -408,7 +407,7 @@ False
 
 You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a
 replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other
-@isConstructorName@:
+@isConstructorName@ functions:
 
 >>> has _Left (Left 1)
 True
@@ -420,15 +419,15 @@ has l = getAny . foldMapOf l (\_ -> Any True)
 -- Lenses ------------------------------------------------------------------
 
 {- |
-Lenses in a nutshell: use '^.' to get, '.~' to set, '%~' to modify. '.'
-composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of in
-@B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses
-with 'lens', or you can write them by hand (see below).
+Lenses in a nutshell: use ('^.') to get, ('.~') to set, ('%~') to
+modify. ('.')  composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is
+a part of in @B@, then @b.c@ lets you operate on @C@ inside @A@). You can
+create lenses with 'lens', or you can write them by hand (see below).
 
 @Lens s t a b@ is the lowest common denominator of a setter and a getter,
 something that has the power of both; it has a 'Functor' constraint, and
-since both 'Const' and 'Identity' are functors, it can be used whenever a
-getter or a setter is needed.
+since both 'Const' and 'Control.Monad.Identity.Identity' are functors, it can
+be used whenever a getter or a setter is needed.
 
   * @a@ is the type of the value inside of structure
   * @b@ is the type of the replaced value
@@ -459,7 +458,7 @@ Here's the '_1' lens:
 
 @
 _1 :: Lens (a, x) (b, x) a b
-_1 f (a, x) = (\\b -> (b, x)) <$> f a
+_1 f (a, x) = (\\b -> (b, x)) '<$>' f a
 @
 
 Here's a more complicated lens, which extracts /several/ values from a
@@ -475,7 +474,7 @@ data Person = Person Age City Country
 -- This lens lets you access all location-related information about a person.
 location :: 'Lens'' Person (City, Country)
 location f (Person age city country) =
-  (\\(city', country') -> Person age city' country') <$> f (city, country)
+  (\\(city', country') -> Person age city' country') '<$>' f (city, country)
 @
 
 You even can choose to use a lens to present /all/ information contained in
@@ -486,13 +485,13 @@ value:
 
 @
 string :: (Read a, Show a) => 'Lens'' a String
-string f s = read <$> f (show s)
+string f s = read '<$>' f (show s)
 @
 
 Using it to reverse a number:
 
 @
->>> 123 & string %~ reverse
+>>> 123 '&' string '%~' reverse
 321
 @
 -}
@@ -544,9 +543,9 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 
 {- |
 Traversals in a nutshell: they're like lenses but they can point at multiple
-values. Use '^..' (not '^.') to get all values, '^?' to get the 1st value,
-'.~' to set values, '%~' to modify them. '.' composes traversals just as it
-composes lenses.
+values. Use ('^..') (not '^.') to get all values, ('^?') to get the 1st
+value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals
+just as it composes lenses.
 
 @Traversal s t a b@ is a generalisation of 'Lens' which allows many targets
 (possibly 0). It's achieved by changing the constraint to 'Applicative'
@@ -554,17 +553,17 @@ instead of 'Functor' – indeed, the point of 'Applicative' is that you can
 combine effects, which is just what we need to have many targets.
 
 Traversals don't differ from lenses when it comes to setting – you can use
-usual '%~' and '.~' to modify and set values. Getting is a bit different,
+usual ('%~') and ('.~') to modify and set values. Getting is a bit different,
 because you have to decide what to do in the case of multiple values. In
 particular, you can use these combinators (as well as everything else in the
 “Folds” section):
 
-  * '^..' gets a list of values
-  * '^?' gets the 1st value (or 'Nothing' if there are no values)
-  * '^?!' gets the 1st value and throws an exception if there are no values
+  * ('^..') gets a list of values
+  * ('^?') gets the 1st value (or 'Nothing' if there are no values)
+  * ('^?!') gets the 1st value and throws an exception if there are no values
 
-In addition, '^.' works for traversals as well – it combines traversed values
-using the '<>' operation (if the values are instances of 'Monoid').
+In addition, ('^.') works for traversals as well – it combines traversed
+values using the ('<>') operation (if the values are instances of 'Monoid').
 
 Traversing any value twice is a violation of traversal laws. You can,
 however, traverse values in any order.
@@ -583,8 +582,7 @@ that you should be able to fuse 2 identical traversals into one. For a more
 detailed explanation of the laws, see
 <http://artyom.me/lens-over-tea-2#traversal-laws this blog post> (if you
 prefer rambling blog posts), or
-<https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence
-Of The Iterator Pattern> (if you prefer papers).
+<https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence Of The Iterator Pattern> (if you prefer papers).
 -}
 type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
 
