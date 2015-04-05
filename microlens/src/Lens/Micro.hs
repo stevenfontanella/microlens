@@ -446,12 +446,12 @@ It is easy to write lenses manually. The generic template is:
 @
 somelens :: Lens s t a b
 
--- "f" is the "a -> f b" function, "s" is the structure.
+-- “f” is the “a -> f b” function, “s” is the structure.
 somelens f s =
   let
-    a = ...                 -- Extract the value from "s".
+    a = ...                 -- Extract the value from “s”.
     rebuildWith b = ...     -- Write a function which would
-                            -- combine "s" and modified value
+                            -- combine “s” and modified value
                             -- to produce new structure.
   in
     rebuildWith '<$>' f a     -- Apply the structure-producing

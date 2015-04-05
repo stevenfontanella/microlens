@@ -30,7 +30,7 @@ Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutor
 
 ## Design decisions
 
-(Or rather "why I don't think you need this" decisions.)
+(Or rather “why I don't think you need this” decisions.)
 
 ---
 
@@ -46,17 +46,17 @@ setOf    l = Set.fromList . toListOf l
 
 I guess the reason for including them all into `lens` (and there's an awful lot of them) is somewhere between
 
-  * "they are faster than going thru intermediate lists"
-  * "there are some rare cases when you can use a SomeSpecialisedMonoid but can't use `Endo [a]`"
-  * "it's nice to be able to say `sumOf (each._1) [(1,"x"),(2,"y")]` instead of clumsy `sum . (^.. each._1) $ [(1,"x"),(2,"y")]`"
+  * “they are faster than going thru intermediate lists”
+  * “there are some rare cases when you can use a SomeSpecialisedMonoid but can't use `Endo [a]`”
+  * “it's nice to be able to say `sumOf (each._1) [(1,"x"),(2,"y")]` instead of clumsy `sum . (^.. each._1) $ [(1,"x"),(2,"y")]`”
 
 I suspect that the last reason is the most important one. The last reason is also the one I dislike most.
 
-There are lots of functions which work on lists; lists are something like "the basic collection/stream type" in Haskell. GHC tries a lot to optimise code which produces and consumes lists; admittedly, it doesn't always succeed. `lens` seems to be trying to sidestep this whole list machinery.
+There are lots of functions which work on lists; lists are something like “the basic collection/stream type” in Haskell. GHC tries a lot to optimise code which produces and consumes lists; admittedly, it doesn't always succeed. `lens` seems to be trying to sidestep this whole list machinery.
 
   * With lists: one function traverses something and extracts a list of results, another function does something to those results.
 
-  * With lenses: one function traverses something and takes another function as a parameter (to know what to do with results). Note that here `each._1` is the traversing function; it seems like `sumOf` takes it as a parameter, but in reality `sumOf` merely gives "summation" as the parameter to the traversing function.
+  * With lenses: one function traverses something and takes another function as a parameter (to know what to do with results). Note that here `each._1` is the traversing function; it seems like `sumOf` takes it as a parameter, but in reality `sumOf` merely gives “summation” as the parameter to the traversing function.
 
 The latter way is theoretically nicer, but *not* when you've got the rest of huge ecosystem using lists as the preferred way of information flow, otherwise you're bound to keep rewriting all functions and adding `Of` to them. `lens` is good for creating functions which extract data, and for creating functions which update structures (nested records, etc.), but it's not good enough to make the whole world want to switch to writing lens-compatible *consumers* of data.
 
@@ -64,7 +64,7 @@ So, don't write `Of` functions yet, it's not their time. Also, this suffix is ug
 
 ---
 
-All those `+=` and `<<&&=` operators aren't included. My opinion is that they shouldn't exist, and that all code for which it's "really nice" to have all those operators available should either be using normal operators instead (if it's an open-source project with code meant to be read by others), or should define them locally (if it's production code), or *at least* import them implicitly from some module called `Weird.Operators`. (It's a pity Haskell doesn't have something like "operator modifiers"; it would solve this problem nicely, as well as "let's have lifted versions of `==` and stuff because `liftA2 (==)` is too long" and other similar ones. You can use Hayoo to find out how many different versions of `==` there are on Hackage.)
+All those `+=` and `<<&&=` operators aren't included. My opinion is that they shouldn't exist, and that all code for which it's “really nice” to have all those operators available should either be using normal operators instead (if it's an open-source project with code meant to be read by others), or should define them locally (if it's production code), or *at least* import them implicitly from some module called `Weird.Operators`. (It's a pity Haskell doesn't have something like "operator modifiers"; it would solve this problem nicely, as well as “let's have lifted versions of `==` and stuff because `liftA2 (==)` is too long” and other similar ones. You can use Hayoo to find out how many different versions of `==` there are on Hackage.)
 
 Moreover, `+=` and friends steal lots of nice operator names. A search for `+=` over Github shows that pretty much the only package which uses it in the `lens` meaning is `lens` itself.
 
@@ -165,7 +165,7 @@ I don't know why can't Edward just make a separate package called `classes`, whe
 
 Agreed. Splitting anything reasonably complex into several parts would lead to loss of functionality.
 
-However, those who don't mind losing e.g. "useful instances of `Comonad` for `Bazaar`" are welcome to use `microlens`. Functionality isn't king.
+However, those who don't mind losing e.g. “useful instances of `Comonad` for `Bazaar`” are welcome to use `microlens`. Functionality isn't the only important thing.
 
 > Template Haskell code can't be moved out either because it doesn't make sense to tie yourself to GHC and implement so many useful things but leave automatic lens generation out.
 
@@ -191,12 +191,12 @@ It's also hard to sell.
 
 ### Sell?
 
-I want people to use lenses and be happy. This requires "selling" some package to them. I can't sell `lens` because it's simply unsellable to people who can't depend on such a big package, and I can't sell `lens-family` because it's outside of my reach. I can't give promises of compatibility, I can't include a nice tutorial in the docs, I can't even file an issue on Github because the library isn't on Github.
+I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell `lens` because it's simply unsellable to people who can't depend on such a big package, and I can't sell `lens-family` because it's outside of my reach. I can't give promises of compatibility, I can't include a nice tutorial in the docs, I can't even file an issue on Github because the library isn't on Github.
 
-It's really easier for me to just write a package from scratch (well, actually more like "by copypasting bits and pieces of `lens`") than to either try to promote `lens-family` or convince its maintainer to let me do what I want to do to it.
+It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of `lens`”) than to either try to promote `lens-family` or convince its maintainer to let me do what I want to do to it.
 
 ### Wouldn't the development of `lens` be hindered if people switched to another, more basic package?
 
 My guess is that at this point the majority of `lens` development is done by people who want `lens` for the sake of having `lens`. The development of Haskell wasn't hindered by people who used C++; in fact, one of the reasons Haskell is so nice now is that it didn't become popular and so developers didn't have to worry about maintaining compatibility so much.
 
-(I wonder whether it shows that I'm afraid of Edward seeing all this, pointing finger at me, and saying "you spoiled my secret plans, insolent muggle, now Haskell won't ever be as nice as I envisioned it, and it's all because of you, you!"...)
+(I wonder whether it shows that I'm afraid of Edward seeing all this, pointing finger at me, and saying “you spoiled my secret plans, insolent muggle, now Haskell won't ever be as nice as I envisioned it, and it's all because of you, you!”...)
