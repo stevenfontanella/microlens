@@ -75,6 +75,11 @@ import Data.Function ((&))
 
 
 #if __GLASGOW_HASKELL__ < 710
+{- |
+'&' is a reverse application operator. This provides notational
+convenience. Its precedence is one higher than that of the forward
+application operator '$', which allows '&' to be nested in '$'.
+-}
 (&) :: a -> (a -> b) -> b
 a & f = f a
 {-# INLINE (&) #-}
