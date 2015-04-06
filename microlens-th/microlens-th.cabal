@@ -10,8 +10,8 @@ license:             BSD3
 license-file:        LICENSE
 author:              Artyom
 maintainer:          Artyom <yom@artyom.me>
-homepage:            http://github.com/aelve/microlens-th
-bug-reports:         http://github.com/aelve/microlens-th/issues
+homepage:            http://github.com/aelve/microlens
+bug-reports:         http://github.com/aelve/microlens/issues
 -- copyright:           
 category:            Data, Lenses
 build-type:          Simple
@@ -20,7 +20,7 @@ cabal-version:       >=1.10
 
 source-repository head
   type:                git
-  location:            git://github.com/aelve/microlens-th.git
+  location:            git://github.com/aelve/microlens.git
 
 library
   exposed-modules:     Lens.Micro.TH
