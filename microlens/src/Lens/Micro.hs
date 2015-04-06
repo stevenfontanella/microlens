@@ -23,8 +23,7 @@ module Lens.Micro
   -- * Getting (retrieving a value)
   -- $getters-note
   Getting,
-  (^.), view,
-  use,
+  (^.),
 
   -- * Folds (getters which return multiple elements)
   (^..), toListOf,
@@ -57,9 +56,7 @@ where
 
 
 import Control.Applicative
-import Control.Monad.Identity
-import Control.Monad.Reader.Class
-import Control.Monad.State.Class
+import Data.Functor.Identity
 import Data.Foldable
 import Data.Monoid
 
@@ -294,21 +291,6 @@ s ^. l = getConst (l Const s)
 {-# INLINE (^.) #-}
 
 infixl 8 ^.
-
-{- |
-'view' is a synonym for ('^.'), generalised for 'MonadReader' (since
-functions are instances of the 'MonadReader' class).
--}
-view :: MonadReader s m => Getting a s a -> m a
-view l = asks (getConst . l Const)
-{-# INLINE view #-}
-
-{- |
-'use' is 'view' which implicitly operates on the state.
--}
-use :: MonadState s m => Getting a s a -> m a
-use l = gets (view l)
-{-# INLINE use #-}
 
 -- Folds -------------------------------------------------------------------
 

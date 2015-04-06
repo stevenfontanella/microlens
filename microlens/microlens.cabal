@@ -21,6 +21,9 @@ description:
       or actually anything else which isn't defined here
     * if you think lenses compose “in the wrong order” (in which case
       you're looking for @fclabels@)
+  .
+  Note that microlens has /no/ dependencies starting from GHC 7.10 
+  (base-4.8). Prior to that, it has to depend on transformers-0.2 or above.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom
@@ -42,7 +45,14 @@ library
                        Lens.Micro.Extras
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.4 && <5
-                     , mtl >=2.0.1 && <2.3
+
+  -- Since base-4.8 we get the Identity functor in base, so we can avoid a
+  -- transformers dependency.
+  if impl(ghc>=7.9)
+    build-depends:     base >=4.8 && <5
+  if !impl(ghc>=7.9)
+    build-depends:     base >=4.4 && <5
+                     , transformers >=0.2
+
   hs-source-dirs:      src
   default-language:    Haskell2010
