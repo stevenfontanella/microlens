@@ -14,6 +14,11 @@ script:
  - cabal install --ghc-options=-Werror
  - cd ..
 
+ - cd microlens-mtl
+ - cabal check
+ - cabal install --ghc-options=-Werror
+ - cd ..
+
  - cd microlens-each
  - cabal check
  - cabal install --ghc-options=-Werror
@@ -23,5 +28,3 @@ script:
  - cabal check
  - cabal install --ghc-options=-Werror
  - cd ..
-
-

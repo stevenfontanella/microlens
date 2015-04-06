@@ -1,0 +1,32 @@
+name:                microlens-mtl
+version:             0.1.0.0
+synopsis:            microlens support for Reader/Writer/State from mtl
+description:
+  This package contains functions (like 'view' or '+=') which work on
+  @Control.Monad.Reader.MonadReader@, @Control.Monad.Writer.MonadWriter@, and
+  @Control.Monad.State.MonadState@ from the mtl package.
+license:             BSD3
+license-file:        LICENSE
+author:              Artyom
+maintainer:          Artyom <yom@artyom.me>
+homepage:            http://github.com/aelve/microlens
+bug-reports:         http://github.com/aelve/microlens/issues
+-- copyright:           
+category:            Data, Lenses
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+source-repository head
+  type:                git
+  location:            git://github.com/aelve/microlens.git
+
+library
+  exposed-modules:     Lens.Micro.Mtl
+  -- other-modules:       
+  -- other-extensions:    
+  build-depends:       base >=4.4 && <5
+                     , microlens ==0.1.*
+                     , mtl >=2.0.1 && <2.3
+  hs-source-dirs:      src
+  default-language:    Haskell2010
