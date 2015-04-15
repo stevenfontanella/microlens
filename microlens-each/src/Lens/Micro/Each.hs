@@ -1,11 +1,11 @@
 {-# LANGUAGE
-    CPP
-  , DefaultSignatures
-  , MultiParamTypeClasses
-  , FunctionalDependencies
-  , GADTs
-  , FlexibleInstances
-  , UndecidableInstances
+  CPP
+, DefaultSignatures
+, MultiParamTypeClasses
+, FunctionalDependencies
+, GADTs
+, FlexibleInstances
+, UndecidableInstances
   #-}
 
 
@@ -27,6 +27,11 @@ import Data.Traversable
 import Lens.Micro
 
 
+{- |
+A class to support 'each'. If you're writing a library, don't write instances
+of this class which would be exported – other users won't be able to use them
+if they use lens.
+-}
 class Each s t a b | s -> a, t -> b, s b -> t, t a -> s where
   {- |
 'each' tries to be a universal 'Traversal' – it behaves like 'traverse' in
