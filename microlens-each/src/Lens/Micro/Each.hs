@@ -28,6 +28,20 @@ import Lens.Micro
 
 
 class Each s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+'each' tries to be a universal 'Traversal' – it behaves like 'traverse' in
+most situations, but also adds support for e.g. tuples with same-typed
+values:
+
+>>> (1,2) & each %~ succ
+(2,3)
+
+>>> ["x", "y", "z"] ^. each
+"xyz"
+
+However, note that 'each' doesn't work on /every/ instance of 'Traversable' –
+the full list of instances can be found below.
+  -}
   each :: Traversal s t a b
   default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
   each = traverse
