@@ -14,7 +14,7 @@ bug-reports:         http://github.com/aelve/microlens/issues
 -- copyright:           
 category:            Data, Lenses
 build-type:          Simple
-extra-source-files:  README.md
+-- extra-source-files:  README.md
 cabal-version:       >=1.10
 
 source-repository head
