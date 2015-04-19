@@ -2,7 +2,7 @@ name:                microlens-each
 version:             0.1.0.0
 synopsis:            'each' for microlens
 description:
-  This package contains @Each@ type class and the @each@ traversal.
+  This package contains the @each@ traversal for microlens.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom

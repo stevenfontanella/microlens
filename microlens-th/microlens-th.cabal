@@ -1,6 +1,6 @@
 name:                microlens-th
 version:             0.1.0.0
-synopsis:            Automatic generation of record lenses for 'microlens'.
+synopsis:            Automatic generation of record lenses for microlens
 description:
   This package lets you automatically generate lenses for data types; code
   was extracted from the lens package, and therefore generated lenses are
