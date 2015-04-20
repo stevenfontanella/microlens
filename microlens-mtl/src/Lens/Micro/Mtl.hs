@@ -28,7 +28,7 @@ It's often used when dealing with environment, for instance:
 @
 doSomething :: ('MonadReader' Config m) => m Int
 doSomething = do
-  thingy        <- 'view' setting1  -- same as “'asks' (^. setting1)”
+  thingy        <- 'view' setting1  -- same as “'asks' ('^.' setting1)”
   anotherThingy <- 'view' setting2
   ...
 @
@@ -53,7 +53,7 @@ infix  4 .=, %=
 infix  4 +=, -=, *=, //=
 
 {- |
-Assign value to the target. This is '.~' which works in 'State'.
+Assign value to the target. This is ('.~') which works in 'State'.
 
 @
 l '.=' b = 'modify' (l '.~' b)
@@ -64,7 +64,7 @@ l .= b = modify (l .~ b)
 {-# INLINE (.=) #-}
 
 {- |
-Apply a function to the target. This is '%~' which works in 'State'.
+Apply a function to the target. This is ('%~') which works in 'State'.
 
 >>> execState (do _1 %= (+1); _2 %= reverse) (1,"hello")
 (2,"olleh")
@@ -110,7 +110,7 @@ l *= b = modify (l *~ b)
 Divide the target by a number.
 
 @
-l //= x = l %= (/x)
+l '//=' x = l '%=' (/x)
 @
 -}
 (//=) :: (MonadState s m, Fractional a) => ASetter s s a a -> a -> m ()
