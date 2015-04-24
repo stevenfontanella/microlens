@@ -85,10 +85,6 @@ _ForallT :: Traversal' Type ([TyVarBndr], Cxt, Type)
 _ForallT f (ForallT a b c) = (\(x, y, z) -> ForallT x y z) <$> f (a, b, c)
 _ForallT _ other = pure other
 
-_head :: Traversal' [a] a
-_head f (a:as) = (:as) <$> f a
-_head _ []     = pure []
-
 coerce :: Const r a -> Const r b
 coerce = Const . getConst
 
@@ -118,6 +114,10 @@ fromSet = Map.fromSet
 #else
 fromSet f x = Map.fromDistinctAscList [ (k,f k) | k <- Set.toAscList x ]
 #endif
+
+overHead :: (a -> a) -> [a] -> [a]
+overHead _ []     = []
+overHead f (x:xs) = f x : xs
 
 --
 -- Control.Lens.TH
@@ -218,7 +218,7 @@ camelCaseNamer tyName fields field = maybeToList $ do
   return (MethodName (mkName cls) (mkName method))
 
   where
-  expectedPrefix = optUnderscore ++ over _head toLower (nameBase tyName)
+  expectedPrefix = optUnderscore ++ overHead toLower (nameBase tyName)
 
   optUnderscore  = ['_' | any (isPrefixOf "_" . nameBase) fields ]
 
