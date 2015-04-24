@@ -68,9 +68,7 @@ original ones.)
 type Getter s a = forall r. Getting r s a
 type Fold s a = forall r. Applicative (Const r) => Getting r s a
 
---
--- Lens functions which would've been in Lens.Micro if it wasn't "micro".
---
+-- Lens functions which would've been in Lens.Micro if it wasn't “micro”
 
 elemOf :: Eq a => Getting (Endo [a]) s a -> a -> s -> Bool
 elemOf l x = elem x . toListOf l
@@ -88,9 +86,7 @@ _ForallT _ other = pure other
 coerce :: Const r a -> Const r b
 coerce = Const . getConst
 
---
--- Utilities.
---
+-- Utilities
 
 -- | Modify element at some index in a list.
 setIx :: Int -> a -> [a] -> [a]
@@ -119,14 +115,107 @@ overHead :: (a -> a) -> [a] -> [a]
 overHead _ []     = []
 overHead f (x:xs) = f x : xs
 
---
 -- Control.Lens.TH
---
 
+{- |
+Generate lenses for a data type or a newtype.
+
+To use, you have to enable Template Haskell:
+
+@
+{-# LANGUAGE TemplateHaskell #-}
+@
+
+Then, after declaring the datatype (let's say @Foo@), add @makeLenses ''Foo@
+on a separate line:
+
+@
+data Foo = Foo {
+  _x :: Int,
+  _y :: Bool }
+
+makeLenses ''Foo
+@
+
+This would generate the following lenses, which can be used to access the
+fields of @Foo@:
+
+@
+x :: 'Lens'' Foo Int
+x f foo = (\\x' -> f {_x = x'}) '<$>' f (_x foo)
+
+y :: 'Lens'' Foo Bool
+y f foo = (\\y' -> f {_y = y'}) '<$>' f (_y foo)
+@
+
+If you don't want a lens to be generated for some field, don't prefix it with
+an @_@.
+
+When the data type has type parameters, it's possible for a lens to do a
+polymorphic update – i.e. change the type of the thing along with changing
+the type of the field. For instance, with this type:
+
+@
+data Foo a = Foo {
+  _x :: a,
+  _y :: Bool }
+@
+
+the following lenses would be generated:
+
+@
+x :: 'Lens' (Foo a) (Foo b) a b
+y :: 'Lens'' (Foo a) Bool
+@
+
+However, when there are several fields using the same type parameter,
+type-changing updates are no longer possible:
+
+@
+data Foo a = Foo {
+  _x :: a,
+  _y :: a }
+@
+
+generates
+
+@
+x :: 'Lens'' (Foo a) a
+y :: 'Lens'' (Foo a) a
+@
+
+Next thing. When the type has several constructors, some of fields may not be
+/always/ present – for those, a 'Traversal' is generated instead. For
+instance, in this example @y@ can be present or absent:
+
+@
+data FooBar
+  = Foo { _x :: Int, _y :: Bool }
+  | Bar { _x :: Int }
+@
+
+and the following accessors would be generated:
+
+@
+x :: 'Lens'' FooBar Int
+y :: 'Traversal'' FooBar Bool
+@
+
+So, to get @_y@, you'd have to either use ('^?') if you're not sure it's
+there, or ('^?!') if you're absolutely sure (and if you're wrong, you'll get
+an exception). Setting and updating @_y@ can be done as usual.
+-}
 makeLenses :: Name -> DecsQ
 makeLenses = makeFieldOptics lensRules
 
--- | Build lenses with a custom configuration.
+{- |
+Generate lenses with custom parameters.
+
+This function lets you customise generated lenses; to see what exactly can be
+changed, look at 'LensRules'. 'makeLenses' is implemented with
+'makeLensesWith' – it uses the 'lensRules' configuration (which you can build
+upon).
+-}
 makeLensesWith :: LensRules -> Name -> DecsQ
 makeLensesWith = makeFieldOptics
 
@@ -240,9 +329,7 @@ defaultFieldRules = LensRules
   , _fieldToDef      = camelCaseNamer
   }
 
---
 -- Language.Haskell.TH.Lens
---
 
 -- | Has a 'Name'
 class HasName t where
@@ -319,9 +406,7 @@ typeVars = typeVarsEx mempty
 substTypeVars :: HasTypeVars t => Map Name Name -> t -> t
 substTypeVars m = over typeVars $ \n -> fromMaybe n (Map.lookup n m)
 
---
 -- FieldTH.hs
---
 
 ------------------------------------------------------------------------
 -- Field generation entry point
@@ -795,9 +880,7 @@ inlinePragma _ = []
 
 #endif
 
---
 -- Control.Lens.Internal.TH
---
 
 -- | Apply arguments to a type constructor.
 conAppsT :: Name -> [Type] -> Type
