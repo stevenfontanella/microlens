@@ -219,6 +219,71 @@ upon).
 makeLensesWith :: LensRules -> Name -> DecsQ
 makeLensesWith = makeFieldOptics
 
+{- |
+Generate overloaded lenses.
+
+This lets you deal with several data types having same fields. For instance,
+let's say you have @Foo@ and @Bar@, and both have a field named @x@. To
+avoid those fields clashing, you would have to use prefixes:
+
+@
+data Foo a = Foo {
+  fooX :: Int,
+  fooY :: a }
+
+data Bar = Bar {
+  barX :: Char }
+@
+
+However, if you use 'makeFields' on both @Foo@ and @Bar@ now, it would
+generate lenses called @x@ and @y@ – and @x@ would be able to access both
+@fooX@ and @barX@! This is done by generating a separate class for each
+field, and making relevant types instances of that class:
+
+@
+class HasX s a | s -> a where
+  x :: 'Lens'' s a
+
+instance HasX (Foo a) Int where
+  x :: 'Lens'' (Foo a) Int
+  x = ...
+
+instance HasX Bar Char where
+  x :: 'Lens'' Bar Char
+  x = ...
+
+
+class HasY s a | s -> a where
+  y :: 'Lens'' s a
+
+instance HasY (Foo a) a where
+  y :: 'Lens'' (Foo a) a
+  y = ...
+@
+
+(There's a minor drawback, tho: you can't perform type-changing updates with
+these lenses.)
+
+If you only want to make lenses for some fields, you can prefix them with
+underscores – the rest would be untouched. If no fields are prefixed with
+underscores, lenses would be created for all fields.
+
+The prefix must be the same as the name of the name of the data type (/not/
+the constructor).
+
+If you want to use 'makeFields' on types declared in different modules, you
+can do it, but then you would have to export the @Has*@ classes from one of
+the modules – 'makeFields' creates a class if it's not in scope yet, so the
+class must be in scope or else there would be duplicate classes and you would
+get an “Ambiguous occurrence” error.
+
+Finally, 'makeFields' is implemented as @'makeLenses' 'camelCaseFields'@, so
+you can build on 'camelCaseFields' if you want to customise behavior of
+'makeFields'.
+-}
+makeFields :: Name -> DecsQ
+makeFields = makeFieldOptics camelCaseFields
+
 -- | Generate "simple" optics even when type-changing optics are possible.
 -- (e.g. 'Lens'' instead of 'Lens')
 simpleLenses :: Lens' LensRules Bool
@@ -313,9 +378,6 @@ camelCaseNamer tyName fields field = maybeToList $ do
 
   computeMethod (x:xs) | isUpper x = Just (toLower x : xs)
   computeMethod _                  = Nothing
-
-makeFields :: Name -> DecsQ
-makeFields = makeFieldOptics camelCaseFields
 
 defaultFieldRules :: LensRules
 defaultFieldRules = LensRules
