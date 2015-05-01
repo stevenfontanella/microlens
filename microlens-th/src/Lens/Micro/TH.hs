@@ -1,8 +1,8 @@
 {-# LANGUAGE
-      CPP
-    , TemplateHaskell
-    , RankNTypes
-    , FlexibleContexts
+CPP,
+TemplateHaskell,
+RankNTypes,
+FlexibleContexts
   #-}
 
 #ifndef MIN_VERSION_template_haskell
