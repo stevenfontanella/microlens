@@ -18,7 +18,7 @@ module Lens.Micro.TH
   -- $compatnote
   Getter,
   Fold,
-  -- * Make lenses
+  -- * Making lenses
   makeLenses,
   makeLensesWith,
   makeFields,
@@ -214,7 +214,25 @@ Generate lenses with custom parameters.
 This function lets you customise generated lenses; to see what exactly can be
 changed, look at 'LensRules'. 'makeLenses' is implemented with
 'makeLensesWith' – it uses the 'lensRules' configuration (which you can build
-upon).
+upon – see the “Configuring lens rules” section).
+
+Here's an example of generating lenses that would use lazy patterns:
+
+@
+data Foo = Foo {_x, _y :: Int}
+
+'makeLensesWith' ('lensRules' '&' 'generateLazyPatterns' '.~' True) ''Foo
+@
+
+When there are several modifications to the rules, the code looks nicer when
+you use 'flip':
+
+@
+'flip' 'makeLensesWith' ''Foo $
+  'lensRules'
+    '&' 'generateLazyPatterns' '.~' True
+    '&' 'generateSignatures'   '.~' False
+@
 -}
 makeLensesWith :: LensRules -> Name -> DecsQ
 makeLensesWith = makeFieldOptics
