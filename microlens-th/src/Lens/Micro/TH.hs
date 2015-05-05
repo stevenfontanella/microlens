@@ -908,6 +908,13 @@ applyTypeSubst sub = rewrite aux
 -- Field generation parameters
 ------------------------------------------------------------------------
 
+{- |
+Rules used to generate lenses. You can't create them from scratch, but you
+can customise already existing ones with lenses in the “Configuring lens
+rules” section.
+
+For an example, see 'makeLensesWith'.
+-}
 data LensRules = LensRules
   { _simpleLenses    :: Bool
   , _generateSigs    :: Bool
@@ -921,10 +928,12 @@ data LensRules = LensRules
        -- type name to class name and top method
   }
 
--- | Name to give to generated field optics.
+{- |
+Name to give to a generated lens.
+-}
 data DefName
-  = TopName Name -- ^ Simple top-level definiton name
-  | MethodName Name Name -- ^ makeFields-style class name and method name
+  = TopName Name          -- ^ Simple top-level definiton name
+  | MethodName Name Name  -- ^ 'makeFields'-style class name and method name
   deriving (Show, Eq, Ord)
 
 ------------------------------------------------------------------------
