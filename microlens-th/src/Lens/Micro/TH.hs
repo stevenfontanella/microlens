@@ -324,19 +324,35 @@ generateUpdateableOptics :: Lens' LensRules Bool
 generateUpdateableOptics f r =
   fmap (\x -> r { _allowUpdates = x}) (f (_allowUpdates r))
 
--- | Generate optics using lazy pattern matches. This can
--- allow fields of an undefined value to be initialized with lenses,
--- and is the default behavior.
---
--- The downside of this flag is that it can lead to space-leaks and
--- code-size/compile-time increases when generated for large records.
---
--- When using lazy optics the strict optic can be recovered by composing
--- with '$!'
---
--- @
--- strictOptic = ($!) . lazyOptic
--- @
+{- |
+Generate optics using lazy pattern matches. This can allow fields of an
+undefined value to be initialized with lenses:
+
+@
+data Foo = Foo {_x :: Int, _y :: Bool}
+  deriving Show
+
+'makeLensesWith' ('lensRules' '&' 'generateLazyPatterns' '.~' True) ''Foo
+@
+
+@
+> 'undefined' '&' x '.~' 8 '&' y '.~' True
+Foo {_x = 8, _y = True}
+@
+
+(Without 'generateLazyPatterns', the result would be just 'undefined'.)
+
+The downside of this flag is that it can lead to space-leaks and
+code-size\/compile-time increases when generated for large records. By
+default this flag is turned off, and strict optics are generated.
+
+When you have a lazy optic, you can get a strict optic from it by composing
+with ('$!'):
+
+@
+strictOptic = ('$!') . lazyOptic
+@
+-}
 generateLazyPatterns :: Lens' LensRules Bool
 generateLazyPatterns f r =
   fmap (\x -> r { _lazyPatterns = x}) (f (_lazyPatterns r))
