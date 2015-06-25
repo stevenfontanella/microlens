@@ -1,0 +1,423 @@
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
+
+module Lens.Micro.Tutorial
+(
+  -- $intro
+)
+where
+
+import Control.Monad.Identity
+import Lens.Micro
+import Lens.Micro.Extras
+
+{- $intro
+
+This is a tutorial for microlens. Microlens is a subset of lens, and lens is the biggest and most powerful library for lenses we've got (...so far, yeah).
+
+Lenses are magical functions which
+
+  * let you access values inside of a structure
+  * let you modify values inside of a structure
+  * can be composed to look "deeper" into the structure
+
+-}
+
+-- (This isn't the main type of this library, but it's the easiest to understand.)
+--
+-- First of all, you can ignore 'Identity': @'Identity' a@ is the same thing
+-- as @a@, and you can always get @a@ from @'Identity' a@ and wrap it back:
+--
+-- >>> Identity 3
+-- Identity 3
+--
+-- >>> runIdentity (Identity 3)
+-- 3
+--
+-- The reason 'Identity' is used here will be apparent later.
+--
+-- Okay, if we ignore 'Identity', we've seen functions which fit the
+-- 'ASetter' pattern before. For instance, 'map':
+--
+-- @
+-- map :: (a -> b) -> [a] -> [b]
+--
+-- ASetter [a] [b] a b = (a -> Identity b) -> [a] -> Identity [b]
+-- @
+--
+-- 'map' takes a function which applies to one element of the list, and
+-- applies it to the whole list:
+--
+-- >>> map (+1) [1,2,3]
+-- [2,3,4]
+--
+-- What you might not have seen, however, is how easily such "function
+-- modifiers" can be combined. Let's say you want to apply a function to
+-- every element in a list of lists. You can do it like this:
+--
+-- >>> map (map (+1)) [[1,2],[3,4],[5,6]]
+-- [[2,3],[4,5],[6,7]]
+--
+-- But instead you could treat 'map' as a /single-argument/ function -- that
+-- is, a function which makes a list-modifying function out of an
+-- element-modifying function. This sentence might be hard to swallow, so
+-- just watch:
+--
+-- @
+-- (+1) :: Int -> Int                      -- adds 1 to a single element
+--
+-- map (+1)   :: [Int] -> [Int]            -- adds 1 to each element
+-- map $ (+1) :: [Int] -> [Int]            -- just making it easier to see
+--
+-- map (map (+1))   :: [[Int]] -> [[Int]]  -- adds 1 to each element of each list
+-- map $ map $ (+1) :: [[Int]] -> [[Int]]  -- same
+-- map . map $ (+1) :: [[Int]] -> [[Int]]  -- same
+-- @
+--
+-- Again, in English:
+--
+--  * 1st application of 'map' to @(+1)@ makes it a function on lists.
+--  * 2nd application of 'map' makes it a function on lists of lists.
+--  * 3rd application of 'map' makes it a function on lists of lists of
+--    lists... and so on.
+--
+-- 'map' isn't the only function like this, but one of the most useful
+-- ones. Let's define another one:
+--
+-- >>> let first f (a, b) = (f a, b)
+--
+-- (By the way, it's already defined in "Control.Arrow", but people often
+-- reinvent it anyway.)
+--
+-- What does @first@ do? It applies a function to the 1st element of a
+-- tuple. Compare it with 'map':
+--
+-- @
+-- first :: (a -> b) -> (a,x) -> (b,x)
+-- map   :: (a -> b) -> [a] -> [b]
+-- @
+--
+-- And, the same way as with 'map', you can use @first@ several times to
+-- apply a function to the 1st element of the 1st element of...
+--
+-- @
+-- first.first.first $ (+1)  ::  (((Int,x),y),z)  ->  (((Int,x),y),z)
+-- @
+--
+-- Moreover, since @first@ and 'map' have the same "shape", you can use them
+-- together to create even more complicated functions:
+--
+-- @
+-- map.first.first $ (+1)  ::  [ ((Int,x),y) ]  ->  [ ((Int,x),y) ]
+-- @
+--
+-- Each function in the chain here "peels" a layer, until we're left with a
+-- bare 'Int'. Notice how it'd be more obvious if we used prefix syntax:
+--
+-- @
+-- map.first.first $ (+1)  ::  []  ((,x)  ((,y)  Int))
+--                         ->  []  ((,x)  ((,y)  Int))
+-- @
+--
+-- So, this is what you should have understood so far:
+--
+--   * There are functions like 'map' of @first@ which turn /functions on
+--   elements/ into /functions on structures containing those elements/,
+--   where "structures" can mean pretty much anything -- a tuple, a list,
+--   etc.
+--
+--   * Those functions can be composed -- used as building blocks -- to
+--   create functions which "point" at things deep inside more complicated
+--   structures, such as lists of lists of lists or lists of tuples of tuples
+--   or whatever.
+--
+--   * None of those functions is actually an 'ASetter', because for whatever
+--   stupid reason 'ASetter' requires function results to be wrapped in
+--   'Identity', which by itself seems as useless as anything could be.
+--
+
+
+
+-- |
+-- To make producing 'ASetter's from ordinary functions easy, there's
+-- 'sets'. It simply unwraps @'Identity' b@ (the result of the original
+-- function) and rewraps @t@ (the result of the modified function):
+--
+-- @
+-- sets f = \g -> Identity . f (runIdentity . g)
+-- @
+--
+-- @g@ is the function given to 'ASetter', of type @a -> 'Identity' b@.
+-- @'runIdentity' . g@ gets us @a -> b@, then we pass it to @f@ to get
+-- @s -> t@, and then we compose 'Identity' with it to get
+-- @s -> 'Identity' t@, which is what the result of 'ASetter' has to be.
+--
+
+-- $toy-setters
+--
+-- Let's make some setters to make it easier to illustrate things later:
+--
+-- >>> let _1 = sets first
+--
+-- >>> let _2 = sets second
+--
+-- >>> let both = sets (\f (a, b) -> (f a, f b))
+--
+-- >>> let mapped = sets fmap  -- because 'fmap' is more general than 'map'
+--
+-- And I'll spell out what they do in English, just in case:
+--
+--   * @_1@ makes a function work on the 1st element of a tuple.
+--   * @_2@ makes a function work on the 2nd element of a tuple.
+--   * @both@ makes a function work on /both/ elements of a tuple (if they
+--     are of the same type, of course).
+--   * 'mapped' makes a function work on any 'Functor' (that is, a list, or
+--     'Maybe', or even 'IO').
+
+-- |
+-- In reality only 'mapped' is an 'ASetter' (the rest can be used as setters
+-- too, but they're actually more general, but ignore this for now).
+
+-- |
+-- 'over' is a dual of 'sets'; it takes an 'ASetter' and makes an ordinary
+-- function back from it:
+--
+-- @
+-- over _1 === over (sets first) === first
+-- @
+--
+-- The implementation is symmetrical as well; just switch 'Identity' and
+-- 'runIdentity' in the definition of 'sets'.
+--
+-- @
+-- over l = \f -> runIdentity . l (Identity . f)
+-- @
+--
+-- With 'over', we can apply compositions of 'ASetter's just as we were
+-- applying compositions of "ordinary functions" before:
+--
+-- @
+-- over (mapped._1._1) === map.first.first
+-- @
+--
+
+-- |
+-- And this is an operator version of 'over'. Some examples:
+--
+-- >>> (_1 %~ (+1)) (1,2)
+-- (2,2)
+--
+-- >>> (mapped %~ reverse) ["hello","world"]
+-- ["olleh","dlrow"]
+--
+
+-- $reverse-application
+--
+-- Since @(_1 '%~' (+1)) (1,2)@ isn't really pretty, you can use ('&') to
+-- turn things backwards and put the modifying function /after/ the thing
+-- it's supposed to modify:
+--
+-- >>> (1,2) & _1 %~ (+1)
+-- (2,2)
+--
+-- >>> [(1,"hello"),(2,"world")] & mapped._2 %~ reverse
+-- [(1,"olleh"),(2,"dlrow")]
+--
+-- Let's retrace the steps again, from setters and weird operators to
+-- ordinary functions:
+--
+-- @
+-- [(1,"hello"),(2,"world")] & mapped._2 %~ reverse
+--
+-- [(1,"hello"),(2,"world")] & (mapped._2 %~ reverse)
+--
+-- (mapped._2 %~ reverse) [(1,"hello"),(2,"world")]
+--
+-- over (mapped._2) reverse $ [(1,"hello"),(2,"world")]
+--
+-- (map.second) reverse $ [(1,"hello"),(2,"world")]
+--
+-- map (second reverse) [(1,"hello"),(2,"world")]
+-- @
+
+-- |
+-- Another convenient function is 'set', which replaces values instead of
+-- modifying them, which is equivalent to using 'const' as the modifying
+-- function:
+--
+-- >>> map (const "foo") [1,2,3]
+-- ["foo","foo","foo"]
+--
+-- Here's how to write 'set':
+--
+-- @
+-- set l b = over l (const b)
+-- @
+--
+
+-- |
+-- 'set' has an operator version as well. With it, we can mimic "assignment"
+-- from OOP languages:
+--
+-- >>> let variable = (1,("foo","bar"))
+--
+-- >>> variable & _2._1 .~ "tux"
+-- (1,("tux","bar"))
+--
+-- If this was some OOP language (C++, perhaps), it would've looked like this:
+--
+-- @
+-- std::pair <int,<char*,char*> >  variable;
+--
+-- variable.second.first = "tux";
+-- @
+--
+-- (Everything flows backwards in this example: @"tux"@ is turned into
+-- @'const' "tux"@ by '.~', then '_1' picks it up to make a function which
+-- works on tuples from it, then '_2' makes a function which works on tuples
+-- of tuples, and finally '&' applies this thing to @variable@.)
+--
+
+-- $record-def
+--
+-- To make examples more interesting, I'll define some types and setters for
+-- them. (Full disclosure: I stole them from
+-- <http://www.haskellforall.com/2013/05/program-imperatively-using-haskell.html
+-- Gabriel>.)
+--
+-- @
+-- -- This is internal state of a simple game.
+-- data Game = Game
+--   { _score :: Int
+--   , _units :: [Unit]
+--   , _boss  :: Unit
+--   }
+--   deriving (Show)
+--
+-- -- This is a unit in this game.
+-- data Unit = Unit
+--   { _health   :: Double
+--   , _position :: Point
+--   }
+--   deriving (Show)
+--
+-- -- This is a type used to store location.
+-- data Point = Point
+--   { _x :: Double
+--   , _y :: Double
+--   }
+--   deriving (Show)
+-- @
+--
+-- And here are setters, which are all pretty similar:
+--
+-- @
+-- score :: 'ASetter' Game Game Int Int
+-- score = 'sets' $ \f game -> game {_score = f (_score game)}
+--
+-- units :: 'ASetter' Game Game [Unit] [Unit]
+-- units = 'sets' $ \f game -> game {_units = f (_units game)}
+--
+-- boss :: 'ASetter' Game Game Unit Unit
+-- boss = 'sets' $ \f game -> game {_boss = f (_boss game)}
+--
+-- -- And so on...
+-- @
+
+-- $state-examples
+--
+-- The following examples showcase operators available from
+-- "Lens.Micro.Extras". They aren't exported from the main module because
+-- they aren't needed often and they clash with operators defined by other
+-- libraries (@aeson@, @cassava@, @hxt@, @cmdargs@, and quite a few
+-- others). If you find them useful (and they /are/ useful occasionally),
+-- don't hesitate to import "Lenx.Micro.Extras".
+--
+-- 'Lens.Micro.Extras..=' is an assignment operator which works in 'State'
+-- monad, thus resembling assignment from imperative languages even more. If
+-- you are unfamiliar with 'State' monad, here's an example:
+--
+-- @
+-- example :: State String ()
+-- example = do
+--   s <- 'get'                  -- 'get' returns current state
+--   'put' (s ++ "!")            -- 'put' updates current state
+--   'modify' (map toUpper)      -- 'modify' applies a function to current state
+-- @
+--
+-- Here's what will happen once it's run:
+--
+-- @
+-- >>> 'execState' example "hello"
+-- "HELLO!"
+-- @
+--
+-- Now, 'Lens.Micro.Extras..=' is '.~' lifted to work in 'State' -- that is,
+-- instead of creating a function it creates a 'State' action which gets
+-- applied to the current state. Like this:
+--
+-- @
+-- example :: State (Int, String) ()
+-- example = do
+--   _1 .= 17
+--   _2 .= "foo"
+-- @
+--
+-- This code is equivalent to this:
+--
+-- @
+-- example = do
+--   s0 <- get
+--   let s1 = s0  &  _1 .~ 17
+--   let s2 = s1  &  _2 .~ "foo"
+--   put s2
+-- @
+--
+-- or, since you can use '&' several times in an expression (just like you
+-- can use '$' several times), to this:
+--
+-- @
+-- example = do
+--   s <- get
+--   let s' = s  &  _1 .~ 17
+--               &  _2 .~ "foo"
+--   put s'
+-- @
+--
+-- or even to this:
+--
+-- @
+-- example = modify $ (_1 .~ 17) . (_2 .~ "foo")
+-- @
+--
+-- Don't let '&' fool you, there's no magic going on. It's just function
+-- application.
+--
+
+-- $record-examples
+--
+-- Next examples use operators 'Lens.Micro.Extras.+=',
+-- 'Lens.Micro.Extras.-=', 'Lens.Micro.Extras.*=', and
+-- 'Lens.Micro.Extras.//='. They are all defined using
+-- 'Lens.Micro.Extras.%=', which is to 'Lens.Micro.Extras..=' what '%~' is to
+-- '.~'. You should be able to deduce what they do easily:
+--
+-- @
+-- -- Boss's health.
+-- bossHP :: 'ASetter' Game Game Double Double
+-- bossHP = boss.health
+--
+-- -- Strike the boss.
+-- strike :: State Game ()
+-- strike = bossHP 'Lens.Micro.Extras.-=' 10
+--
+-- -- Breathe fire, damaging everyone.
+-- breatheFire :: State Game ()
+-- breatheFire = do
+--   units.'mapped'.health 'Lens.Micro.Extras.*=' 0.7
+--   bossHP 'Lens.Micro.Extras.*=' 0.9
+--
+-- -- Heal every unit by 20HP (with 100 being the cap).
+-- healUnits :: State Game ()
+-- healUnits =
+--   units.'mapped'.health 'Lens.Micro.Extras.%=' (\h -> min 100 (h+20))
+-- @

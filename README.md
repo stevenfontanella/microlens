@@ -12,7 +12,7 @@
 
   * Compatibility with `lens`. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear. (Documentation for `Lens` and `Traversal` here refers the user to `lens` package as well, which is done so that you wouldn't have to explain that while you're depending on `microlens`, you're probably intending your lenses to be used with `lens`, which is more powerful.)
 
-  * Only **1** dependency (`mtl`). And the whole package builds in ~4s on my laptop. (There are plans to get rid even of this single dependency, however.)
+  * **No** dependencies. And the whole package builds in ~4s on my laptop.
 
   * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of `lens`.
 
@@ -20,7 +20,7 @@
 
   * All `INLINE` pragmas sprinkled thru `lens` were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
 
-  * `microlens` should also be compilable with JHC, but I haven't checked. Tell me if it works!
+It could also be compatible with JHC but, unfortunately, I couldn't get JHC to accept type families without erroring out.
 
 [`microlens-th`]: http://hackage.haskell.org/package/microlens-th
 
@@ -103,19 +103,11 @@ Perhaps it is for the best.
 
 ---
 
-`ix` and `at` aren't included, because they are pretty useless without instances for `Map`, `Vector`, `Text`, etc., and this would require lots of dependencies. In an ideal world, we would have `Ixed` and `At` defined in `microlens`, and `vector`, `text`, `unordered-containers`, etc. would depend on `microlens` and provide instances. For this to happen:
-
-  * `microlens` itself must remain dependency-free. It's not free now (due to the `mtl` dependency, which might be something `vector` maintainers won't agree to), but it will be once everything which doesn't depend on `mtl` is moved into something like `baselens` (better name suggestions are welcome), which should happen anyway because `mtl` isn't the only monad transformers library and I've been in the past hindered by not being able to use `view`, `use`, etc. with transformers libraries like `monad-classes`.
-
-  * Someone has to convince conservative maintainers of various container libraries to agree to a `microlens` dependency. The best way to get them to agree is probably to start using the library a lot, and providing lenses and instances of classes like `Ixed` and `At` in all your packages. Pull requests to others' packages might work, too.
+`ix` and `at` aren't included, because they are pretty useless without instances for `Map`, `Vector`, `Text`, etc., and this would require lots of dependencies. In an ideal world, we would have `Ixed` and `At` defined in `microlens`, and `vector`, `text`, `unordered-containers`, etc. would depend on `microlens` and provide instances. For this to happen, someone has to convince conservative maintainers of various container libraries to agree to a `microlens` dependency, which probably won't ever happen.
 
 ---
 
 `zoom` isn't included yet, but should be.
-
----
-
-The module with extra functions and operators is called `Lens.Micro.Extras` instead of `Lens.Micro.Extra`, as plurals seem to be more common on Hackage than singulars (e.g. look for `Type` vs. `Types`). Moreover, the corresponding module of `lens` is named `Control.Lens.Extras`.
 
 ## Motivation
 
@@ -159,7 +151,7 @@ Yes, but it doesn't matter because lots of people don't mind being tied to GHC. 
 
 Moreover, I can't include `Prism` and `Iso` anyway without depending on `profunctors`, which depends on all other Edward's small packages, because they all provide instances for each other's types, because there's a useful type called `Tambara`, and it's important that there are instances like `Profunctor p => Strong (Tambara p)`. Like a big, happy family, Edward's packages all hold to each other.
 
-I don't know why can't Edward just make a separate package called `classes`, where `Profunctor` and `Contravariant` would reside along with their *only* instances people ever use, namely `Profunctor (->)` and `Contravariant (Const a)`, and all nir other packages would just depend on `classes` and provide useful `Tambara` and `Cotambara` instances, and then `microlens` could also depend on `classes` and provide prisms and isos. There's probably a good reason.
+I don't know why Edward can't just make a separate package called `classes`, where `Profunctor` and `Contravariant` would reside along with their *only* instances people ever use, namely `Profunctor (->)` and `Contravariant (Const a)`, and all nir other packages would just depend on `classes` and provide useful `Tambara` and `Cotambara` instances, and then `microlens` could also depend on `classes` and provide prisms and isos. There's probably a good reason. Or maybe Edward just doesn't want to maintain yet another package, ne's got too many of them already.
 
 > Splitting `lens` would either lead to orphaned instances or loss of functionality.
 
@@ -194,9 +186,3 @@ It's also hard to sell.
 I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell `lens` because it's simply unsellable to people who can't depend on such a big package, and I can't sell `lens-family` because it's outside of my reach. I can't give promises of compatibility, I can't include a nice tutorial in the docs, I can't even file an issue on Github because the library isn't on Github.
 
 It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of `lens`”) than to either try to promote `lens-family` or convince its maintainer to let me do what I want to do to it.
-
-### Wouldn't the development of `lens` be hindered if people switched to another, more basic package?
-
-My guess is that at this point the majority of `lens` development is done by people who want `lens` for the sake of having `lens`. The development of Haskell wasn't hindered by people who used C++; in fact, one of the reasons Haskell is so nice now is that it didn't become popular and so developers didn't have to worry about maintaining compatibility so much.
-
-(I wonder whether it shows that I'm afraid of Edward seeing all this, pointing finger at me, and saying “you spoiled my secret plans, insolent muggle, now Haskell won't ever be as nice as I envisioned it, and it's all because of you, you!”...)
