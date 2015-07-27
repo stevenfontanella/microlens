@@ -14,7 +14,7 @@ module Lens.Micro
   (&),
 
   -- * Setting (applying a function to values)
-  ASetter,
+  ASetter, ASetter',
   sets,
   (%~), over,
   (.~), set,
@@ -122,6 +122,14 @@ setters you are exporting from your library; the right type to use is
 however, to export functions which take an 'ASetter' as an argument.
 -}
 type ASetter s t a b = (a -> Identity b) -> s -> Identity t
+
+{- |
+This is a type alias for monomorphic setters which don't change the type of
+the container (or of the value inside). It's useful more often than the same
+type in lens, because we can't provide real setters and so it does the job of
+both @ASetter'@ and @Setter'@.
+-}
+type ASetter' s a = ASetter s s a a
 
 {- |
 'sets' creates an 'ASetter' from an ordinary function. (The only thing it
