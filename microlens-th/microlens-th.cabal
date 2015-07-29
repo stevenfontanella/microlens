@@ -1,5 +1,5 @@
 name:                microlens-th
-version:             0.1.0.1
+version:             0.1.1.0
 synopsis:            Automatic generation of record lenses for microlens
 description:
   This package lets you automatically generate lenses for data types; code
@@ -12,10 +12,10 @@ author:              Artyom
 maintainer:          Artyom <yom@artyom.me>
 homepage:            http://github.com/aelve/microlens
 bug-reports:         http://github.com/aelve/microlens/issues
--- copyright:           
 category:            Data, Lenses
 build-type:          Simple
--- extra-source-files:  README.md
+extra-source-files:
+  CHANGELOG.md
 cabal-version:       >=1.10
 
 source-repository head

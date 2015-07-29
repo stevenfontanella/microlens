@@ -20,12 +20,14 @@ module Lens.Micro.TH
   Fold,
   -- * Making lenses
   makeLenses,
+  makeLensesFor,
   makeLensesWith,
   makeFields,
   -- * Default lens rules
   LensRules,
   DefName(..),
   lensRules,
+  lensRulesFor,
   defaultFieldRules,
   camelCaseFields,
   -- * Configuring lens rules
@@ -207,6 +209,33 @@ an exception). Setting and updating @_y@ can be done as usual.
 -}
 makeLenses :: Name -> DecsQ
 makeLenses = makeFieldOptics lensRules
+
+{- |
+Like 'makeLenses', but lets you choose your own names for lenses:
+
+@
+data Foo = Foo {foo :: Int, bar :: Bool}
+
+'makeLensesFor' [(\"foo\", \"fooLens\"), (\"bar\", \"_bar\")] ''Foo
+@
+
+would create lenses called @fooLens@ and @_bar@. This is useful, for instance,
+when you don't want to prefix your fields with underscores and want to prefix
+/lenses/ with underscores instead.
+
+If you give the same name to different fields, it will generate a 'Traversal'
+instead:
+
+@
+data Foo = Foo {slot1, slot2, slot3 :: Int}
+
+'makeLensesFor' [(\"slot1\", \"slots\"),
+                 (\"slot2\", \"slots\"),
+                 (\"slot3\", \"slots\")] ''Foo
+@
+-}
+makeLensesFor :: [(String, String)] -> Name -> DecsQ
+makeLensesFor fields = makeFieldOptics (lensRulesFor fields)
 
 {- |
 Generate lenses with custom parameters.
@@ -393,6 +422,16 @@ lensRules = LensRules
          '_':x:xs -> [TopName (mkName (toLower x:xs))]
          _        -> []
   }
+
+-- | Used in 'makeLensesFor'.
+lensRulesFor ::
+  [(String, String)] {- ^ [(Field Name, Lens Name)] -} ->
+  LensRules
+lensRulesFor fields = lensRules & lensField .~ mkNameLookup fields
+
+mkNameLookup :: [(String,String)] -> Name -> [Name] -> Name -> [DefName]
+mkNameLookup kvs _ _ field =
+  [ TopName (mkName v) | (k,v) <- kvs, k == nameBase field]
 
 camelCaseFields :: LensRules
 camelCaseFields = defaultFieldRules
