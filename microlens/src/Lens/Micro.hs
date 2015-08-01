@@ -12,6 +12,7 @@
 module Lens.Micro
 (
   (&),
+  -- $ampersand-note
 
   -- * Setting (applying a function to values)
   ASetter, ASetter',
@@ -80,6 +81,30 @@ a & f = f a
 {-# INLINE (&) #-}
 infixl 1 &
 #endif
+
+{- $ampersand-note
+
+This operator is useful when you want to modify something several times. For instance, if you want to change 1st and 3rd elements of a tuple, you can write this:
+
+@
+(1,2,3) '&' '_1' '.~' 0
+        '&' '_3' '%~' 'negate'
+@
+
+instead of e.g. this:
+
+@
+('_1' '.~' 0) '.' ('_3' '%~' 'negate') '$' (1,2,3)
+@
+
+or this:
+
+@
+'set' '_1' 0 '.'
+'over' '_3' 'negate'
+  '$' (1,2,3)
+@
+-}
 
 -- Setting -----------------------------------------------------------------
 
