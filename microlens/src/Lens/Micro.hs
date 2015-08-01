@@ -73,9 +73,7 @@ import Data.Function ((&))
 
 #if __GLASGOW_HASKELL__ < 710
 {- |
-'&' is a reverse application operator. This provides notational
-convenience. Its precedence is one higher than that of the forward
-application operator '$', which allows '&' to be nested in '$'.
+'&' is a reverse application operator. This provides notational convenience. Its precedence is one higher than that of the forward application operator '$', which allows '&' to be nested in '$'.
 -}
 (&) :: a -> (a -> b) -> b
 a & f = f a
@@ -86,10 +84,7 @@ infixl 1 &
 -- Setting -----------------------------------------------------------------
 
 {- |
-@ASetter s t a b@ is something that turns a function modifying a value
-into a function modifying a /structure/. If you ignore
-'Control.Monad.Identity.Identity' (as @Identity a@ is the same thing as @a@),
-the type is:
+@ASetter s t a b@ is something that turns a function modifying a value into a function modifying a /structure/. If you ignore 'Control.Monad.Identity.Identity' (as @Identity a@ is the same thing as @a@), the type is:
 
 @
 type ASetter s t a b = (a -> b) -> s -> t
@@ -113,36 +108,26 @@ This means that examples of setters you might've already seen are:
 
     (which corresponds to '_Left')
 
-The reason 'Control.Monad.Identity.Identity' is used here is for 'ASetter' to
-be composable with other types, such as 'Lens'.
+The reason 'Control.Monad.Identity.Identity' is used here is for 'ASetter' to be composable with other types, such as 'Lens'.
 
-Technically, if you're writing a library, you shouldn't use this type for
-setters you are exporting from your library; the right type to use is
-@Setter@, but it is not provided by microlens. It's completely alright,
-however, to export functions which take an 'ASetter' as an argument.
+Technically, if you're writing a library, you shouldn't use this type for setters you are exporting from your library; the right type to use is @Setter@, but it is not provided by microlens. It's completely alright, however, to export functions which take an 'ASetter' as an argument.
 -}
 type ASetter s t a b = (a -> Identity b) -> s -> Identity t
 
 {- |
-This is a type alias for monomorphic setters which don't change the type of
-the container (or of the value inside). It's useful more often than the same
-type in lens, because we can't provide real setters and so it does the job of
-both @ASetter'@ and @Setter'@.
+This is a type alias for monomorphic setters which don't change the type of the container (or of the value inside). It's useful more often than the same type in lens, because we can't provide real setters and so it does the job of both @ASetter'@ and @Setter'@.
 -}
 type ASetter' s a = ASetter s s a a
 
 {- |
-'sets' creates an 'ASetter' from an ordinary function. (The only thing it
-does is wrapping and unwrapping 'Control.Monad.Identity.Identity'.)
+'sets' creates an 'ASetter' from an ordinary function. (The only thing it does is wrapping and unwrapping 'Control.Monad.Identity.Identity'.)
 -}
 sets :: ((a -> b) -> s -> t) -> ASetter s t a b
 sets f g = Identity . f (runIdentity . g)
 {-# INLINE sets #-}
 
 {- |
-('%~') applies a function to the target; an alternative explanation is that
-it is an inverse of 'sets', which turns a setter into an ordinary
-function. @'mapped' '%~' reverse@ is the same thing as @'fmap' reverse@.
+('%~') applies a function to the target; an alternative explanation is that it is an inverse of 'sets', which turns a setter into an ordinary function. @'mapped' '%~' reverse@ is the same thing as @'fmap' reverse@.
 
 See 'over' if you want a non-operator synonym.
 
@@ -231,17 +216,14 @@ set l b = runIdentity . l (\_ -> Identity b)
 {-# INLINE set #-}
 
 {- |
-'mapped' is a setter for everything contained in a functor. You can use it
-to map over lists, @Maybe@, or even @IO@ (which is something you can't do
-with 'traversed' or 'each').
+'mapped' is a setter for everything contained in a functor. You can use it to map over lists, @Maybe@, or even @IO@ (which is something you can't do with 'traversed' or 'each').
 
 Here 'mapped' is used to turn a value to all non-'Nothing' values in a list:
 
 >>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
 [Just 0,Nothing,Just 0]
 
-Keep in mind that while 'mapped' is a more powerful setter than 'each', it
-can't be used as a getter! This won't work (and will fail with a type error):
+Keep in mind that while 'mapped' is a more powerful setter than 'each', it can't be used as a getter! This won't work (and will fail with a type error):
 
 @
 [(1,2),(3,4),(5,6)] '^..' 'mapped' . 'both'
@@ -255,26 +237,18 @@ mapped = sets fmap
 
 {- $getters-note
 
-Getters are a not-entirely-obvious way to use (supposedly) /value-changing/
-traversals to /carry out/ information from a structure. For details, see the
-documentation for 'Getting'.
+Getters are a not-entirely-obvious way to use (supposedly) /value-changing/ traversals to /carry out/ information from a structure. For details, see the documentation for 'Getting'.
 
-Exporting @Getter@ is impossible, as then microlens would have to depend on
-contravariant.
+Exporting @Getter@ is impossible, as then microlens would have to depend on contravariant.
 -}
 
 {- |
-@Getting r s a@ is, in a way, equivalent to @s -> a@. Since @'Const' r a@ is
-the same as @r@, 'Getting' is actually @(a -> r) -> s -> r@, which is just
-CPS-transformed @s -> a@. The reason 'Const' and CPS are used is that we want
-getters to have the same shape as lenses (which we achieve because 'Const' is
-a functor).
+@Getting r s a@ is, in a way, equivalent to @s -> a@. Since @'Const' r a@ is the same as @r@, 'Getting' is actually @(a -> r) -> s -> r@, which is just CPS-transformed @s -> a@. The reason 'Const' and CPS are used is that we want getters to have the same shape as lenses (which we achieve because 'Const' is a functor).
 -}
 type Getting r s a = (a -> Const r a) -> s -> Const r s
 
 {- |
-('^.') applies a getter to a value; in other words, it gets a value out of a
-structure using a getter (which can be a lens, traversal, fold, etc.).
+('^.') applies a getter to a value; in other words, it gets a value out of a structure using a getter (which can be a lens, traversal, fold, etc.).
 
 Getting 1st field of a tuple:
 
@@ -283,16 +257,12 @@ Getting 1st field of a tuple:
 ('^.' '_1') = 'fst'
 @
 
-When ('^.') is used with a traversal, it combines all results using the
-'Monoid' instance for the resulting type. For instance, for lists it would be
-simple concatenation:
+When ('^.') is used with a traversal, it combines all results using the 'Monoid' instance for the resulting type. For instance, for lists it would be simple concatenation:
 
 >>> ("str","ing") ^. each
 "string"
 
-The reason for this is that traversals use 'Applicative', and the
-'Applicative' instance for 'Const' uses monoid concatenation to combine
-“effects” of 'Const'.
+The reason for this is that traversals use 'Applicative', and the 'Applicative' instance for 'Const' uses monoid concatenation to combine “effects” of 'Const'.
 -}
 (^.) :: s -> Getting a s a -> a
 s ^. l = getConst (l Const s)
@@ -338,9 +308,7 @@ toListOf l = foldrOf l (:) []
 {-# INLINE toListOf #-}
 
 {- |
-@s ^? t@ returns the 1st element @t@ returns, or 'Nothing' if @t@ doesn't
-return anything. It's trivially implemented by passing the 'First' monoid to
-the getter.
+@s ^? t@ returns the 1st element @t@ returns, or 'Nothing' if @t@ doesn't return anything. It's trivially implemented by passing the 'First' monoid to the getter.
 
 Safe 'head':
 
@@ -365,8 +333,7 @@ s ^? l = getFirst (foldMapOf l (First . Just) s)
 infixl 8 ^?
 
 {- |
-('^?!') is an unsafe variant of ('^?') – instead of using 'Nothing' to
-indicate that there were no elements returned, it throws an exception.
+('^?!') is an unsafe variant of ('^?') – instead of using 'Nothing' to indicate that there were no elements returned, it throws an exception.
 -}
 (^?!) :: s -> Getting (Endo a) s a -> a
 s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
@@ -391,17 +358,14 @@ folded f = Const . getConst . getFolding . foldMap (Folding . f)
 {-# INLINE folded #-}
 
 {- |
-'has' checks whether a getter (any getter, including lenses, traversals, and
-folds) returns at least 1 value.
+'has' checks whether a getter (any getter, including lenses, traversals, and folds) returns at least 1 value.
 
 Checking whether a list is non-empty:
 
 >>> has each []
 False
 
-You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a
-replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other
-@isConstructorName@ functions:
+You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other @isConstructorName@ functions:
 
 >>> has _Left (Left 1)
 True
@@ -413,23 +377,16 @@ has l = getAny . foldMapOf l (\_ -> Any True)
 -- Lenses ------------------------------------------------------------------
 
 {- |
-Lenses in a nutshell: use ('^.') to get, ('.~') to set, ('%~') to
-modify. ('.')  composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is
-a part of in @B@, then @b.c@ lets you operate on @C@ inside @A@). You can
-create lenses with 'lens', or you can write them by hand (see below).
+Lenses in a nutshell: use ('^.') to get, ('.~') to set, ('%~') to modify. ('.') composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of in @B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses with 'lens', or you can write them by hand (see below).
 
-@Lens s t a b@ is the lowest common denominator of a setter and a getter,
-something that has the power of both; it has a 'Functor' constraint, and
-since both 'Const' and 'Control.Monad.Identity.Identity' are functors, it can
-be used whenever a getter or a setter is needed.
+@Lens s t a b@ is the lowest common denominator of a setter and a getter, something that has the power of both; it has a 'Functor' constraint, and since both 'Const' and 'Control.Monad.Identity.Identity' are functors, it can be used whenever a getter or a setter is needed.
 
   * @a@ is the type of the value inside of structure
   * @b@ is the type of the replaced value
   * @s@ is the type of the whole structure
   * @t@ is the type of the structure after replacing @a@ in it with @b@
 
-A 'Lens' can only point at a single value inside a structure (unlike a
-'Traversal').
+A 'Lens' can only point at a single value inside a structure (unlike a 'Traversal').
 
 It is easy to write lenses manually. The generic template is:
 
@@ -455,8 +412,7 @@ _1 :: Lens (a, x) (b, x) a b
 _1 f (a, x) = (\\b -> (b, x)) '<$>' f a
 @
 
-Here's a more complicated lens, which extracts /several/ values from a
-structure (in a tuple):
+Here's a more complicated lens, which extracts /several/ values from a structure (in a tuple):
 
 @
 type Age     = Int
@@ -471,11 +427,7 @@ location f (Person age city country) =
   (\\(city', country') -> Person age city' country') '<$>' f (city, country)
 @
 
-You even can choose to use a lens to present /all/ information contained in
-the structure (in a different way). Such lenses are called @Iso@ in lens's
-terminology. For instance (assuming you don't mind functions that can error
-out), here's a lens which lets you act on the string representation of a
-value:
+You even can choose to use a lens to present /all/ information contained in the structure (in a different way). Such lenses are called @Iso@ in lens's terminology. For instance (assuming you don't mind functions that can error out), here's a lens which lets you act on the string representation of a value:
 
 @
 string :: (Read a, Show a) => 'Lens'' a String
@@ -492,15 +444,12 @@ Using it to reverse a number:
 type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
 
 {- |
-This is a type alias for monomorphic lenses which don't change the type of
-the container (or of the value inside).
+This is a type alias for monomorphic lenses which don't change the type of the container (or of the value inside).
 -}
 type Lens' s a = Lens s s a a
 
 {- |
-'lens' creates a 'Lens' from a getter and a setter. The resulting lens isn't
-the most effective one (because of having to traverse the structure twice
-when modifying), but it shouldn't matter much.
+'lens' creates a 'Lens' from a getter and a setter. The resulting lens isn't the most effective one (because of having to traverse the structure twice when modifying), but it shouldn't matter much.
 
 A (partial) lens for list indexing:
 
@@ -520,11 +469,9 @@ Usage:
 [1,2,3,-4,5,6,7,8,9]
 @
 
-When getting, the setter is completely unused. When setting, the getter is
-unused. Both are used only when the value is being modified.
+When getting, the setter is completely unused. When setting, the getter is unused. Both are used only when the value is being modified.
 
-Here's an example of using a lens targeting the head of a list. The getter is
-replaced with 'undefined' to make sure it's not used:
+Here's an example of using a lens targeting the head of a list. The getter is replaced with 'undefined' to make sure it's not used:
 
 >>> [1,2,3] & lens undefined (\s b -> b : tail s) .~ 10
 [10,2,3]
@@ -536,31 +483,19 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 -- Traversals --------------------------------------------------------------
 
 {- |
-Traversals in a nutshell: they're like lenses but they can point at multiple
-values. Use ('^..') (not '^.') to get all values, ('^?') to get the 1st
-value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals
-just as it composes lenses.
+Traversals in a nutshell: they're like lenses but they can point at multiple values. Use ('^..') (not '^.') to get all values, ('^?') to get the 1st value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals just as it composes lenses.
 
-@Traversal s t a b@ is a generalisation of 'Lens' which allows many targets
-(possibly 0). It's achieved by changing the constraint to 'Applicative'
-instead of 'Functor' – indeed, the point of 'Applicative' is that you can
-combine effects, which is just what we need to have many targets.
+@Traversal s t a b@ is a generalisation of 'Lens' which allows many targets (possibly 0). It's achieved by changing the constraint to 'Applicative' instead of 'Functor' – indeed, the point of 'Applicative' is that you can combine effects, which is just what we need to have many targets.
 
-Traversals don't differ from lenses when it comes to setting – you can use
-usual ('%~') and ('.~') to modify and set values. Getting is a bit different,
-because you have to decide what to do in the case of multiple values. In
-particular, you can use these combinators (as well as everything else in the
-“Folds” section):
+Traversals don't differ from lenses when it comes to setting – you can use usual ('%~') and ('.~') to modify and set values. Getting is a bit different, because you have to decide what to do in the case of multiple values. In particular, you can use these combinators (as well as everything else in the “Folds” section):
 
   * ('^..') gets a list of values
   * ('^?') gets the 1st value (or 'Nothing' if there are no values)
   * ('^?!') gets the 1st value and throws an exception if there are no values
 
-In addition, ('^.') works for traversals as well – it combines traversed
-values using the ('<>') operation (if the values are instances of 'Monoid').
+In addition, ('^.') works for traversals as well – it combines traversed values using the ('<>') operation (if the values are instances of 'Monoid').
 
-Traversing any value twice is a violation of traversal laws. You can,
-however, traverse values in any order.
+Traversing any value twice is a violation of traversal laws. You can, however, traverse values in any order.
 
 Ultimately, traversals should follow 2 laws:
 
@@ -569,26 +504,17 @@ t pure ≡ pure
 fmap (t f) . t g ≡ getCompose . t (Compose . fmap f . g)
 @
 
-The 1st law states that you can't change the shape of the structure or do
-anything funny with elements (traverse elements which aren't in the
-structure, create new elements out of thin air, etc.). The 2nd law states
-that you should be able to fuse 2 identical traversals into one. For a more
-detailed explanation of the laws, see
-<http://artyom.me/lens-over-tea-2#traversal-laws this blog post> (if you
-prefer rambling blog posts), or
-<https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence Of The Iterator Pattern> (if you prefer papers).
+The 1st law states that you can't change the shape of the structure or do anything funny with elements (traverse elements which aren't in the structure, create new elements out of thin air, etc.). The 2nd law states that you should be able to fuse 2 identical traversals into one. For a more detailed explanation of the laws, see <http://artyom.me/lens-over-tea-2#traversal-laws this blog post> (if you prefer rambling blog posts), or <https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence Of The Iterator Pattern> (if you prefer papers).
 -}
 type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
 
 {- |
-This is a type alias for monomorphic traversals which don't change the type
-of the container (or of the values inside).
+This is a type alias for monomorphic traversals which don't change the type of the container (or of the values inside).
 -}
 type Traversal' s a = Traversal s s a a
 
 {- |
-'both' traverses both fields of a tuple. Unlike @both@ from lens, it only
-works for pairs – not for triples or 'Either'.
+'both' traverses both fields of a tuple. Unlike @both@ from lens, it only works for pairs – not for triples or 'Either'.
 
 >>> ("str","ing") ^. both
 "string"
@@ -604,9 +530,7 @@ both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 
 {- $prisms-note
 
-Prisms are traversals which always target 0 or 1 values. Moreover, it's
-possible to /reverse/ a prism, using it to construct a structure instead of
-peeking into it. Here's an example from the lens library:
+Prisms are traversals which always target 0 or 1 values. Moreover, it's possible to /reverse/ a prism, using it to construct a structure instead of peeking into it. Here's an example from the lens library:
 
 @
 >>> over _Left (+1) (Left 2)
@@ -616,10 +540,7 @@ Left 3
 Left 5
 @
 
-However, it's not possible for microlens to export prisms, because their type
-depends on @Choice@, which resides in the profunctors library, which is a
-somewhat huge dependency. So, all prisms included here are traversals
-instead.
+However, it's not possible for microlens to export prisms, because their type depends on @Choice@, which resides in the profunctors library, which is a somewhat huge dependency. So, all prisms included here are traversals instead.
 -}
 
 {- |
@@ -675,8 +596,7 @@ _Right _ (Left a) = pure (Left a)
 {- |
 '_Just' targets the value contained in a 'Maybe', provided it's a 'Just'.
 
-See documentation for '_Left' (as these 2 are pretty similar). In particular,
-it can be used to write these:
+See documentation for '_Left' (as these 2 are pretty similar). In particular, it can be used to write these:
 
   * Unsafely extracting a value from a 'Just':
 
@@ -708,8 +628,7 @@ _Just _ Nothing = pure Nothing
 {-# INLINE _Just #-}
 
 {- |
-'_Nothing' targets a @()@ if the 'Maybe' is a 'Nothing', and doesn't target
-anything otherwise:
+'_Nothing' targets a @()@ if the 'Maybe' is a 'Nothing', and doesn't target anything otherwise:
 
 >>> Just 1 ^.. _Nothing
 []
@@ -717,8 +636,7 @@ anything otherwise:
 >>> Nothing ^.. _Nothing
 [()]
 
-It's not particularly useful (unless you want to use @'has' '_Nothing'@ as a
-replacement for 'Data.Maybe.isNothing'), and provided mainly for consistency.
+It's not particularly useful (unless you want to use @'has' '_Nothing'@ as a replacement for 'Data.Maybe.isNothing'), and provided mainly for consistency.
 
 Implementation:
 
@@ -755,8 +673,7 @@ Note that this lens is lazy, and can set fields even of 'undefined':
 >>> set _1 10 undefined :: (Int, Int)
 (10,*** Exception: Prelude.undefined
 
-This is done to avoid violating a lens law stating that you can get
-back what you put:
+This is done to avoid violating a lens law stating that you can get back what you put:
 
 >>> view _1 . set _1 10 $ (undefined :: (Int, Int))
 10

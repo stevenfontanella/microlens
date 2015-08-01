@@ -59,12 +59,7 @@ import           Language.Haskell.TH
 
 {- $compatnote
 
-When updates aren't allowed, or when a field simply can't be updated (for
-instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we
-generate 'Getter' and 'Fold'. These aren't true @Getter@ and @Fold@ from lens
-– they're not sufficiently polymorphic. Beware. (Still, they're compatible,
-it's just that you can't do some things with them that you can do with
-original ones.)
+When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'Getter' and 'Fold'. These aren't true @Getter@ and @Fold@ from lens – they're not sufficiently polymorphic. Beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones.)
 -}
 
 type Getter s a = forall r. Getting r s a
@@ -128,8 +123,7 @@ To use, you have to enable Template Haskell:
 {-# LANGUAGE TemplateHaskell #-}
 @
 
-Then, after declaring the datatype (let's say @Foo@), add @makeLenses ''Foo@
-on a separate line:
+Then, after declaring the datatype (let's say @Foo@), add @makeLenses ''Foo@ on a separate line:
 
 @
 data Foo = Foo {
@@ -139,8 +133,7 @@ data Foo = Foo {
 makeLenses ''Foo
 @
 
-This would generate the following lenses, which can be used to access the
-fields of @Foo@:
+This would generate the following lenses, which can be used to access the fields of @Foo@:
 
 @
 x :: 'Lens'' Foo Int
@@ -150,12 +143,9 @@ y :: 'Lens'' Foo Bool
 y f foo = (\\y' -> f {_y = y'}) '<$>' f (_y foo)
 @
 
-If you don't want a lens to be generated for some field, don't prefix it with
-an @_@.
+If you don't want a lens to be generated for some field, don't prefix it with an @_@.
 
-When the data type has type parameters, it's possible for a lens to do a
-polymorphic update – i.e. change the type of the thing along with changing
-the type of the field. For instance, with this type:
+When the data type has type parameters, it's possible for a lens to do a polymorphic update – i.e. change the type of the thing along with changing the type of the field. For instance, with this type:
 
 @
 data Foo a = Foo {
@@ -170,8 +160,7 @@ x :: 'Lens' (Foo a) (Foo b) a b
 y :: 'Lens'' (Foo a) Bool
 @
 
-However, when there are several fields using the same type parameter,
-type-changing updates are no longer possible:
+However, when there are several fields using the same type parameter, type-changing updates are no longer possible:
 
 @
 data Foo a = Foo {
@@ -186,9 +175,7 @@ x :: 'Lens'' (Foo a) a
 y :: 'Lens'' (Foo a) a
 @
 
-Next thing. When the type has several constructors, some of fields may not be
-/always/ present – for those, a 'Traversal' is generated instead. For
-instance, in this example @y@ can be present or absent:
+Next thing. When the type has several constructors, some of fields may not be /always/ present – for those, a 'Traversal' is generated instead. For instance, in this example @y@ can be present or absent:
 
 @
 data FooBar
@@ -203,9 +190,7 @@ x :: 'Lens'' FooBar Int
 y :: 'Traversal'' FooBar Bool
 @
 
-So, to get @_y@, you'd have to either use ('^?') if you're not sure it's
-there, or ('^?!') if you're absolutely sure (and if you're wrong, you'll get
-an exception). Setting and updating @_y@ can be done as usual.
+So, to get @_y@, you'd have to either use ('^?') if you're not sure it's there, or ('^?!') if you're absolutely sure (and if you're wrong, you'll get an exception). Setting and updating @_y@ can be done as usual.
 -}
 makeLenses :: Name -> DecsQ
 makeLenses = makeFieldOptics lensRules
@@ -219,12 +204,9 @@ data Foo = Foo {foo :: Int, bar :: Bool}
 'makeLensesFor' [(\"foo\", \"fooLens\"), (\"bar\", \"_bar\")] ''Foo
 @
 
-would create lenses called @fooLens@ and @_bar@. This is useful, for instance,
-when you don't want to prefix your fields with underscores and want to prefix
-/lenses/ with underscores instead.
+would create lenses called @fooLens@ and @_bar@. This is useful, for instance, when you don't want to prefix your fields with underscores and want to prefix /lenses/ with underscores instead.
 
-If you give the same name to different fields, it will generate a 'Traversal'
-instead:
+If you give the same name to different fields, it will generate a 'Traversal' instead:
 
 @
 data Foo = Foo {slot1, slot2, slot3 :: Int}
@@ -240,10 +222,7 @@ makeLensesFor fields = makeFieldOptics (lensRulesFor fields)
 {- |
 Generate lenses with custom parameters.
 
-This function lets you customise generated lenses; to see what exactly can be
-changed, look at 'LensRules'. 'makeLenses' is implemented with
-'makeLensesWith' – it uses the 'lensRules' configuration (which you can build
-upon – see the “Configuring lens rules” section).
+This function lets you customise generated lenses; to see what exactly can be changed, look at 'LensRules'. 'makeLenses' is implemented with 'makeLensesWith' – it uses the 'lensRules' configuration (which you can build upon – see the “Configuring lens rules” section).
 
 Here's an example of generating lenses that would use lazy patterns:
 
@@ -253,8 +232,7 @@ data Foo = Foo {_x, _y :: Int}
 'makeLensesWith' ('lensRules' '&' 'generateLazyPatterns' '.~' True) ''Foo
 @
 
-When there are several modifications to the rules, the code looks nicer when
-you use 'flip':
+When there are several modifications to the rules, the code looks nicer when you use 'flip':
 
 @
 'flip' 'makeLensesWith' ''Foo $
@@ -269,9 +247,7 @@ makeLensesWith = makeFieldOptics
 {- |
 Generate overloaded lenses.
 
-This lets you deal with several data types having same fields. For instance,
-let's say you have @Foo@ and @Bar@, and both have a field named @x@. To
-avoid those fields clashing, you would have to use prefixes:
+This lets you deal with several data types having same fields. For instance, let's say you have @Foo@ and @Bar@, and both have a field named @x@. To avoid those fields clashing, you would have to use prefixes:
 
 @
 data Foo a = Foo {
@@ -282,10 +258,7 @@ data Bar = Bar {
   barX :: Char }
 @
 
-However, if you use 'makeFields' on both @Foo@ and @Bar@ now, it would
-generate lenses called @x@ and @y@ – and @x@ would be able to access both
-@fooX@ and @barX@! This is done by generating a separate class for each
-field, and making relevant types instances of that class:
+However, if you use 'makeFields' on both @Foo@ and @Bar@ now, it would generate lenses called @x@ and @y@ – and @x@ would be able to access both @fooX@ and @barX@! This is done by generating a separate class for each field, and making relevant types instances of that class:
 
 @
 class HasX s a | s -> a where
@@ -308,25 +281,15 @@ instance HasY (Foo a) a where
   y = ...
 @
 
-(There's a minor drawback, tho: you can't perform type-changing updates with
-these lenses.)
+(There's a minor drawback, tho: you can't perform type-changing updates with these lenses.)
 
-If you only want to make lenses for some fields, you can prefix them with
-underscores – the rest would be untouched. If no fields are prefixed with
-underscores, lenses would be created for all fields.
+If you only want to make lenses for some fields, you can prefix them with underscores – the rest would be untouched. If no fields are prefixed with underscores, lenses would be created for all fields.
 
-The prefix must be the same as the name of the name of the data type (/not/
-the constructor).
+The prefix must be the same as the name of the name of the data type (/not/ the constructor).
 
-If you want to use 'makeFields' on types declared in different modules, you
-can do it, but then you would have to export the @Has*@ classes from one of
-the modules – 'makeFields' creates a class if it's not in scope yet, so the
-class must be in scope or else there would be duplicate classes and you would
-get an “Ambiguous occurrence” error.
+If you want to use 'makeFields' on types declared in different modules, you can do it, but then you would have to export the @Has*@ classes from one of the modules – 'makeFields' creates a class if it's not in scope yet, so the class must be in scope or else there would be duplicate classes and you would get an “Ambiguous occurrence” error.
 
-Finally, 'makeFields' is implemented as @'makeLenses' 'camelCaseFields'@, so
-you can build on 'camelCaseFields' if you want to customise behavior of
-'makeFields'.
+Finally, 'makeFields' is implemented as @'makeLenses' 'camelCaseFields'@, so you can build on 'camelCaseFields' if you want to customise behavior of 'makeFields'.
 -}
 makeFields :: Name -> DecsQ
 makeFields = makeFieldOptics camelCaseFields
@@ -354,8 +317,7 @@ generateUpdateableOptics f r =
   fmap (\x -> r { _allowUpdates = x}) (f (_allowUpdates r))
 
 {- |
-Generate optics using lazy pattern matches. This can allow fields of an
-undefined value to be initialized with lenses:
+Generate optics using lazy pattern matches. This can allow fields of an undefined value to be initialized with lenses:
 
 @
 data Foo = Foo {_x :: Int, _y :: Bool}
@@ -371,12 +333,9 @@ Foo {_x = 8, _y = True}
 
 (Without 'generateLazyPatterns', the result would be just 'undefined'.)
 
-The downside of this flag is that it can lead to space-leaks and
-code-size\/compile-time increases when generated for large records. By
-default this flag is turned off, and strict optics are generated.
+The downside of this flag is that it can lead to space-leaks and code-size\/compile-time increases when generated for large records. By default this flag is turned off, and strict optics are generated.
 
-When you have a lazy optic, you can get a strict optic from it by composing
-with ('$!'):
+When you have a lazy optic, you can get a strict optic from it by composing with ('$!'):
 
 @
 strictOptic = ('$!') . lazyOptic
@@ -948,9 +907,7 @@ applyTypeSubst sub = rewrite aux
 ------------------------------------------------------------------------
 
 {- |
-Rules used to generate lenses. You can't create them from scratch, but you
-can customise already existing ones with lenses in the “Configuring lens
-rules” section.
+Rules used to generate lenses. You can't create them from scratch, but you can customise already existing ones with lenses in the “Configuring lens rules” section.
 
 For an example, see 'makeLensesWith'.
 -}

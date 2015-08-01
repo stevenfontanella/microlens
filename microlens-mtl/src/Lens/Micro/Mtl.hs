@@ -17,8 +17,7 @@ import Lens.Micro.Extras
 
 
 {- |
-'view' is a synonym for ('^.'), generalised for 'MonadReader' (since
-functions are instances of the 'MonadReader' class).
+'view' is a synonym for ('^.'), generalised for 'MonadReader' (since functions are instances of the 'MonadReader' class).
 
 >>> view _1 (1, 2)
 1
