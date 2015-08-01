@@ -143,7 +143,17 @@ y :: 'Lens'' Foo Bool
 y f foo = (\\y' -> f {_y = y'}) '<$>' f (_y foo)
 @
 
-If you don't want a lens to be generated for some field, don't prefix it with an @_@.
+(If you don't want a lens to be generated for some field, don't prefix it with an @_@.)
+
+If you want to creat lenses for many types, you can do it all in one place like this (of course, instead you just can use 'makeLenses' several times if you feel it would be more readable):
+
+@
+data Foo = ...
+data Bar = ...
+data Quux = ...
+
+'concat' '<$>' 'mapM' 'makeLenses' [''Foo, ''Bar, ''Quux]
+@
 
 When the data type has type parameters, it's possible for a lens to do a polymorphic update – i.e. change the type of the thing along with changing the type of the field. For instance, with this type:
 
@@ -175,7 +185,7 @@ x :: 'Lens'' (Foo a) a
 y :: 'Lens'' (Foo a) a
 @
 
-Next thing. When the type has several constructors, some of fields may not be /always/ present – for those, a 'Traversal' is generated instead. For instance, in this example @y@ can be present or absent:
+Finally, when the type has several constructors, some of fields may not be /always/ present – for those, a 'Traversal' is generated instead. For instance, in this example @y@ can be present or absent:
 
 @
 data FooBar
