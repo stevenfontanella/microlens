@@ -21,12 +21,6 @@ script:
  - cabal sdist
  - cd ..
 
- - cd microlens-each
- - cabal install --ghc-options=-Werror
- - cabal configure
- - cabal sdist
- - cd ..
-
  - cd microlens-th
  - cabal install --ghc-options=-Werror
  - cabal configure

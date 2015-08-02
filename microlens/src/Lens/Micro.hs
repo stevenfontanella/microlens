@@ -4,6 +4,9 @@ MultiParamTypeClasses,
 FunctionalDependencies,
 FlexibleInstances,
 FlexibleContexts,
+DefaultSignatures,
+GADTs,
+UndecidableInstances,
 RankNTypes,
 ScopedTypeVariables
   #-}
@@ -46,6 +49,9 @@ module Lens.Micro
   _Left, _Right,
   _Just, _Nothing,
 
+  -- * Each (an universal traversal for various structures)
+  Each(..),
+  
   -- * Tuples
   Field1(..),
   Field2(..),
@@ -59,9 +65,11 @@ where
 import Control.Applicative
 import Data.Functor.Identity
 import Data.Monoid
+import Data.Complex
 
 #if __GLASGOW_HASKELL__ < 710
 import Data.Foldable
+import Data.Traversable
 #endif
 
 #if __GLASGOW_HASKELL__ >= 710
@@ -677,6 +685,66 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
+
+-- Each
+
+{- |
+A class to support 'each'. If you're writing a library, don't write instances of this class which would be exported – other users won't be able to use them if they use lens.
+-}
+class Each s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  {- |
+'each' tries to be a universal 'Traversal' – it behaves like 'traverse' in most situations, but also adds support for e.g. tuples with same-typed values:
+
+>>> (1,2) & each %~ succ
+(2,3)
+
+>>> ["x", "y", "z"] ^. each
+"xyz"
+
+However, note that 'each' doesn't work on /every/ instance of 'Traversable'. If you have a 'Traversable' which isn't supported by 'each', you can use 'traverse' instead. Personally, I like using 'each' instead of 'traverse' whenever possible – it's shorter and more descriptive.
+
+You can use 'each' with these things:
+
+@
+'each' :: 'Traversal' [a] [b] a b
+
+'each' :: 'Traversal' ('Maybe' a) ('Maybe' b) a b
+
+'each' :: 'Traversal' (a,a) (b,b) a b
+'each' :: 'Traversal' (a,a,a) (b,b,b) a b
+'each' :: 'Traversal' (a,a,a,a) (b,b,b,b) a b
+'each' :: 'Traversal' (a,a,a,a,a) (b,b,b,b,b) a b
+
+'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
+@
+  -}
+  each :: Traversal s t a b
+  default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
+  each = traverse
+
+instance (a~b, q~r) => Each (a,b) (q,r) a q where
+  each f ~(a,b) = (,) <$> f a <*> f b
+  {-# INLINE each #-}
+
+instance (a~b, a~c, q~r, q~s) => Each (a,b,c) (q,r,s) a q where
+  each f ~(a,b,c) = (,,) <$> f a <*> f b <*> f c
+  {-# INLINE each #-}
+
+instance (a~b, a~c, a~d, q~r, q~s, q~t) => Each (a,b,c,d) (q,r,s,t) a q where
+  each f ~(a,b,c,d) = (,,,) <$> f a <*> f b <*> f c <*> f d
+  {-# INLINE each #-}
+
+instance (a~b, a~c, a~d, a~e, q~r, q~s, q~t, q~u) => Each (a,b,c,d,e) (q,r,s,t,u) a q where
+  each f ~(a,b,c,d,e) = (,,,,) <$> f a <*> f b <*> f c <*> f d <*> f e
+  {-# INLINE each #-}
+
+instance Each (Complex a) (Complex b) a b where
+  each f (a :+ b) = (:+) <$> f a <*> f b
+  {-# INLINE each #-}
+
+instance Each [a] [b] a b
+
+instance Each (Maybe a) (Maybe b) a b
 
 -- Tuples ------------------------------------------------------------------
 
