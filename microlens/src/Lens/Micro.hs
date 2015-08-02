@@ -1,11 +1,11 @@
 {-# LANGUAGE
-  CPP
-, MultiParamTypeClasses
-, FunctionalDependencies
-, FlexibleInstances
-, FlexibleContexts
-, RankNTypes
-, ScopedTypeVariables
+CPP,
+MultiParamTypeClasses,
+FunctionalDependencies,
+FlexibleInstances,
+FlexibleContexts,
+RankNTypes,
+ScopedTypeVariables
   #-}
 
 
