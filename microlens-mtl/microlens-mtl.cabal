@@ -13,7 +13,8 @@ bug-reports:         http://github.com/aelve/microlens/issues
 -- copyright:           
 category:            Data, Lenses
 build-type:          Simple
--- extra-source-files:  README.md
+extra-source-files:
+  CHANGELOG.md
 cabal-version:       >=1.10
 
 source-repository head
@@ -22,10 +23,12 @@ source-repository head
 
 library
   exposed-modules:     Lens.Micro.Mtl
-  -- other-modules:       
+  other-modules:       Lens.Micro.Mtl.Zoom
   -- other-extensions:    
   build-depends:       base >=4.4 && <5
                      , microlens ==0.1.*
                      , mtl >=2.0.1 && <2.3
+                     , transformers >=0.2 && <0.5
+                     , transformers-compat >=0.4 && <1
   hs-source-dirs:      src
   default-language:    Haskell2010
