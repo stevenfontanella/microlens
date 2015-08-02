@@ -9,11 +9,6 @@ UndecidableInstances
   #-}
 
 
-#ifndef MIN_VERSION_base
-#define MIN_VERSION_base(x,y,z) 1
-#endif
-
-
 module Lens.Micro.Each
 (
   Each(..),
@@ -74,17 +69,10 @@ instance (a~a2, a~a3, a~a4, a~a5, a~a6, b~b2, b~b3, b~b4, b~b5, b~b6) => Each (a
   each f ~(a,b,c,d,e,g) = (,,,,,) <$> f a <*> f b <*> f c <*> f d <*> f e <*> f g
   {-# INLINE each #-}
 
-#if MIN_VERSION_base(4,4,0)
 -- | @'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b@
 instance Each (Complex a) (Complex b) a b where
   each f (a :+ b) = (:+) <$> f a <*> f b
   {-# INLINE each #-}
-#else
--- | @'each' :: 'Traversal' ('Complex' a) ('Complex' b) a b@
-instance (RealFloat a, RealFloat b) => Each (Complex a) (Complex b) a b where
-  each f (a :+ b) = (:+) <$> f a <*> f b
-  {-# INLINE each #-}
-#endif
 
 -- | @'each' :: 'Traversal' [a] [b] a b@
 instance Each [a] [b] a b
