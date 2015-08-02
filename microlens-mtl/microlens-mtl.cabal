@@ -1,5 +1,5 @@
 name:                microlens-mtl
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            microlens support for Reader/Writer/State from mtl
 description:
   This package contains functions (like 'view' or '+=') which work   
