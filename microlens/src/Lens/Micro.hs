@@ -37,11 +37,11 @@ module Lens.Micro
   Lens, Lens',
   lens,
 
-  -- * Traversals (lenses which have multiple targets)
+  -- * Traversals (lenses which iterate over several elements)
   Traversal, Traversal',
   both,
 
-  -- * Prisms
+  -- * Prisms (traversals which iterate over at most 1 element)
   -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
