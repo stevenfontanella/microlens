@@ -39,6 +39,9 @@ import Data.Coerce
 import Unsafe.Coerce
 #endif
 
+#if __GLASGOW_HASKELL__ < 710
+import Data.Monoid
+#endif
 
 ------------------------------------------------------------------------------
 -- Data.Profunctor.Unsafe

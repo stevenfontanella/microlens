@@ -1,4 +1,5 @@
 {-# LANGUAGE
+CPP,
 MultiParamTypeClasses,
 FunctionalDependencies,
 FlexibleInstances,
@@ -42,6 +43,9 @@ import Lens.Micro.Extras
 -- Internal modules
 import Lens.Micro.Mtl.Zoom
 
+#if __GLASGOW_HASKELL__ < 710
+import Data.Monoid
+#endif
 
 {- |
 'view' is a synonym for ('^.'), generalised for 'MonadReader' (we are able to use it instead of ('^.') since functions are instances of the 'MonadReader' class):
