@@ -1,11 +1,11 @@
 {-# LANGUAGE
-  CPP
-, DefaultSignatures
-, MultiParamTypeClasses
-, FunctionalDependencies
-, GADTs
-, FlexibleInstances
-, UndecidableInstances
+CPP,
+DefaultSignatures,
+MultiParamTypeClasses,
+FunctionalDependencies,
+GADTs,
+FlexibleInstances,
+UndecidableInstances
   #-}
 
 
