@@ -21,10 +21,13 @@ module Lens.Micro.Each
 where
 
 
-import Control.Applicative
 import Data.Complex
-import Data.Traversable
 import Lens.Micro
+
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative
+import Data.Traversable
+#endif
 
 
 {- |

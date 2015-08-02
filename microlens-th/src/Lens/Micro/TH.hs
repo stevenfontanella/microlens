@@ -53,9 +53,13 @@ import qualified Data.Set as Set
 import           Data.Set (Set)
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
-import           Data.Traversable (traverse, sequenceA)
 import           Lens.Micro
 import           Language.Haskell.TH
+
+#if __GLASGOW_HASKELL__ < 710
+import           Data.Traversable (traverse, sequenceA)
+#endif
+
 
 {- $compatnote
 

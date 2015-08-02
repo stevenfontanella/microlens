@@ -58,8 +58,11 @@ where
 
 import Control.Applicative
 import Data.Functor.Identity
-import Data.Foldable
 import Data.Monoid
+
+#if __GLASGOW_HASKELL__ < 710
+import Data.Foldable
+#endif
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
