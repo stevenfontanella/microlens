@@ -1,12 +1,11 @@
 name:                microlens
-version:             0.1.1.0
+version:             0.1.2.0
 synopsis:            A tiny part of the lens library which you can depend upon
 description:
   This is an extract from <http://hackage.haskell.org/package/lens lens>
   (with no dependencies). It's not a toy lenses library, unsuitable for
   “real world”, but merely a small one. It is compatible with lens, and
-  should have same performance once I add some pragmas (which I haven't
-  done yet).
+  should have same performance. It also has better documentation.
   .
   Use this library:
   .
@@ -30,8 +29,7 @@ description:
   (base-4.8). Prior to that, it has to depend on transformers-0.2 or above.
   .
   Also note that it's not done yet and there's a lot of things missing
-  and I'm writing a tutorial for it and it'll have worse performance
-  (for now).
+  and I'm still writing a tutorial for it.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom
