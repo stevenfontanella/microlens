@@ -28,6 +28,24 @@ It could also be compatible with JHC but, unfortunately, I couldn't get JHC to a
 
 Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutorial.html>.
 
+## Competitors
+
+  * [basic-lens][] – the smallest library ever, containing only `Lens`, `view`, `set`, and `over` (and no lenses whatsoever). Uses only 1 extension – `RankNTypes` – and thus can be used with e.g. JHC and really old GHCs. Otherwise, you probably should still use microlens instead unless you're dead sure you won't ever need anything other than `Lens` and won't actually need any lenses.
+
+  * [reasonable-lens][] – a bigger library which has `Lens`, some utilities (like `view`, `use`, `+=`), `makeLenses` even, but little else – no lenses (except for `_1`..`_4`), no `Traversal`, no documentation. Overall it looks like something slapped together in a hurry by someone who simply needed to get rid of a lens dependency in one of nir projects.
+
+  * [lens-simple][] – a single module reexporting parts of [lens-family][]. It's the most feature-complete library on this list, with both `Lens` and `Traversal` available, as well as a number of lenses, traversals, and utilities. However, it has some annoyances – no `each`, `_1` and `_2` work only on pairs, `ix` doesn't work on lists or arrays and is thus useless, `at` only works on `Map`, etc. These are unlikely to be ever fixed, as lens-family doesn't actually try to be compatible with lens.
+
+  * [data-lens-light][] – a library which uses a different formulation of lenses and is thus incompatible with lens (it uses different names, too). Doesn't actually provide any lenses.
+
+[basic-lens]: http://hackage.haskell.org/package/basic-lens
+[reasonable-lens]: http://hackage.haskell.org/package/reasonable-lens
+[lens-simple]: http://hackage.haskell.org/package/lens-simple
+[lens-family]: http://hackage.haskell.org/package/lens-family
+[data-lens-light]: http://hackage.haskell.org/package/data-lens-light
+
+I think the benefits of microlens (compatibility with lens, features, documentation, etc) definitely outweigh its flaws (the need to import 3 packages instead of just 1 in case of reasonable-lens or lens-simple), but I can't say that microlens is *strictly* better than any library on this list. If you happen to use nothing but the functions provided by reasonable-lens (unlikely, but...), then you can switch to reasonable-lens and enjoy improved build times, while switching to microlens will take you more time merely because you'll likely need 3 packages instead of just 1.
+
 ## Design decisions
 
 (Or rather “why I don't think you need this” decisions.)
