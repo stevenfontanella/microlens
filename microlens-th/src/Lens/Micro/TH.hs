@@ -124,7 +124,7 @@ Generate lenses for a data type or a newtype.
 To use, you have to enable Template Haskell:
 
 @
-{-# LANGUAGE TemplateHaskell #-}
+\{\-\# LANGUAGE TemplateHaskell \#\-\}
 @
 
 Then, after declaring the datatype (let's say @Foo@), add @makeLenses ''Foo@ on a separate line:
@@ -226,8 +226,8 @@ If you give the same name to different fields, it will generate a 'Traversal' in
 data Foo = Foo {slot1, slot2, slot3 :: Int}
 
 'makeLensesFor' [(\"slot1\", \"slots\"),
-                 (\"slot2\", \"slots\"),
-                 (\"slot3\", \"slots\")] ''Foo
+               (\"slot2\", \"slots\"),
+               (\"slot3\", \"slots\")] ''Foo
 @
 -}
 makeLensesFor :: [(String, String)] -> Name -> DecsQ
