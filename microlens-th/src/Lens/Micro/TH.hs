@@ -308,8 +308,19 @@ Finally, 'makeFields' is implemented as @'makeLenses' 'camelCaseFields'@, so you
 makeFields :: Name -> DecsQ
 makeFields = makeFieldOptics camelCaseFields
 
--- | Generate "simple" optics even when type-changing optics are possible.
--- (e.g. 'Lens'' instead of 'Lens')
+{- |
+Generate simple (monomorphic) lenses even when type-changing lenses are possible – i.e. 'Lens'' instead of 'Lens' and 'Traversal'' instead of 'Traversal'. Just in case, here's an example of a situation when type-changing lenses would be normally generated:
+
+@
+data Foo a = Foo { _foo :: a }
+@
+
+Generated lens:
+
+@
+foo :: Lens (Foo a) (Foo b) a b
+@
+-}
 simpleLenses :: Lens' LensRules Bool
 simpleLenses f r = fmap (\x -> r { _simpleLenses = x}) (f (_simpleLenses r))
 
