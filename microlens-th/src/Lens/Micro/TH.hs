@@ -407,7 +407,9 @@ lensRules = LensRules
          _        -> []
   }
 
--- | Used in 'makeLensesFor'.
+{- |
+A modification of 'lensRules' used by 'makeLensesFor'.
+-}
 lensRulesFor ::
   [(String, String)] {- ^ [(Field Name, Lens Name)] -} ->
   LensRules
