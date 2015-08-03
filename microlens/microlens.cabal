@@ -50,6 +50,8 @@ source-repository head
 library
   exposed-modules:     Lens.Micro
                        Lens.Micro.Extras
+                       Lens.Micro.Classes
+                       Lens.Micro.Type
   -- other-modules:       
   -- other-extensions:    
 

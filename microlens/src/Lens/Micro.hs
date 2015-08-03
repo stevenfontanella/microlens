@@ -1,11 +1,7 @@
 {-# LANGUAGE
 CPP,
-MultiParamTypeClasses,
-FunctionalDependencies,
 FlexibleInstances,
 FlexibleContexts,
-DefaultSignatures,
-GADTs,
 UndecidableInstances,
 RankNTypes,
 ScopedTypeVariables
@@ -29,41 +25,40 @@ module Lens.Micro
   Getting,
   (^.),
 
-  -- * Folds (getters which return multiple elements)
+  -- * Folds (getters returning multiple elements)
   (^..), toListOf,
   (^?),
   (^?!),
   folded,
   has,
 
-  -- * Lenses (things which are both setters and getters)
+  -- * Lenses (setters and getters at once)
   Lens, Lens',
   lens,
   _1, _2, _3, _4, _5,
 
-  -- * Traversals (lenses which iterate over several elements)
+  -- * Traversals (lenses iterating over several elements)
   Traversal, Traversal',
   both,
+  each,
 
-  -- * Prisms (traversals which iterate over at most 1 element)
+  -- * Prisms (traversals iterating over at most 1 element)
   -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
-
-  -- * Each (an universal traversal for various structures)
-  Each(..),
 )
 where
 
 
+import Lens.Micro.Classes
+import Lens.Micro.Type
+
 import Control.Applicative
 import Data.Functor.Identity
 import Data.Monoid
-import Data.Complex
 
 #if __GLASGOW_HASKELL__ < 710
 import Data.Foldable
-import Data.Traversable
 #endif
 
 #if __GLASGOW_HASKELL__ >= 710
@@ -112,42 +107,6 @@ or this:
 -}
 
 -- Setting -----------------------------------------------------------------
-
-{- |
-@ASetter s t a b@ is something that turns a function modifying a value into a function modifying a /structure/. If you ignore 'Identity' (as @Identity a@ is the same thing as @a@), the type is:
-
-@
-type ASetter s t a b = (a -> b) -> s -> t
-@
-
-This means that examples of setters you might've already seen are:
-
-  * @'map' :: (a -> b) -> [a] -> [b]@
-
-    (which corresponds to 'mapped')
-
-  * @'fmap' :: 'Functor' f => (a -> b) -> f a -> f b@
-
-    (which corresponds to 'mapped' as well)
-
-  * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@
-
-    (which corresponds to '_1')
-
-  * @'Control.Arrow.left' :: (a -> b) -> 'Either' a x -> 'Either' b x@
-
-    (which corresponds to '_Left')
-
-The reason 'Identity' is used here is for 'ASetter' to be composable with other types, such as 'Lens'.
-
-Technically, if you're writing a library, you shouldn't use this type for setters you are exporting from your library; the right type to use is @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Setter.html#t:Setter Setter>@, but it is not provided by this package (because then we'd have to depend on <http://hackage.haskell.org/package/distributive distributive>). It's completely alright, however, to export functions which take an 'ASetter' as an argument.
--}
-type ASetter s t a b = (a -> Identity b) -> s -> Identity t
-
-{- |
-This is a type alias for monomorphic setters which don't change the type of the container (or of the value inside). It's useful more often than the same type in lens, because we can't provide real setters and so it does the job of both @ASetter'@ and @Setter'@.
--}
-type ASetter' s a = ASetter s s a a
 
 {- |
 'sets' creates an 'ASetter' from an ordinary function. (The only thing it does is wrapping and unwrapping 'Identity'.)
@@ -271,17 +230,6 @@ For details, see the documentation for 'Getting'.
 
 Including @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Getter.html#t:Getter Getter>@ is impossible, as then this package would have to depend on <http://hackage.haskell.org/package/contravariant contravariant> and it's a big dependency.
 -}
-
-{- |
-If you take a lens or a traversal and choose @'Const' r@ as your functor, you will get @Getting r s a@. This can be used to get something out of the structure instead of modifying it:
-
-@
-s '^.' l = 'getConst' (l 'Const' s)
-@
-
-Functions that operate on getters – such as ('^.'), ('^..'), ('^?') – use @Getter r s a@ (with different values of @r@) to describe what kind of getter they need. For instance, ('^.') needs the getter to be able to return a single value, and so it accepts a getter of type @Getting a s a@. ('^..') wants the getter to gather values together, so it uses @Getting (Endo [a]) s a@ (it could've used @Getting [a] s a@ instead, but it's faster with 'Endo'). The choice of @r@ depends on what you want to do with elements you're extracting from @s@.
--}
-type Getting r s a = (a -> Const r a) -> s -> Const r s
 
 {- |
 ('^.') applies a getter to a value; in other words, it gets a value out of a structure using a getter (which can be a lens, traversal, fold, etc.).
@@ -413,78 +361,6 @@ has l = getAny . foldMapOf l (\_ -> Any True)
 -- Lenses ------------------------------------------------------------------
 
 {- |
-Lenses in a nutshell: use ('^.') to get, ('.~') to set, ('%~') to modify. ('.') composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of in @B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses with 'lens', or you can write them by hand (see below).
-
-@Lens s t a b@ is the lowest common denominator of a setter and a getter, something that has the power of both; it has a 'Functor' constraint, and since both 'Const' and 'Identity' are functors, it can be used whenever a getter or a setter is needed.
-
-  * @a@ is the type of the value inside of structure
-  * @b@ is the type of the replaced value
-  * @s@ is the type of the whole structure
-  * @t@ is the type of the structure after replacing @a@ in it with @b@
-
-A 'Lens' can only point at a single value inside a structure (unlike a 'Traversal').
-
-It is easy to write lenses manually. The generic template is:
-
-@
-somelens :: Lens s t a b
-
--- “f” is the “a -> f b” function, “s” is the structure.
-somelens f s =
-  let
-    a = ...                 -- Extract the value from “s”.
-    rebuildWith b = ...     -- Write a function which would
-                            -- combine “s” and modified value
-                            -- to produce new structure.
-  in
-    rebuildWith '<$>' f a     -- Apply the structure-producing
-                            -- function to the modified value.
-@
-
-Here's the '_1' lens:
-
-@
-'_1' :: 'Lens' (a, x) (b, x) a b
-'_1' f (a, x) = (\\b -> (b, x)) '<$>' f a
-@
-
-Here's a more complicated lens, which extracts /several/ values from a structure (in a tuple):
-
-@
-type Age     = Int
-type City    = String
-type Country = String
-
-data Person = Person Age City Country
-
--- This lens lets you access all location-related information about a person.
-location :: 'Lens'' Person (City, Country)
-location f (Person age city country) =
-  (\\(city', country') -> Person age city' country') '<$>' f (city, country)
-@
-
-You even can choose to use a lens to present /all/ information contained in the structure (in a different way). Such lenses are called @Iso@ in lens's terminology. For instance (assuming you don't mind functions that can error out), here's a lens which lets you act on the string representation of a value:
-
-@
-string :: (Read a, Show a) => 'Lens'' a String
-string f s = read '<$>' f (show s)
-@
-
-Using it to reverse a number:
-
-@
->>> 123 '&' string '%~' reverse
-321
-@
--}
-type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
-
-{- |
-This is a type alias for monomorphic lenses which don't change the type of the container (or of the value inside).
--}
-type Lens' s a = Lens s s a a
-
-{- |
 'lens' creates a 'Lens' from a getter and a setter. The resulting lens isn't the most effective one (because of having to traverse the structure twice when modifying), but it shouldn't matter much.
 
 A (partial) lens for list indexing:
@@ -515,37 +391,6 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
 
 -- Traversals --------------------------------------------------------------
-
-{- |
-Traversals in a nutshell: they're like lenses but they can point at multiple values. Use ('^..') to get all values, ('^?') to get the 1st value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals just as it composes lenses. ('^.') can be used with traversals as well, but don't confuse it with ('^..').
-
-@Traversal s t a b@ is a generalisation of 'Lens' which allows many targets (possibly 0). It's achieved by changing the constraint to 'Applicative' instead of 'Functor' – indeed, the point of 'Applicative' is that you can combine effects, which is just what we need to have many targets.
-
-Traversals don't differ from lenses when it comes to setting – you can use usual ('%~') and ('.~') to modify and set values. Getting is a bit different, because you have to decide what to do in the case of multiple values. In particular, you can use these combinators (as well as everything else in the “Folds” section):
-
-  * ('^..') gets a list of values
-  * ('^?') gets the 1st value (or 'Nothing' if there are no values)
-  * ('^?!') gets the 1st value and throws an exception if there are no values
-
-In addition, ('^.') works for traversals as well – it combines traversed values using the ('<>') operation (if the values are instances of 'Monoid').
-
-Traversing any value twice is a violation of traversal laws. You can, however, traverse values in any order.
-
-Ultimately, traversals should follow 2 laws:
-
-@
-t pure ≡ pure
-fmap (t f) . t g ≡ getCompose . t (Compose . fmap f . g)
-@
-
-The 1st law states that you can't change the shape of the structure or do anything funny with elements (traverse elements which aren't in the structure, create new elements out of thin air, etc.). The 2nd law states that you should be able to fuse 2 identical traversals into one. For a more detailed explanation of the laws, see <http://artyom.me/lens-over-tea-2#traversal-laws this blog post> (if you prefer rambling blog posts), or <https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence Of The Iterator Pattern> (if you prefer papers).
--}
-type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
-
-{- |
-This is a type alias for monomorphic traversals which don't change the type of the container (or of the values inside).
--}
-type Traversal' s a = Traversal s s a a
 
 {- |
 'both' traverses both fields of a tuple. Unlike @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Traversal.html#v:both both>@ from lens, it only works for pairs – not for triples or 'Either'.
@@ -583,8 +428,8 @@ However, it's not possible for microlens to export prisms, because their type de
 Gathering all @Left@s in a structure (like the 'Data.Either.lefts' function):
 
 @
-'toListOf' ('each' . '_Left') :: ['Either' a b] -> [a]
-'toListOf' ('each' . '_Left') = 'Data.Either.lefts'
+'toListOf' ('each' '.' '_Left') :: ['Either' a b] -> [a]
+'toListOf' ('each' '.' '_Left') = 'Data.Either.lefts'
 @
 
 Checking whether an 'Either' is a 'Left' (like 'Data.Either.isLeft'):
@@ -653,7 +498,7 @@ See documentation for '_Left' (as these 2 are pretty similar). In particular, it
   * Gathering all @Just@s in a list:
 
     @
-    'Data.Maybe.catMaybes' = ('^..' 'each' . '_Just')
+    'Data.Maybe.catMaybes' = ('^..' 'each' '.' '_Just')
     @
 -}
 _Just :: Traversal (Maybe a) (Maybe a') a a'
@@ -683,278 +528,3 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
-
--- Each
-
-{- |
-A class to support 'each'. If you're writing a library, don't write instances of this class which would be exported – other users won't be able to use them if they use lens.
--}
-class Each s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  {- |
-'each' tries to be a universal 'Traversal' – it behaves like 'traverse' in most situations, but also adds support for e.g. tuples with same-typed values:
-
->>> (1,2) & each %~ succ
-(2,3)
-
->>> ["x", "y", "z"] ^. each
-"xyz"
-
-However, note that 'each' doesn't work on /every/ instance of 'Traversable'. If you have a 'Traversable' which isn't supported by 'each', you can use 'traverse' instead. Personally, I like using 'each' instead of 'traverse' whenever possible – it's shorter and more descriptive.
-
-You can use 'each' with these things:
-
-@
-'each' :: 'Traversal' [a] [b] a b
-
-'each' :: 'Traversal' ('Maybe' a) ('Maybe' b) a b
-
-'each' :: 'Traversal' (a,a) (b,b) a b
-'each' :: 'Traversal' (a,a,a) (b,b,b) a b
-'each' :: 'Traversal' (a,a,a,a) (b,b,b,b) a b
-'each' :: 'Traversal' (a,a,a,a,a) (b,b,b,b,b) a b
-
-'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
-@
-  -}
-  each :: Traversal s t a b
-  default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
-  each = traverse
-
-instance (a~b, q~r) => Each (a,b) (q,r) a q where
-  each f ~(a,b) = (,) <$> f a <*> f b
-  {-# INLINE each #-}
-
-instance (a~b, a~c, q~r, q~s) => Each (a,b,c) (q,r,s) a q where
-  each f ~(a,b,c) = (,,) <$> f a <*> f b <*> f c
-  {-# INLINE each #-}
-
-instance (a~b, a~c, a~d, q~r, q~s, q~t) => Each (a,b,c,d) (q,r,s,t) a q where
-  each f ~(a,b,c,d) = (,,,) <$> f a <*> f b <*> f c <*> f d
-  {-# INLINE each #-}
-
-instance (a~b, a~c, a~d, a~e, q~r, q~s, q~t, q~u) => Each (a,b,c,d,e) (q,r,s,t,u) a q where
-  each f ~(a,b,c,d,e) = (,,,,) <$> f a <*> f b <*> f c <*> f d <*> f e
-  {-# INLINE each #-}
-
-instance Each (Complex a) (Complex b) a b where
-  each f (a :+ b) = (:+) <$> f a <*> f b
-  {-# INLINE each #-}
-
-instance Each [a] [b] a b
-
-instance Each (Maybe a) (Maybe b) a b
-
--- Tuples ------------------------------------------------------------------
-
--- Commented instances amount to ~0.8s of building time.
-
-class Field1 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  {- |
-Gives access to the 1st field of a tuple (up to 5-tuples).
-
-Getting the 1st component:
-
->>> (1,2,3,4,5) ^. _1
-1
-
-Setting the 1st component:
-
->>> (1,2,3) & _1 .~ 10
-(10,2,3)
-
-Note that this lens is lazy, and can set fields even of 'undefined':
-
->>> set _1 10 undefined :: (Int, Int)
-(10,*** Exception: Prelude.undefined
-
-This is done to avoid violating a lens law stating that you can get back what you put:
-
->>> view _1 . set _1 10 $ (undefined :: (Int, Int))
-10
-
-The implementation (for 2-tuples) is:
-
-@
-'_1' f t = (,) '<$>' f    ('fst' t)
-             '<*>' 'pure' ('snd' t)
-@
-
-or, alternatively,
-
-@
-'_1' f ~(a,b) = (\\a' -> (a',b)) '<$>' f a
-@
-
-(where @~@ means a <https://wiki.haskell.org/Lazy_pattern_match lazy pattern>).
-
-'_2', '_3', '_4', and '_5' are also available (see below).
-  -}
-  _1 :: Lens s t a b
-
-instance Field1 (a,b) (a',b) a a' where
-  _1 k ~(a,b) = (\a' -> (a',b)) <$> k a
-  {-# INLINE _1 #-}
-
-instance Field1 (a,b,c) (a',b,c) a a' where
-  _1 k ~(a,b,c) = (\a' -> (a',b,c)) <$> k a
-  {-# INLINE _1 #-}
-
-instance Field1 (a,b,c,d) (a',b,c,d) a a' where
-  _1 k ~(a,b,c,d) = (\a' -> (a',b,c,d)) <$> k a
-  {-# INLINE _1 #-}
-
-instance Field1 (a,b,c,d,e) (a',b,c,d,e) a a' where
-  _1 k ~(a,b,c,d,e) = (\a' -> (a',b,c,d,e)) <$> k a
-  {-# INLINE _1 #-}
-
-{-
-
-instance Field1 (a,b,c,d,e,f) (a',b,c,d,e,f) a a' where
-  _1 k ~(a,b,c,d,e,f) = (\a' -> (a',b,c,d,e,f)) <$> k a
-  {-# INLINE _1 #-}
-
-instance Field1 (a,b,c,d,e,f,g) (a',b,c,d,e,f,g) a a' where
-  _1 k ~(a,b,c,d,e,f,g) = (\a' -> (a',b,c,d,e,f,g)) <$> k a
-  {-# INLINE _1 #-}
-
-instance Field1 (a,b,c,d,e,f,g,h) (a',b,c,d,e,f,g,h) a a' where
-  _1 k ~(a,b,c,d,e,f,g,h) = (\a' -> (a',b,c,d,e,f,g,h)) <$> k a
-  {-# INLINE _1 #-}
-
-instance Field1 (a,b,c,d,e,f,g,h,i) (a',b,c,d,e,f,g,h,i) a a' where
-  _1 k ~(a,b,c,d,e,f,g,h,i) = (\a' -> (a',b,c,d,e,f,g,h,i)) <$> k a
-  {-# INLINE _1 #-}
-
--}
-
-class Field2 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  _2 :: Lens s t a b
-
-instance Field2 (a,b) (a,b') b b' where
-  _2 k ~(a,b) = (\b' -> (a,b')) <$> k b
-  {-# INLINE _2 #-}
-
-instance Field2 (a,b,c) (a,b',c) b b' where
-  _2 k ~(a,b,c) = (\b' -> (a,b',c)) <$> k b
-  {-# INLINE _2 #-}
-
-instance Field2 (a,b,c,d) (a,b',c,d) b b' where
-  _2 k ~(a,b,c,d) = (\b' -> (a,b',c,d)) <$> k b
-  {-# INLINE _2 #-}
-
-instance Field2 (a,b,c,d,e) (a,b',c,d,e) b b' where
-  _2 k ~(a,b,c,d,e) = (\b' -> (a,b',c,d,e)) <$> k b
-  {-# INLINE _2 #-}
-
-{-
-
-instance Field2 (a,b,c,d,e,f) (a,b',c,d,e,f) b b' where
-  _2 k ~(a,b,c,d,e,f) = (\b' -> (a,b',c,d,e,f)) <$> k b
-  {-# INLINE _2 #-}
-
-instance Field2 (a,b,c,d,e,f,g) (a,b',c,d,e,f,g) b b' where
-  _2 k ~(a,b,c,d,e,f,g) = (\b' -> (a,b',c,d,e,f,g)) <$> k b
-  {-# INLINE _2 #-}
-
-instance Field2 (a,b,c,d,e,f,g,h) (a,b',c,d,e,f,g,h) b b' where
-  _2 k ~(a,b,c,d,e,f,g,h) = (\b' -> (a,b',c,d,e,f,g,h)) <$> k b
-  {-# INLINE _2 #-}
-
-instance Field2 (a,b,c,d,e,f,g,h,i) (a,b',c,d,e,f,g,h,i) b b' where
-  _2 k ~(a,b,c,d,e,f,g,h,i) = (\b' -> (a,b',c,d,e,f,g,h,i)) <$> k b
-  {-# INLINE _2 #-}
-
--}
-
-class Field3 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  _3 :: Lens s t a b
-
-instance Field3 (a,b,c) (a,b,c') c c' where
-  _3 k ~(a,b,c) = (\c' -> (a,b,c')) <$> k c
-  {-# INLINE _3 #-}
-
-instance Field3 (a,b,c,d) (a,b,c',d) c c' where
-  _3 k ~(a,b,c,d) = (\c' -> (a,b,c',d)) <$> k c
-  {-# INLINE _3 #-}
-
-instance Field3 (a,b,c,d,e) (a,b,c',d,e) c c' where
-  _3 k ~(a,b,c,d,e) = (\c' -> (a,b,c',d,e)) <$> k c
-  {-# INLINE _3 #-}
-
-{-
-
-instance Field3 (a,b,c,d,e,f) (a,b,c',d,e,f) c c' where
-  _3 k ~(a,b,c,d,e,f) = (\c' -> (a,b,c',d,e,f)) <$> k c
-  {-# INLINE _3 #-}
-
-instance Field3 (a,b,c,d,e,f,g) (a,b,c',d,e,f,g) c c' where
-  _3 k ~(a,b,c,d,e,f,g) = (\c' -> (a,b,c',d,e,f,g)) <$> k c
-  {-# INLINE _3 #-}
-
-instance Field3 (a,b,c,d,e,f,g,h) (a,b,c',d,e,f,g,h) c c' where
-  _3 k ~(a,b,c,d,e,f,g,h) = (\c' -> (a,b,c',d,e,f,g,h)) <$> k c
-  {-# INLINE _3 #-}
-
-instance Field3 (a,b,c,d,e,f,g,h,i) (a,b,c',d,e,f,g,h,i) c c' where
-  _3 k ~(a,b,c,d,e,f,g,h,i) = (\c' -> (a,b,c',d,e,f,g,h,i)) <$> k c
-  {-# INLINE _3 #-}
-
--}
-
-class Field4 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  _4 :: Lens s t a b
-
-instance Field4 (a,b,c,d) (a,b,c,d') d d' where
-  _4 k ~(a,b,c,d) = (\d' -> (a,b,c,d')) <$> k d
-  {-# INLINE _4 #-}
-
-instance Field4 (a,b,c,d,e) (a,b,c,d',e) d d' where
-  _4 k ~(a,b,c,d,e) = (\d' -> (a,b,c,d',e)) <$> k d
-  {-# INLINE _4 #-}
-
-{-
-
-instance Field4 (a,b,c,d,e,f) (a,b,c,d',e,f) d d' where
-  _4 k ~(a,b,c,d,e,f) = (\d' -> (a,b,c,d',e,f)) <$> k d
-  {-# INLINE _4 #-}
-
-instance Field4 (a,b,c,d,e,f,g) (a,b,c,d',e,f,g) d d' where
-  _4 k ~(a,b,c,d,e,f,g) = (\d' -> (a,b,c,d',e,f,g)) <$> k d
-  {-# INLINE _4 #-}
-
-instance Field4 (a,b,c,d,e,f,g,h) (a,b,c,d',e,f,g,h) d d' where
-  _4 k ~(a,b,c,d,e,f,g,h) = (\d' -> (a,b,c,d',e,f,g,h)) <$> k d
-  {-# INLINE _4 #-}
-
-instance Field4 (a,b,c,d,e,f,g,h,i) (a,b,c,d',e,f,g,h,i) d d' where
-  _4 k ~(a,b,c,d,e,f,g,h,i) = (\d' -> (a,b,c,d',e,f,g,h,i)) <$> k d
-  {-# INLINE _4 #-}
-
--}
-
-class Field5 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  _5 :: Lens s t a b
-
-instance Field5 (a,b,c,d,e) (a,b,c,d,e') e e' where
-  _5 k ~(a,b,c,d,e) = (\e' -> (a,b,c,d,e')) <$> k e
-  {-# INLINE _5 #-}
-
-{-
-
-instance Field5 (a,b,c,d,e,f) (a,b,c,d,e',f) e e' where
-  _5 k ~(a,b,c,d,e,f) = (\e' -> (a,b,c,d,e',f)) <$> k e
-  {-# INLINE _5 #-}
-
-instance Field5 (a,b,c,d,e,f,g) (a,b,c,d,e',f,g) e e' where
-  _5 k ~(a,b,c,d,e,f,g) = (\e' -> (a,b,c,d,e',f,g)) <$> k e
-  {-# INLINE _5 #-}
-
-instance Field5 (a,b,c,d,e,f,g,h) (a,b,c,d,e',f,g,h) e e' where
-  _5 k ~(a,b,c,d,e,f,g,h) = (\e' -> (a,b,c,d,e',f,g,h)) <$> k e
-  {-# INLINE _5 #-}
-
-instance Field5 (a,b,c,d,e,f,g,h,i) (a,b,c,d,e',f,g,h,i) e e' where
-  _5 k ~(a,b,c,d,e,f,g,h,i) = (\e' -> (a,b,c,d,e',f,g,h,i)) <$> k e
-  {-# INLINE _5 #-}
-
--}

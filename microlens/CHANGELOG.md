@@ -1,3 +1,8 @@
+# 0.1.3.0
+
+* Moved some things into `Lens.Micro.Type` and `Lens.Micro.Classes`.
+* `Each` and `Field*` aren't exported by `Lens.Micro` now.
+
 # 0.1.2.0
 
 * Added `each`.
