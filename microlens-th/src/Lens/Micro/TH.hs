@@ -333,10 +333,11 @@ generateSignatures :: Lens' LensRules Bool
 generateSignatures f r =
   fmap (\x -> r { _generateSigs = x}) (f (_generateSigs r))
 
--- | Generate "updateable" optics when 'True'. When 'False', 'Fold's will be
--- generated instead of 'Traversal's and 'Getter's will be generated instead
--- of 'Lens'es. This mode is intended to be used for types with invariants
--- which must be maintained by "smart" constructors.
+{- |
+Generate “updateable” optics. When turned off, 'Fold's will be generated instead of 'Traversal's and 'Getter's will be generated instead of 'Lens'es.
+
+This option is useful for types with invariants (also known as “types with smart constructors”) – if you generate updateable optics, anyone would be able to use them to break your invariants.
+-}
 generateUpdateableOptics :: Lens' LensRules Bool
 generateUpdateableOptics f r =
   fmap (\x -> r { _allowUpdates = x}) (f (_allowUpdates r))
