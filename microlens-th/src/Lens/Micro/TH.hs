@@ -324,11 +324,11 @@ foo :: Lens (Foo a) (Foo b) a b
 simpleLenses :: Lens' LensRules Bool
 simpleLenses f r = fmap (\x -> r { _simpleLenses = x}) (f (_simpleLenses r))
 
--- | Indicate whether or not to supply the signatures for the generated
--- lenses.
---
--- Disabling this can be useful if you want to provide a more restricted type
--- signature or if you want to supply hand-written haddocks.
+{- |
+Supply type signatures for the generated lenses.
+
+Disable this if you want to write the signature by yourself – for instance, if the signature should be more restricted, or if you want to write haddocks for the lens (as haddocks are attached to the signature and not to the definition).
+-}
 generateSignatures :: Lens' LensRules Bool
 generateSignatures f r =
   fmap (\x -> r { _generateSigs = x}) (f (_generateSigs r))
