@@ -39,6 +39,7 @@ module Lens.Micro
   -- * Lenses (things which are both setters and getters)
   Lens, Lens',
   lens,
+  _1, _2, _3, _4, _5,
 
   -- * Traversals (lenses which iterate over several elements)
   Traversal, Traversal',
@@ -51,13 +52,6 @@ module Lens.Micro
 
   -- * Each (an universal traversal for various structures)
   Each(..),
-  
-  -- * Tuples
-  Field1(..),
-  Field2(..),
-  Field3(..),
-  Field4(..),
-  Field5(..),
 )
 where
 
@@ -792,6 +786,8 @@ or, alternatively,
 @
 
 (where @~@ means a <https://wiki.haskell.org/Lazy_pattern_match lazy pattern>).
+
+'_2', '_3', '_4', and '_5' are also available (see below).
   -}
   _1 :: Lens s t a b
 
@@ -832,11 +828,6 @@ instance Field1 (a,b,c,d,e,f,g,h,i) (a',b,c,d,e,f,g,h,i) a a' where
 -}
 
 class Field2 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  {- |
-Gives access to the 2nd field of a tuple (up to 5-tuples).
-
-See documentation for '_1'.
-  -}
   _2 :: Lens s t a b
 
 instance Field2 (a,b) (a,b') b b' where
@@ -876,11 +867,6 @@ instance Field2 (a,b,c,d,e,f,g,h,i) (a,b',c,d,e,f,g,h,i) b b' where
 -}
 
 class Field3 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  {- |
-Gives access to the 3rd field of a tuple (up to 5-tuples).
-
-See documentation for '_1'.
-  -}
   _3 :: Lens s t a b
 
 instance Field3 (a,b,c) (a,b,c') c c' where
@@ -916,11 +902,6 @@ instance Field3 (a,b,c,d,e,f,g,h,i) (a,b,c',d,e,f,g,h,i) c c' where
 -}
 
 class Field4 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  {- |
-Gives access to the 4th field of a tuple (up to 5-tuples).
-
-See documentation for '_1'.
-  -}
   _4 :: Lens s t a b
 
 instance Field4 (a,b,c,d) (a,b,c,d') d d' where
@@ -952,11 +933,6 @@ instance Field4 (a,b,c,d,e,f,g,h,i) (a,b,c,d',e,f,g,h,i) d d' where
 -}
 
 class Field5 s t a b | s -> a, t -> b, s b -> t, t a -> s where
-  {- |
-Gives access to the 5th field of a tuple (only for 5-tuples).
-
-See documentation for '_1'.
-  -}
   _5 :: Lens s t a b
 
 instance Field5 (a,b,c,d,e) (a,b,c,d,e') e e' where
