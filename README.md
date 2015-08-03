@@ -2,29 +2,27 @@
 
 [![Build status](https://secure.travis-ci.org/aelve/microlens.svg)](http://travis-ci.org/aelve/microlens)
 
-*A tiny part of the `lens` library which you can depend upon.*
+*A tiny part of the lens library which you can depend upon.*
 
 ## What you get
 
-  * Essential lenses and traversals.
+  * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`).
 
   * Nice, comprehensive documentation; a tutorial for people who haven't ever seen lenses before (like the embedded tutorial in the pipes package); and a complementary set of exercises at School Of Haskell (still in progress).
 
-  * Compatibility with `lens`. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear. (Documentation for `Lens` and `Traversal` here refers the user to `lens` package as well, which is done so that you wouldn't have to explain that while you're depending on `microlens`, you're probably intending your lenses to be used with `lens`, which is more powerful.)
+  * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
   * **No** dependencies. And the whole package builds in ~4s on my laptop.
 
-  * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of `lens`.
+  * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens.
 
-  * No Template Haskell dependency. There is a separate package for generating (`lens`-compatible) record lenses, which is called [`microlens-th`][]. It takes ~6s to build and it doesn't require any special dependencies either.
+  * No Template Haskell dependency. There is a separate package for generating (lens-compatible) record lenses, which is called [microlens-th][]. It takes ~6s to build and it doesn't require any special dependencies either.
 
-  * All `INLINE` pragmas sprinkled thru `lens` were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
+  * All `INLINE` pragmas sprinkled thru lens were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
 
-It could also be compatible with JHC but, unfortunately, I couldn't get JHC to accept type families without erroring out.
+[microlens-th]: http://hackage.haskell.org/package/microlens-th
 
-[`microlens-th`]: http://hackage.haskell.org/package/microlens-th
-
-## Tutorial for newcomers to the whole lens thing
+## Tutorial (if you're new to this whole lens thing)
 
 Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutorial.html>.
 
@@ -32,7 +30,7 @@ Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutor
 
   * [basic-lens][] – the smallest library ever, containing only `Lens`, `view`, `set`, and `over` (and no lenses whatsoever). Uses only 1 extension – `RankNTypes` – and thus can be used with e.g. JHC and really old GHCs. Otherwise, you probably should still use microlens instead unless you're dead sure you won't ever need anything other than `Lens` and won't actually need any lenses.
 
-  * [reasonable-lens][] – a bigger library which has `Lens`, some utilities (like `view`, `use`, `+=`), `makeLenses` even, but little else – no lenses (except for `_1`..`_4`), no `Traversal`, no documentation. Overall it looks like something slapped together in a hurry by someone who simply needed to get rid of a lens dependency in one of nir projects.
+  * [reasonable-lens][] – a bigger library which has `Lens`, some utilities (like `view`, `use`, `+=`), `makeLenses` even, but little else – no lenses (except for `_1` ... `_4`), no `Traversal`, no documentation. Overall it looks like something slapped together in a hurry by someone who simply needed to get rid of a lens dependency in one of nir projects.
 
   * [lens-simple][] – a single module reexporting parts of [lens-family][]. It's the most feature-complete library on this list, with both `Lens` and `Traversal` available, as well as a number of lenses, traversals, and utilities. However, it has some annoyances – no `each`, `_1` and `_2` work only on pairs, `ix` doesn't work on lists or arrays and is thus useless, `at` only works on `Map`, etc. These are unlikely to be ever fixed, as lens-family doesn't actually try to be compatible with lens.
 
@@ -48,9 +46,9 @@ I think the benefits of microlens (compatibility with lens, features, documentat
 
 ## Design decisions
 
-(Or rather “why I don't think you need this” decisions.)
+microlens doesn't include anything lens doesn't include, even tho sometimes I'm very tempted to improve something in microlens just because I have control over it.
 
----
+-----------------------------------------------------------------------------
 
 All the `*Of` functions aren't included. If you don't know, those are `sumOf`, `lengthOf`, `setOf`, etc., and they are roughly equivalent to following:
 
@@ -80,21 +78,19 @@ The latter way is theoretically nicer, but *not* when you've got the rest of hug
 
 So, don't write `Of` functions yet, it's not their time. Also, this suffix is uglyuglyugly.
 
----
+-----------------------------------------------------------------------------
 
-All those `+=` and `<<&&=` operators aren't included. My opinion is that they shouldn't exist, and that all code for which it's “really nice” to have all those operators available should either be using normal operators instead (if it's an open-source project with code meant to be read by others), or should define them locally (if it's production code), or *at least* import them implicitly from some module called `Weird.Operators`. (It's a pity Haskell doesn't have something like "operator modifiers"; it would solve this problem nicely, as well as “let's have lifted versions of `==` and stuff because `liftA2 (==)` is too long” and other similar ones. You can use Hayoo to find out how many different versions of `==` there are on Hackage.)
+All those `<<&&=` operators aren't included. My opinion is that they shouldn't exist, and that all code for which it's “really nice” to have all those operators available should either be using normal operators instead (if it's an open-source project with code meant to be read by others), or should define them locally (if it's production code), or *at least* import them implicitly from some module called `Weird.Operators`. (It's a pity Haskell doesn't have something like "operator modifiers"; it would solve this problem nicely, as well as “let's have lifted versions of `==` and stuff because `liftA2 (==)` is too long” and other similar ones. You can use Hayoo to find out how many different versions of `==` there are on Hackage.)
 
-Moreover, `+=` and friends steal lots of nice operator names. A search for `+=` over Github shows that pretty much the only package which uses it in the `lens` meaning is `lens` itself.
+Operators like `+=` or `.=` are available from microlens-mtl. Operators like `~+` are available from `Lens.Micro.Extras` (a module in microlens), but not from the main module. The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
 
-`.=` conflicts with pretty much everything (especially `aeson`).
+-----------------------------------------------------------------------------
 
-For these reasons, operators are available from `Lens.Micro.Extras`, but not from the main module. (Not the full `lens` set, just the most useful ones.) The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
+`Prism` and `Iso` aren't included. Long story short, I can't afford depending on [profunctors][]. This is explained better in the [Motivation](#motivation) section. It'd be cool if I could include them, but for now isos are nonexistent and those prisms/isos which are included are actually just traversals.
 
----
+[profunctors]: http://hackage.haskell.com/package/profunctors
 
-`Prism` and `Iso` aren't included. Long story short, I can't afford depending on `profunctors`. This is explained better in the [Motivation][] section. It'd be cool if I could include them, but for now isos are nonexistent and those prisms/isos which are included are actually just traversals.
-
----
+-----------------------------------------------------------------------------
 
 Nothing indexed is included.
 
@@ -119,45 +115,41 @@ class Conjoined p => Indexable i p
 
 Perhaps it is for the best.
 
----
-
-`ix` and `at` aren't included, because they are pretty useless without instances for `Map`, `Vector`, `Text`, etc., and this would require lots of dependencies. In an ideal world, we would have `Ixed` and `At` defined in `microlens`, and `vector`, `text`, `unordered-containers`, etc. would depend on `microlens` and provide instances. For this to happen, someone has to convince conservative maintainers of various container libraries to agree to a `microlens` dependency, which probably won't ever happen.
-
----
-
-`zoom` isn't included yet, but should be.
-
 ## Motivation
 
-[`lens`][] is awesome. It's also huge, and requires lots of dependencies; not only `vector` and `text` (which you probably have anyway), but:
+[lens][] is awesome. It's also huge, and requires lots of dependencies; not only [vector][] and [text][] (which you probably have anyway), but:
 
-  * `bifunctors`
-  * `comonad`
-  * `contravariant`
-  * `distributive`
-  * `exceptions`
-  * `free`
-  * `hashable`
-  * `primitive`
-  * `profunctors`
-  * `reflection`
-  * `semigroupoids`
-  * `semigroups`
-  * `split`
-  * `tagged`
-  * `transformers-compat`
-  * `unordered-containers`
-  * `void`
+  * bifunctors
+  * comonad
+  * contravariant
+  * distributive
+  * exceptions
+  * free
+  * hashable
+  * primitive
+  * profunctors
+  * reflection
+  * semigroupoids
+  * semigroups
+  * split
+  * tagged
+  * transformers-compat
+  * unordered-containers
+  * void
 
-[`lens`]: http://hackage.haskell.com/package/lens
+[lens]: http://hackage.haskell.com/package/lens
+[vector]: http://hackage.haskell.com/package/vector
+[text]: http://hackage.haskell.com/package/text
 
-Each of these packages is a nice one, solving a well-defined task, or providing a useful abstraction. Most of category-theoretical ones (`bifunctors`, etc.) only take seconds to install. However, having to depend on them all is a death by a thousand papercuts. It's alright for an application, but it's absolutely not alright for a library... until `lens` becomes a part of the Haskell Prelude, or subsumes it entirely. (If this was Edward Kmett's plan all along: sorry for spoiling it!)
+Each of these packages is a nice one, solving a well-defined task, or providing a useful abstraction. Most of category-theoretical ones ([bifunctors][], etc.) only take seconds to install. However, having to depend on them all is a death by a thousand papercuts. It's alright for an application, but it's absolutely not alright for a library... until lens becomes a part of the Haskell Prelude, or subsumes it entirely. (If this was Edward Kmett's plan all along: sorry for spoiling it!)
+
+[bifunctors]: http://hackage.haskell.com/package/bifunctors
 
 What Edward wants is a huge, huge, huge Swiss knife. And ne is smart and strong enough to carry such a knife with nem and benefit from it. I imagine that there are lots of applications in the world which depend on `lens` and use more than 20% of its possibilities; even if not, creating such a Swiss knife is an entirely legitimate goal in itself.
 
 What I want is a small knife to carry in my pocket. I actually have one in mine right now; it's just as sharp as other knives, but it's 5cm long and it contains scissors, a toothpick, tweezers, and a nail file. It's not enough for all purposes, or for even *most* purposes; but the cool thing is that I never have to consider taking it out of the pocket. Choosing to carry it isn't ever a tradeoff.
 
-If you don't like knives (I don't either, I actually only ever use small scissors), consider an alternative analogy: `lens` is Emacs or Microsoft Word, `microlens` is nano (or Notepad) (possibly with Emacs's bindings, tho Emacs's default bindings actually suck, so it's not such a good analogy after all).
+If you don't like knives (I don't either, I actually only ever use small scissors), consider an alternative analogy: lens is Emacs or Microsoft Word, microlens is nano (or Notepad) (possibly with Emacs's bindings, tho Emacs's default bindings actually suck, so it's not such a good analogy after all).
 
 ### But hasn't Edward said splitting `lens` into several packages is impossible?
 
@@ -169,19 +161,19 @@ Yes, but it doesn't matter because lots of people don't mind being tied to GHC. 
 
 Moreover, I can't include `Prism` and `Iso` anyway without depending on `profunctors`, which depends on all other Edward's small packages, because they all provide instances for each other's types, because there's a useful type called `Tambara`, and it's important that there are instances like `Profunctor p => Strong (Tambara p)`. Like a big, happy family, Edward's packages all hold to each other.
 
-I don't know why Edward can't just make a separate package called `classes`, where `Profunctor` and `Contravariant` would reside along with their *only* instances people ever use, namely `Profunctor (->)` and `Contravariant (Const a)`, and all nir other packages would just depend on `classes` and provide useful `Tambara` and `Cotambara` instances, and then `microlens` could also depend on `classes` and provide prisms and isos. There's probably a good reason. Or maybe Edward just doesn't want to maintain yet another package, ne's got too many of them already.
+I don't know why Edward can't just make a separate package called “classes”, where `Profunctor` and `Contravariant` would reside along with their *only* instances people ever use, namely `Profunctor (->)` and `Contravariant (Const a)`, and all nir other packages would just depend on classes and provide useful `Tambara` and `Cotambara` instances, and then microlens could also depend on classes and provide prisms and isos. There's probably a good reason. Or maybe Edward just doesn't want to maintain yet another package, ne's got too many of them already. Or maybe Edward has more interesting things to think about (imagine having to continue maintaining something as huge as lens when you're no longer really passionate about it or just want to be doing something else).
 
 > Splitting `lens` would either lead to orphaned instances or loss of functionality.
 
 Agreed. Splitting anything reasonably complex into several parts would lead to loss of functionality.
 
-However, those who don't mind losing e.g. “useful instances of `Comonad` for `Bazaar`” are welcome to use `microlens`. Functionality isn't the only important thing.
+However, orphaned instances aren't the end of the world, and neither is loss of functionality. There are other important things to consider.
 
 > Template Haskell code can't be moved out either because it doesn't make sense to tie yourself to GHC and implement so many useful things but leave automatic lens generation out.
 
 Agreed.
 
-It definitely doesn't make much sense to create `lens` and leave TH bits out, just as it doesn't make sense to produce a 2000$ tv set where you can't switch between sound tracks when watching a file from a usb stick. Fuck you, Philips, so much.
+It definitely doesn't make much sense to create lens and leave TH bits out, just as it doesn't make sense to produce a 2000$ tv set where you can't switch between sound tracks when watching a file from a usb stick. Fuck you, Philips, so much.
 
 It makes sense, however, to leave TH bits out when they account for a 200% increase in build time, and they do in my case. So I moved them into a separate package.
 
@@ -189,11 +181,11 @@ It makes sense, however, to leave TH bits out when they account for a 200% incre
 
 Well, yep, if you've made an amazing knife for youself you might as well make it nicer for other people to use it, and let them add features you personally don't need but don't mind having in your knife either, because what does it matter when the knife weighs 10kg already?
 
-### What about `lens-family`?
+### What about lens-family?
 
-[`lens-family`][] is a nice package which is mostly compatible with `lens`, which has few dependencies, and which provides Template Haskell in a separate package as well.
+[lens-family][] is a nice package which is mostly compatible with lens, which has few dependencies, and which provides Template Haskell in a separate package as well.
 
-[`lens-family`]: http://hackage.haskell.org/packages/lens-family
+[lens-family]: http://hackage.haskell.org/packages/lens-family
 
 I'm afraid to depend on it, because it isn't *guaranteed* to be compatible and doesn't even try to be compatible.
 
@@ -201,6 +193,6 @@ It's also hard to sell.
 
 ### Sell?
 
-I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell `lens` because it's simply unsellable to people who can't depend on such a big package, and I can't sell `lens-family` because it's outside of my reach. I can't give promises of compatibility, I can't include a nice tutorial in the docs, I can't even file an issue on Github because the library isn't on Github.
+I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell lens because it's simply unsellable to people who can't depend on such a big package, and I can't sell lens-family because it's outside of my reach. I can't give promises of compatibility, I can't include a nice tutorial in the docs, I can't even file an issue on Github because the library isn't on Github.
 
-It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of `lens`”) than to either try to promote `lens-family` or convince its maintainer to let me do what I want to do to it.
+It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of lens”) than to either try to promote lens-family or convince its maintainer to let me do what I want to do to it.
