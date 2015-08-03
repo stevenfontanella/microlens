@@ -42,7 +42,7 @@ Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutor
 [lens-family]: http://hackage.haskell.org/package/lens-family
 [data-lens-light]: http://hackage.haskell.org/package/data-lens-light
 
-I think the benefits of microlens (compatibility with lens, features, documentation, etc) definitely outweigh its flaws (the need to import 3 packages instead of just 1 in case of reasonable-lens or lens-simple), but I can't say that microlens is *strictly* better than any library on this list. If you happen to use nothing but the functions provided by reasonable-lens (unlikely, but...), then you can switch to reasonable-lens and enjoy improved build times, while switching to microlens will take you more time merely because you'll likely need 3 packages instead of just 1.
+For *most* usecases microlens is a better library than any of those libraries, but... well, like, c'mon, if you somehow accidentally happen to have used only the functions that reasonable-lens provides, and you are sure won't need any other functions, then reasonable-lens might win over microlens simply because with microlens you'd have to import 2–3 packages (depending on whether you need e.g. Template Haskell), and with reasonable-lens – only 1, which means that I can't claim with a straight face that microlens is *strictly* better.
 
 ## Design decisions
 
