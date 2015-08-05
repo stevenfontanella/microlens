@@ -338,6 +338,8 @@ Generated lens with 'simpleLenses' turned on:
 @
 foo :: 'Lens'' (Foo a) a
 @
+
+This option is disabled by default.
 -}
 simpleLenses :: Lens' LensRules Bool
 simpleLenses f r = fmap (\x -> r { _simpleLenses = x}) (f (_simpleLenses r))
@@ -345,7 +347,7 @@ simpleLenses f r = fmap (\x -> r { _simpleLenses = x}) (f (_simpleLenses r))
 {- |
 Supply type signatures for the generated lenses.
 
-Disable this if you want to write the signature by yourself – for instance, if the signature should be more restricted, or if you want to write haddocks for the lens (as haddocks are attached to the signature and not to the definition).
+This option is enabled by default. Disable it if you want to write the signature by yourself – for instance, if the signature should be more restricted, or if you want to write haddocks for the lens (as haddocks are attached to the signature and not to the definition).
 -}
 generateSignatures :: Lens' LensRules Bool
 generateSignatures f r =
@@ -354,7 +356,7 @@ generateSignatures f r =
 {- |
 Generate “updateable” optics. When turned off, 'Fold's will be generated instead of 'Traversal's and 'Getter's will be generated instead of 'Lens'es.
 
-This option is useful for types with invariants (also known as “types with smart constructors”) – if you generate updateable optics, anyone would be able to use them to break your invariants.
+This option is enabled by default. Disabling it can be useful for types with invariants (also known as “types with smart constructors”) – if you generate updateable optics, anyone would be able to use them to break your invariants.
 -}
 generateUpdateableOptics :: Lens' LensRules Bool
 generateUpdateableOptics f r =
@@ -377,7 +379,7 @@ Foo {_x = 8, _y = True}
 
 (Without 'generateLazyPatterns', the result would be just 'undefined'.)
 
-The downside of this flag is that it can lead to space-leaks and code-size\/compile-time increases when lenses are generated for large records. By default this flag is turned off, and strict lenses are generated.
+This option is disabled by default. The downside of enabling it is that it can lead to space-leaks and code-size\/compile-time increases when lenses are generated for large records.
 
 When you have a lazy lens, you can get a strict lens from it by composing with ('$!'):
 
