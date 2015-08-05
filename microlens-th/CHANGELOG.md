@@ -1,4 +1,4 @@
-# next
+# 0.2.0.0
 
 * `createClass` was removed because it doesn't seem to be useful without `lensClass`.
 * `defaultFieldRules` isn't exported anymore – use `camelCaseFields`.
