@@ -93,11 +93,12 @@ instance Each [a] [b] a b
 instance Each (Maybe a) (Maybe b) a b
 
 type family Index (s :: *) :: *
-type instance Index (e -> a) = e
-type instance Index [a] = Int
 
 type family IxValue (m :: *) :: *
+
+type instance Index   (e -> a) = e
 type instance IxValue (e -> a) = a
+type instance Index   [a] = Int
 type instance IxValue [a] = a
 
 class Ixed m where
