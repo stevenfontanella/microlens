@@ -418,6 +418,15 @@ You can also generate classes (i.e. what 'makeFields' does) by using @'MethodNam
 lensField :: Lens' LensRules (Name -> [Name] -> Name -> [DefName])
 lensField f r = fmap (\x -> r { _fieldToDef = x}) (f (_fieldToDef r))
 
+{- |
+Lens rules used by default (i.e. in 'makeLenses'):
+
+* 'generateSignatures' is turned on
+* 'generateUpdateableOptics' is turned on
+* 'generateLazyPatterns' is turned off
+* 'simpleLenses' is turned off
+* 'lensField' strips “_” off the field name, lowercases the next character after “_”, and skips the field entirely if it doesn't start with “_” (you can see how it's implemented in the docs for 'lensField').
+-}
 lensRules :: LensRules
 lensRules = LensRules
   { _simpleLenses    = False
@@ -434,7 +443,7 @@ lensRules = LensRules
   }
 
 {- |
-A modification of 'lensRules' used by 'makeLensesFor'.
+A modification of 'lensRules' used by 'makeLensesFor' (the only difference is that a simple lookup function is used for 'lensField').
 -}
 lensRulesFor
   :: [(String, String)] -- ^ \[(fieldName, lensName)\]
@@ -445,6 +454,15 @@ mkNameLookup :: [(String,String)] -> Name -> [Name] -> Name -> [DefName]
 mkNameLookup kvs _ _ field =
   [ TopName (mkName v) | (k,v) <- kvs, k == nameBase field]
 
+{- |
+Lens rules used by 'makeFields':
+
+* 'generateSignatures' is turned on
+* 'generateUpdateableOptics' is turned on
+* 'generateLazyPatterns' is turned off
+* 'simpleLenses' is turned on (unlike in 'lensRules')
+* 'lensField' is more complicated – it takes fields which are prefixed with the name of the type they belong to (e.g. “fooFieldName” for “Foo”), strips that prefix, and generates a class called “HasFieldName” with a single method called “fieldName”. If some fields are prefixed with underscores, underscores would be stripped too, but then fields without underscores won't have any lenses generated for them. Also note that e.g. “foolish” won't have a lens called “lish” generated for it – the prefix must be followed by a capital letter (or else it wouldn't be camel case).
+-}
 camelCaseFields :: LensRules
 camelCaseFields = defaultFieldRules
 
