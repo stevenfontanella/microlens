@@ -8,7 +8,7 @@
 
   * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`).
 
-  * Nice, comprehensive documentation; a tutorial for people who haven't ever seen lenses before (like the embedded tutorial in the pipes package); and a complementary set of exercises at School Of Haskell (still in progress).
+  * Nice, comprehensive documentation.
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
@@ -21,10 +21,6 @@
   * All `INLINE` pragmas sprinkled thru lens were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
 
 [microlens-th]: http://hackage.haskell.org/package/microlens-th
-
-## Tutorial (if you're new to this whole lens thing)
-
-Just look at <http://hackage.haskell.org/package/microlens/docs/Lens-Micro-Tutorial.html>.
 
 ## Competitors
 
@@ -193,6 +189,4 @@ It's also hard to sell.
 
 ### Sell?
 
-I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell lens because it's simply unsellable to people who can't depend on such a big package, and I can't sell lens-family because it's outside of my reach. I can't give promises of compatibility, I can't include a nice tutorial in the docs, I can't even file an issue on Github because the library isn't on Github.
-
-It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of lens”) than to either try to promote lens-family or convince its maintainer to let me do what I want to do to it.
+I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell lens because it's simply unsellable to people who can't depend on such a big package, and I can't sell lens-family because it's outside of my reach. I can't give promises of compatibility, I'm afraid to bother the maintainer whenever I want to reword a paragraph because it's good but not good enough, I can't even file an issue on Github because the library isn't on Github. It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of lens”) than to either try to promote lens-family or convince its maintainer to let me do whatever I want to do to it.

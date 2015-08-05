@@ -28,8 +28,7 @@ description:
   Note that microlens has /no/ dependencies starting from GHC 7.10 
   (base-4.8). Prior to that, it has to depend on transformers-0.2 or above.
   .
-  Also note that it's not done yet and there's a lot of things missing
-  and I'm still writing a tutorial for it.
+  Also note that it's not done yet and there's a lot of things missing.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom
