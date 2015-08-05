@@ -35,12 +35,14 @@ module Lens.Micro
   -- * Lenses (setters and getters at once)
   Lens, Lens',
   lens,
+  at,
   _1, _2, _3, _4, _5,
 
   -- * Traversals (lenses iterating over several elements)
   Traversal, Traversal',
   both,
   each,
+  ix,
 
   -- * Prisms (traversals iterating over at most 1 element)
   -- $prisms-note

@@ -1,3 +1,7 @@
+# next
+
+* Added `ix` and `at`.
+
 # 0.1.3.0
 
 * Moved some things into `Lens.Micro.Type` and `Lens.Micro.Classes`.

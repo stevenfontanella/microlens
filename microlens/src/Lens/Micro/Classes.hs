@@ -2,7 +2,9 @@
 CPP,
 MultiParamTypeClasses,
 FunctionalDependencies,
-GADTs,
+RankNTypes,
+TypeFamilies,
+KindSignatures,
 FlexibleInstances,
 UndecidableInstances,
 DefaultSignatures
@@ -12,6 +14,10 @@ DefaultSignatures
 module Lens.Micro.Classes
 (
   Each(..),
+  Index,
+  IxValue,
+  Ixed(..),
+  At(..),
   Field1(..),
   Field2(..),
   Field3(..),
@@ -85,6 +91,90 @@ instance Each (Complex a) (Complex b) a b where
 instance Each [a] [b] a b
 
 instance Each (Maybe a) (Maybe b) a b
+
+type family Index (s :: *) :: *
+type instance Index (e -> a) = e
+type instance Index [a] = Int
+
+type family IxValue (m :: *) :: *
+type instance IxValue (e -> a) = a
+type instance IxValue [a] = a
+
+class Ixed m where
+  {- |
+This traversal lets you access (and update) an arbitrary element in a list, array, @Map@, etc. (If you want to insert or delete elements as well, look at 'at'.)
+
+An example for lists:
+
+>>> [0..5] & ix 3 .~ 10
+[0,1,2,100,4,5]
+
+You can use it for getting, too:
+
+>>> [0..5] ^? ix 3
+Just 3
+
+Of course, the element may not be present (which means that you can use 'ix' as a safe variant of ('!!')):
+
+>>> [0..5] ^? ix 10
+Nothing
+
+Another useful instance is the one for functions – it lets you modify their outputs for specific inputs. For instance, here's 'maximum' that returns 0 when the list is empty (instead of throwing an exception):
+
+@
+maximum0 = 'maximum' 'Lens.Micro.&' 'ix' [] 'Lens.Micro..~' 0
+@
+
+The following instances are provided in this package:
+
+@
+'ix' :: 'Int' -> 'Traversal'' [a] a
+
+'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
+@
+  -}
+  ix :: Index m -> Traversal' m (IxValue m)
+  default ix :: (At m) => Index m -> Traversal' m (IxValue m)
+  ix = ixAt
+  {-# INLINE ix #-}
+
+class Ixed m => At m where
+  {- |
+This lens lets you read, write, or delete elements in @Map@-like structures. It returns 'Nothing' when the value isn't found, just like @lookup@:
+
+@
+Data.Map.lookup k m = m 'Lens.Micro.^.' at k
+@
+
+However, it also lets you insert and delete values by setting the value to @'Just' value@ or 'Nothing':
+
+@
+Data.Map.insert k a m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Just a
+
+Data.Map.delete k m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Nothing
+@
+
+'at' doesn't work for arrays, because you can't delete an arbitrary element from an array.
+
+If you want to modify an already existing value, you should use 'ix' instead because then you won't have to deal with 'Maybe' ('ix' is available for all types that have 'at').
+  -}
+  at :: Index m -> Lens' m (Maybe (IxValue m))
+
+ixAt :: At m => Index m -> Traversal' m (IxValue m)
+ixAt i = at i . traverse
+{-# INLINE ixAt #-}
+
+instance Eq e => Ixed (e -> a) where
+  ix e p f = (\a e' -> if e == e' then a else f e') <$> p (f e)
+  {-# INLINE ix #-}
+
+instance Ixed [a] where
+  ix k f xs0 | k < 0     = pure xs0
+             | otherwise = go xs0 k where
+    go [] _ = pure []
+    go (a:as) 0 = (:as) <$> f a
+    go (a:as) i = (a:) <$> (go as $! i - 1)
+  {-# INLINE ix #-}
 
 class Field1 s t a b | s -> a, t -> b, s b -> t, t a -> s where
   {- |
