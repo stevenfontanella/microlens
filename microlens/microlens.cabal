@@ -1,5 +1,5 @@
 name:                microlens
-version:             0.1.3.0
+version:             0.1.4.0
 synopsis:            A tiny part of the lens library which you can depend upon
 description:
   This is an extract from <http://hackage.haskell.org/package/lens lens>
@@ -59,7 +59,7 @@ library
   if impl(ghc>=7.9)
     build-depends:     base >=4.8 && <5
   if !impl(ghc>=7.9)
-    build-depends:     base >=4.4 && <5
+    build-depends:     base >=4.5 && <5
                      , transformers >=0.2
 
   ghc-options:

@@ -1,3 +1,7 @@
+# 0.1.3.0
+
+* Bumped base version.
+
 # 0.1.2.0
 
 * Package now compiles with `-O2` and other optimisations by default.

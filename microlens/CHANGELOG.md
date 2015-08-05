@@ -1,5 +1,6 @@
-# next
+# 0.1.4.0
 
+* Bumped base version.
 * Added `ix` and `at`.
 
 # 0.1.3.0

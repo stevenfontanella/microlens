@@ -1,5 +1,5 @@
 name:                microlens-mtl
-version:             0.1.2.0
+version:             0.1.3.0
 synopsis:            microlens support for Reader/Writer/State from mtl
 description:
   This package contains functions (like 'view' or '+=') which work   
@@ -25,7 +25,7 @@ library
   exposed-modules:     Lens.Micro.Mtl
   other-modules:       Lens.Micro.Mtl.Zoom
   -- other-extensions:    
-  build-depends:       base >=4.4 && <5
+  build-depends:       base >=4.5 && <5
                      , microlens ==0.1.*
                      , mtl >=2.0.1 && <2.3
                      , transformers >=0.2 && <0.5
