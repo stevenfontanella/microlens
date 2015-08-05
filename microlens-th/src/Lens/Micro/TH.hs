@@ -377,19 +377,31 @@ createClass :: Lens' LensRules Bool
 createClass f r =
   fmap (\x -> r { _generateClasses = x}) (f (_generateClasses r))
 
--- | 'Lens'' to access the convention for naming fields in our 'LensRules'.
---
--- Defaults to stripping the _ off of the field name, lowercasing the name, and
--- skipping the field if it doesn't start with an '_'. The field naming rule
--- provides the names of all fields in the type as well as the current field.
--- This extra generality enables field naming conventions that depend on the
--- full set of names in a type.
---
--- The field naming rule has access to the type name, the names of all the field
--- of that type (including the field being named), and the name of the field
--- being named.
---
--- TypeName -> FieldNames -> FieldName -> DefinitionNames
+{- |
+This lets you choose which fields would have lenses generated for them and how would those lenses be called. To do that, you provide a function that would take a field name and output a list (possibly empty) of lenses that should be generated for that field.
+
+Here's the full type of the function you have to provide:
+
+@
+'Name' ->     -- The datatype lenses are being generated for.
+['Name'] ->   -- A list of all fields of the datatype.
+'Name' ->     -- The current field.
+['DefName']   -- A list of lens names.
+@
+
+Most of the time you won't need the first 2 parameters, but sometimes they are useful – for instance, the list of all fields would be useful if you wanted to implement a slightly more complicated rule like “if some fields are prefixed with underscores, generate lenses for them, but if no fields are prefixed with underscores, generate lenses for /all/ fields”.
+
+As an example, here's a function used by default. It strips @_@ off the field name, lowercases the next character after @_@, and skips the field entirely if it doesn't start with @_@:
+
+@
+\\_ _ n ->
+  case 'nameBase' n of
+    \'_\':x:xs -> ['TopName' ('mkName' ('toLower' x : xs))]
+    _        -> []
+@
+
+You can also generate classes (i.e. what 'makeFields' does) by using @'MethodName' className lensName@ instead of @'TopName' lensName@.
+-}
 lensField :: Lens' LensRules (Name -> [Name] -> Name -> [DefName])
 lensField f r = fmap (\x -> r { _fieldToDef = x}) (f (_fieldToDef r))
 
