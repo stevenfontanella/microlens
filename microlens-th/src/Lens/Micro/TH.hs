@@ -88,21 +88,21 @@ coerce = Const . getConst
 
 -- Utilities
 
--- | Modify element at some index in a list.
+-- Modify element at some index in a list.
 setIx :: Int -> a -> [a] -> [a]
 setIx i x s
   | i < 0 || i >= length s = s
   | otherwise              = let (l, _:r) = splitAt i s
                              in  l ++ [x] ++ r
 
--- | This is like @rewrite@ from uniplate.
+-- This is like @rewrite@ from uniplate.
 rewrite :: (Data a, Data b) => (a -> Maybe a) -> b -> b
 rewrite f mbA = case cast mbA of
   Nothing -> gmapT (rewrite f) mbA
   Just a  -> let a' = gmapT (rewrite f) a
              in  fromJust . cast $ fromMaybe a' (f a')
 
--- | @fromSet@ wasn't always there, and we need compatibility with
+-- @fromSet@ wasn't always there, and we need compatibility with
 -- containers-0.4 to compile on GHC 7.4.
 fromSet :: (k -> v) -> Set.Set k -> Map.Map k v
 #if MIN_VERSION_containers(0,5,0)
@@ -458,9 +458,9 @@ defaultFieldRules = LensRules
 
 -- Language.Haskell.TH.Lens
 
--- | Has a 'Name'
+-- Has a 'Name'
 class HasName t where
-  -- | Extract (or modify) the 'Name' of something
+  -- Extract (or modify) the 'Name' of something
   name :: Lens' t Name
 
 instance HasName TyVarBndr where
@@ -476,9 +476,9 @@ instance HasName Con where
   name f (InfixC l n r)        = (\n' -> InfixC l n' r) <$> f n
   name f (ForallC bds ctx con) = ForallC bds ctx <$> name f con
 
--- | Provides for the extraction of free type variables, and alpha renaming.
+-- Provides for the extraction of free type variables, and alpha renaming.
 class HasTypeVars t where
-  -- | When performing substitution into this traversal you're not allowed
+  -- When performing substitution into this traversal you're not allowed
   -- to substitute in a name that is bound internally or you'll violate
   -- the 'Traversal' laws, when in doubt generate your names with 'newName'.
   typeVarsEx :: Set Name -> Traversal' t Name
@@ -525,11 +525,11 @@ instance HasTypeVars t => HasTypeVars [t] where
 instance HasTypeVars t => HasTypeVars (Maybe t) where
   typeVarsEx s = traverse . typeVarsEx s
 
--- | Traverse /free/ type variables
+-- Traverse /free/ type variables
 typeVars :: HasTypeVars t => Traversal' t Name
 typeVars = typeVarsEx mempty
 
--- | Substitute using a map of names in for /free/ type variables
+-- Substitute using a map of names in for /free/ type variables
 substTypeVars :: HasTypeVars t => Map Name Name -> t -> t
 substTypeVars m = over typeVars $ \n -> fromMaybe n (Map.lookup n m)
 
@@ -540,7 +540,7 @@ substTypeVars m = over typeVars $ \n -> fromMaybe n (Map.lookup n m)
 ------------------------------------------------------------------------
 
 
--- | Compute the field optics for the type identified by the given type name.
+-- Compute the field optics for the type identified by the given type name.
 -- Lenses will be computed when possible, Traversals otherwise.
 makeFieldOptics :: LensRules -> Name -> DecsQ
 makeFieldOptics rules tyName =
@@ -565,7 +565,7 @@ makeFieldOpticsForDec rules dec = case dec of
   mkS tyName vars = tyName `conAppsT` map VarT (toListOf typeVars vars)
 
 
--- | Compute the field optics for a deconstructed Dec
+-- Compute the field optics for a deconstructed Dec
 -- When possible build an Iso otherwise build one optic per field.
 makeFieldOpticsForDec' :: LensRules -> Name -> Type -> [Con] -> DecsQ
 makeFieldOpticsForDec' rules tyName s cons =
@@ -598,12 +598,12 @@ makeFieldOpticsForDec' rules tyName s cons =
   expandName _ _ = []
 
 
--- | Normalized the Con type into a uniform positional representation,
+-- Normalized the Con type into a uniform positional representation,
 -- eliminating the variance between records, infix constructors, and normal
 -- constructors.
 normalizeConstructor ::
   Con ->
-  Q (Name, [(Maybe Name, Type)]) -- ^ constructor name, field name, field type
+  Q (Name, [(Maybe Name, Type)]) -- constructor name, field name, field type
 
 normalizeConstructor (RecC n xs) =
   return (n, [ (Just fieldName, ty) | (fieldName,_,ty) <- xs])
@@ -621,15 +621,15 @@ normalizeConstructor (ForallC _ _ con) =
 
 data OpticType = GetterType | LensType -- or IsoType
 
--- | Compute the positional location of the fields involved in
+-- Compute the positional location of the fields involved in
 -- each constructor for a given optic definition as well as the
 -- type of clauses to generate and the type to annotate the declaration
 -- with.
 buildScaffold ::
-  LensRules                                                                  ->
-  Type                              {- ^ outer type                       -} ->
-  [(Name, [([DefName], Type)])]     {- ^ normalized constructors          -} ->
-  DefName                           {- ^ target definition                -} ->
+  LensRules                                                                ->
+  Type                              {- outer type                       -} ->
+  [(Name, [([DefName], Type)])]     {- normalized constructors          -} ->
+  DefName                           {- target definition                -} ->
   Q (OpticType, OpticStab, [(Name, Int, [Int])])
               {- ^ optic type, definition type, field count, target fields -}
 buildScaffold rules s cons defName =
@@ -717,7 +717,7 @@ stabToA :: OpticStab -> Type
 stabToA (OpticStab _ _ _ a _) = a
 stabToA (OpticSa _ _ _ a) = a
 
--- | Compute the s t a b types given the outer type 's' and the
+-- Compute the s t a b types given the outer type 's' and the
 -- categorized field types. Left for fixed and Right for visited.
 -- These types are "raw" and will be packaged into an 'OpticStab'
 -- shortly after creation.
@@ -738,7 +738,7 @@ buildStab s categorizedFields =
   unfixedTypeVars             = setOf typeVars s Set.\\ fixedTypeVars
 
 
--- | Build the signature and definition for a single field optic.
+-- Build the signature and definition for a single field optic.
 -- In the case of a singleton constructor irrefutable matches are
 -- used to enable the resulting lenses to be used on a bottom value.
 makeFieldOptic ::
@@ -807,7 +807,7 @@ makeFieldClauses rules opticType cons =
       irref = _lazyPatterns rules
            && length cons == 1
 
--- | Construct an optic clause that returns an unmodified value
+-- Construct an optic clause that returns an unmodified value
 -- given a constructor name and the number of fields on that
 -- constructor.
 makePureClause :: Name -> Int -> ClauseQ
@@ -818,7 +818,7 @@ makePureClause conName fieldCount =
             (normalB (appE (varE 'pure) (appsE (conE conName : map varE xs))))
             []
 
--- | Construct an optic clause suitable for a Getter or Fold
+-- Construct an optic clause suitable for a Getter or Fold
 -- by visited the fields identified by their 0 indexed positions
 makeGetterClause :: Name -> Int -> [Int] -> ClauseQ
 makeGetterClause conName fieldCount []     = makePureClause conName fieldCount
@@ -841,7 +841,7 @@ makeGetterClause conName fieldCount fields =
             (normalB body)
             []
 
--- | Build a clause that updates the field at the given indexes
+-- Build a clause that updates the field at the given indexes
 -- When irref is 'True' the value with me matched with an irrefutable
 -- pattern. This is suitable for Lens and Traversal construction
 makeFieldOpticClause :: Name -> Int -> [Int] -> Bool -> ClauseQ
@@ -876,7 +876,7 @@ makeFieldOpticClause conName fieldCount (field:fields) irref =
 -- The field-oriented optic generation supports incorporating fields
 -- with distinct but unifiable types into a single definition.
 
--- | Unify the given list of types, if possible, and return the
+-- Unify the given list of types, if possible, and return the
 -- substitution used to unify the types for unifying the outer
 -- type when building a definition's type signature.
 unifyTypes :: [Type] -> Q (Map Name Type, Type)
@@ -884,7 +884,7 @@ unifyTypes (x:xs) = foldM (uncurry unify1) (Map.empty, x) xs
 unifyTypes []     = fail "unifyTypes: Bug: Unexpected empty list"
 
 
--- | Attempt to unify two given types using a running substitution
+-- Attempt to unify two given types using a running substitution
 unify1 :: Map Name Type -> Type -> Type -> Q (Map Name Type, Type)
 unify1 sub (VarT x) y
   | Just r <- Map.lookup x sub = unify1 sub r y
@@ -912,7 +912,7 @@ unify1 sub (ForallT v1 [] t1) (ForallT v2 [] t2) =
 
 unify1 _ x y = fail ("Failed to unify types: " ++ show (x,y))
 
--- | Perform a limited substitution on type variables. This is used
+-- Perform a limited substitution on type variables. This is used
 -- when unifying rank-2 fields when trying to achieve a Getter or Fold.
 limitedSubst :: Map Name Type -> TyVarBndr -> Q TyVarBndr
 limitedSubst sub (PlainTV n)
@@ -927,7 +927,7 @@ limitedSubst sub (KindedTV n k)
          _ -> fail "Unable to unify exotic higher-rank type"
 limitedSubst _ tv = return tv
 
--- | Apply a substitution to a type. This is used after unifying
+-- Apply a substitution to a type. This is used after unifying
 -- the types of the fields in unifyTypes.
 applyTypeSubst :: Map Name Type -> Type -> Type
 applyTypeSubst sub = rewrite aux
@@ -949,9 +949,9 @@ data LensRules = LensRules
   , _generateSigs    :: Bool
   , _generateClasses :: Bool
   -- , _allowIsos       :: Bool
-  , _allowUpdates    :: Bool -- ^ Allow Lens/Traversal (otherwise Getter/Fold)
+  , _allowUpdates    :: Bool -- Allow Lens/Traversal (otherwise Getter/Fold)
   , _lazyPatterns    :: Bool
-  -- | Type Name -> Field Names -> Target Field Name -> Definition Names
+  -- Type Name -> Field Names -> Target Field Name -> Definition Names
   , _fieldToDef      :: Name -> [Name] -> Name -> [DefName]
   -- , _classyLenses    :: Name -> Maybe (Name,Name)
        -- type name to class name and top method
@@ -970,14 +970,14 @@ data DefName
 ------------------------------------------------------------------------
 
 
--- | Template Haskell wants type variables declared in a forall, so
+-- Template Haskell wants type variables declared in a forall, so
 -- we find all free type variables in a given type and declare them.
 quantifyType :: Cxt -> Type -> Type
 quantifyType c t = ForallT vs c t
   where
   vs = map PlainTV (toList (setOf typeVars t))
 
--- | This function works like 'quantifyType' except that it takes
+-- This function works like 'quantifyType' except that it takes
 -- a list of variables to exclude from quantification.
 quantifyType' :: Set Name -> Cxt -> Type -> Type
 quantifyType' exclude c t = ForallT vs c t
@@ -1016,6 +1016,6 @@ inlinePragma _ = []
 
 -- Control.Lens.Internal.TH
 
--- | Apply arguments to a type constructor.
+-- Apply arguments to a type constructor.
 conAppsT :: Name -> [Type] -> Type
 conAppsT conName = foldl AppT (ConT conName)
