@@ -33,7 +33,6 @@ module Lens.Micro.TH
   -- * Configuring lens rules
   lensField,
   simpleLenses,
-  createClass,
   generateSignatures,
   generateUpdateableOptics,
   generateLazyPatterns,
@@ -370,12 +369,6 @@ strictOptic = ('$!') . lazyOptic
 generateLazyPatterns :: Lens' LensRules Bool
 generateLazyPatterns f r =
   fmap (\x -> r { _lazyPatterns = x}) (f (_lazyPatterns r))
-
--- | Create the class if the constructor is 'Control.Lens.Type.Simple' and the
--- 'lensClass' rule matches.
-createClass :: Lens' LensRules Bool
-createClass f r =
-  fmap (\x -> r { _generateClasses = x}) (f (_generateClasses r))
 
 {- |
 This lets you choose which fields would have lenses generated for them and how would those lenses be called. To do that, you provide a function that would take a field name and output a list (possibly empty) of lenses that should be generated for that field.
