@@ -120,7 +120,7 @@ overHead f (x:xs) = f x : xs
 {- |
 Generate lenses for a data type or a newtype.
 
-To use, you have to enable Template Haskell:
+To use it, you have to enable Template Haskell first:
 
 @
 \{\-\# LANGUAGE TemplateHaskell \#\-\}
@@ -133,7 +133,7 @@ data Foo = Foo {
   _x :: Int,
   _y :: Bool }
 
-makeLenses ''Foo
+'makeLenses' ''Foo
 @
 
 This would generate the following lenses, which can be used to access the fields of @Foo@:
@@ -146,7 +146,7 @@ y :: 'Lens'' Foo Bool
 y f foo = (\\y' -> f {_y = y'}) '<$>' f (_y foo)
 @
 
-(If you don't want a lens to be generated for some field, don't prefix it with an @_@.)
+(If you don't want a lens to be generated for some field, don't prefix it with “_”.)
 
 If you want to creat lenses for many types, you can do it all in one place like this (of course, instead you just can use 'makeLenses' several times if you feel it would be more readable):
 
@@ -158,7 +158,7 @@ data Quux = ...
 'concat' '<$>' 'mapM' 'makeLenses' [''Foo, ''Bar, ''Quux]
 @
 
-When the data type has type parameters, it's possible for a lens to do a polymorphic update – i.e. change the type of the thing along with changing the type of the field. For instance, with this type:
+When the data type has type parameters, it's possible for a lens to do a polymorphic update – i.e. change the type of the thing along with changing the type of the field. For instance, with this type
 
 @
 data Foo a = Foo {
@@ -228,6 +228,15 @@ data Foo = Foo {slot1, slot2, slot3 :: Int}
                (\"slot2\", \"slots\"),
                (\"slot3\", \"slots\")] ''Foo
 @
+
+would generate
+
+@
+slots :: 'Traversal'' Foo Int
+slots f foo = Foo '<$>' f (slot1 foo)
+                  '<*>' f (slot2 foo)
+                  '<*>' f (slot3 foo)
+@
 -}
 makeLensesFor :: [(String, String)] -> Name -> DecsQ
 makeLensesFor fields = makeFieldOptics (lensRulesFor fields)
@@ -235,7 +244,11 @@ makeLensesFor fields = makeFieldOptics (lensRulesFor fields)
 {- |
 Generate lenses with custom parameters.
 
-This function lets you customise generated lenses; to see what exactly can be changed, look at 'LensRules'. 'makeLenses' is implemented with 'makeLensesWith' – it uses the 'lensRules' configuration (which you can build upon – see the “Configuring lens rules” section).
+To see what exactly you can customise, look at the “Configuring lens rules” section. Usually you would build upon the 'lensRules' configuration, which is used by 'makeLenses':
+
+@
+'makeLenses' = 'makeLensesWith' 'lensRules'
+@
 
 Here's an example of generating lenses that would use lazy patterns:
 
@@ -317,7 +330,13 @@ data Foo a = Foo { _foo :: a }
 Generated lens:
 
 @
-foo :: Lens (Foo a) (Foo b) a b
+foo :: 'Lens' (Foo a) (Foo b) a b
+@
+
+Generated lens with 'simpleLenses' turned on:
+
+@
+foo :: 'Lens'' (Foo a) a
 @
 -}
 simpleLenses :: Lens' LensRules Bool
@@ -342,7 +361,7 @@ generateUpdateableOptics f r =
   fmap (\x -> r { _allowUpdates = x}) (f (_allowUpdates r))
 
 {- |
-Generate optics using lazy pattern matches. This can allow fields of an undefined value to be initialized with lenses:
+Generate lenses using lazy pattern matches. This can allow fields of an undefined value to be initialized with lenses:
 
 @
 data Foo = Foo {_x :: Int, _y :: Bool}
@@ -352,18 +371,18 @@ data Foo = Foo {_x :: Int, _y :: Bool}
 @
 
 @
-> 'undefined' '&' x '.~' 8 '&' y '.~' True
+>>> 'undefined' '&' x '.~' 8 '&' y '.~' True
 Foo {_x = 8, _y = True}
 @
 
 (Without 'generateLazyPatterns', the result would be just 'undefined'.)
 
-The downside of this flag is that it can lead to space-leaks and code-size\/compile-time increases when generated for large records. By default this flag is turned off, and strict optics are generated.
+The downside of this flag is that it can lead to space-leaks and code-size\/compile-time increases when lenses are generated for large records. By default this flag is turned off, and strict lenses are generated.
 
-When you have a lazy optic, you can get a strict optic from it by composing with ('$!'):
+When you have a lazy lens, you can get a strict lens from it by composing with ('$!'):
 
 @
-strictOptic = ('$!') . lazyOptic
+strictLens = ('$!') . lazyLens
 @
 -}
 generateLazyPatterns :: Lens' LensRules Bool
@@ -376,15 +395,15 @@ This lets you choose which fields would have lenses generated for them and how w
 Here's the full type of the function you have to provide:
 
 @
-'Name' ->     -- The datatype lenses are being generated for.
-['Name'] ->   -- A list of all fields of the datatype.
-'Name' ->     -- The current field.
-['DefName']   -- A list of lens names.
+'Name' ->     -- The datatype lenses are being generated for
+['Name'] ->   -- A list of all fields of the datatype
+'Name' ->     -- The current field
+['DefName']   -- A list of lens names
 @
 
 Most of the time you won't need the first 2 parameters, but sometimes they are useful – for instance, the list of all fields would be useful if you wanted to implement a slightly more complicated rule like “if some fields are prefixed with underscores, generate lenses for them, but if no fields are prefixed with underscores, generate lenses for /all/ fields”.
 
-As an example, here's a function used by default. It strips @_@ off the field name, lowercases the next character after @_@, and skips the field entirely if it doesn't start with @_@:
+As an example, here's a function used by default. It strips “_” off the field name, lowercases the next character after “_”, and skips the field entirely if it doesn't start with “_”:
 
 @
 \\_ _ n ->
@@ -416,9 +435,9 @@ lensRules = LensRules
 {- |
 A modification of 'lensRules' used by 'makeLensesFor'.
 -}
-lensRulesFor ::
-  [(String, String)] {- ^ [(Field Name, Lens Name)] -} ->
-  LensRules
+lensRulesFor
+  :: [(String, String)] -- ^ \[(fieldName, lensName)\]
+  -> LensRules
 lensRulesFor fields = lensRules & lensField .~ mkNameLookup fields
 
 mkNameLookup :: [(String,String)] -> Name -> [Name] -> Name -> [DefName]
@@ -958,7 +977,7 @@ data LensRules = LensRules
   }
 
 {- |
-Name to give to a generated lens.
+Name to give to a generated lens (used in 'lensField').
 -}
 data DefName
   = TopName Name          -- ^ Simple top-level definiton name
