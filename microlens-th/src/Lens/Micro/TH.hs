@@ -28,7 +28,6 @@ module Lens.Micro.TH
   DefName(..),
   lensRules,
   lensRulesFor,
-  defaultFieldRules,
   camelCaseFields,
   -- * Configuring lens rules
   lensField,
