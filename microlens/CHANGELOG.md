@@ -1,6 +1,7 @@
 # 0.2.0.0
 
 * Removed `toListOf`.
+* Removed `+~`, `-~`, `*~`, `//~` and the `Lens.Micro.Extras` module.
 
 # 0.1.5.0
 

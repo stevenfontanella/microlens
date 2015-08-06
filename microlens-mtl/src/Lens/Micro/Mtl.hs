@@ -39,7 +39,6 @@ import Control.Monad.Trans.Identity
 import Control.Monad.Trans.Maybe
 -- microlens
 import Lens.Micro
-import Lens.Micro.Extras
 import Lens.Micro.Internal
 -- Internal modules
 import Lens.Micro.Mtl.Zoom
@@ -115,7 +114,7 @@ l '+=' x = l '%=' (+x)
 @
 -}
 (+=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
-l += b = State.modify (l +~ b)
+l += x = l %= (+x)
 {-# INLINE (+=) #-}
 
 {- |
@@ -126,7 +125,7 @@ l '-=' x = l '%=' ('subtract' x)
 @
 -}
 (-=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
-l -= b = State.modify (l -~ b)
+l -= x = l %= (subtract x)
 {-# INLINE (-=) #-}
 
 {- |
@@ -137,7 +136,7 @@ l '*=' x = l '%=' (*x)
 @
 -}
 (*=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
-l *= b = State.modify (l *~ b)
+l *= x = l %= (*x)
 {-# INLINE (*=) #-}
 
 {- |
@@ -148,7 +147,7 @@ l '//=' x = l '%=' (/x)
 @
 -}
 (//=) :: (MonadState s m, Fractional a) => ASetter s s a a -> a -> m ()
-l //= a = State.modify (l //~ a)
+l //= x = l %= (/x)
 {-# INLINE (//=) #-}
 
 class (Zoomed m ~ Zoomed n, MonadState s m, MonadState t n) => Zoom m n s t | m -> s, n -> t, m t -> n, n s -> m where

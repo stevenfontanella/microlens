@@ -26,7 +26,7 @@ library
   other-modules:       Lens.Micro.Mtl.Zoom
   -- other-extensions:    
   build-depends:       base >=4.5 && <5
-                     , microlens >=0.1.5 && <0.3
+                     , microlens ==0.2.*
                      , mtl >=2.0.1 && <2.3
                      , transformers >=0.2 && <0.5
                      , transformers-compat >=0.4 && <1

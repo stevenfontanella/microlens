@@ -8,7 +8,7 @@
 
   * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`, `at`, and `ix`).
 
-  * Nice, mostly comprehensive documentation. (“mostly” – because I was a bit lazy to document `+~` and `+=`. Let's see whether anyone would want to send a pull request!)
+  * Nice, comprehensive documentation.
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
@@ -76,12 +76,12 @@ microlens doesn't include anything lens doesn't include, even tho sometimes I'm 
 All the `*Of` functions aren't included. If you don't know, those are `sumOf`, `lengthOf`, `setOf`, etc., and they are roughly equivalent to following:
 
 ~~~ haskell
-sumOf    l = sum          . toListOf l
-lengthOf l = length       . toListOf l
-setOf    l = Set.fromList . toListOf l
+sumOf    l s = sum          (s ^.. l)
+lengthOf l s = length       (s ^.. l)
+setOf    l s = Set.fromList (s ^.. l)
 ~~~
 
-(Where `toListOf` takes something which extracts several targets, and returns a list of those targets. E.g. `toListOf both (1, 2)` is `[1, 2]`).
+(Where `^..` takes something which extracts several targets, and returns a list of those targets. E.g. `(1, 2) ^.. both` is `[1, 2]`).
 
 I guess the reason for including them all into `lens` (and there's an awful lot of them) is somewhere between
 
@@ -103,9 +103,7 @@ So, don't write `Of` functions yet, it's not their time. Also, this suffix is ug
 
 -----------------------------------------------------------------------------
 
-All those `<<&&=` operators aren't included. I don't know how useful they are – I never used them – and I don't like them because it feels like they do more harm than good, but they're not included merely because there's too many of them and I don't know how to pick which ones to include.
-
-Operators like `+=` or `.=` are available from [microlens-mtl][]. Operators like `~+` are available from `Lens.Micro.Extras` (a module in [microlens][]), but not from the main module. The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
+All those `<<&&=` operators aren't included. I don't know how useful they are – I never used them – and I don't like them because it feels like they do more harm than good, but they're not included merely because there's too many of them and I don't know how to pick which ones to include. Operators like `+=` or `.=` are available from [microlens-mtl][]. The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
 
 -----------------------------------------------------------------------------
 
