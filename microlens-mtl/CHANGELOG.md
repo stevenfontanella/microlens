@@ -1,9 +1,6 @@
-# 0.1.3.1
-
-* Moved some internally used functions to `Lens.Micro.Internal` in microlens.
-
 # 0.1.3.0
 
+* Moved some internally used functions to `Lens.Micro.Internal` in microlens.
 * Bumped base version.
 
 # 0.1.2.0
