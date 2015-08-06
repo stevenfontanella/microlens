@@ -1,0 +1,38 @@
+name:                microlens-ghc
+version:             0.1.0.0
+synopsis:            Orphan instances of microlens classes for packages coming with GHC (array, bytestring, containers)
+description:
+  Orphan instances of <http://hackage.haskell.org/package/microlens microlens> classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>).
+license:             BSD3
+license-file:        LICENSE
+author:              Artyom
+maintainer:          Artyom <yom@artyom.me>
+homepage:            http://github.com/aelve/microlens
+bug-reports:         http://github.com/aelve/microlens/issues
+category:            Data, Lenses
+build-type:          Simple
+extra-source-files:
+  CHANGELOG.md
+cabal-version:       >=1.10
+
+source-repository head
+  type:                git
+  location:            git://github.com/aelve/microlens.git
+
+library
+  exposed-modules:     Lens.Micro.GHC
+  -- other-modules:       
+  -- other-extensions:    
+  build-depends:       base >=4.5 && <5
+                     , microlens >=0.1.5 && <0.2
+                     , array >=0.3.0.2 && <0.6
+                     , bytestring >=0.9.1.10 && <0.11
+                     , containers >=0.4.0 && <0.6
+
+  ghc-options:
+    -Wall -fwarn-tabs
+    -O2 -fdicts-cheap -funbox-strict-fields
+    -fmax-simplifier-iterations=10
+
+  hs-source-dirs:      src
+  default-language:    Haskell2010

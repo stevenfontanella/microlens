@@ -64,6 +64,8 @@ You can use 'each' with these things:
 
 'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
 @
+
+To use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers>, import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package.
   -}
   each :: Traversal s t a b
   default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
