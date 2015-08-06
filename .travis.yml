@@ -15,13 +15,13 @@ script:
  - cabal configure && cabal sdist
  - cd ..
 
- - cd microlens-ghc
+ - cd microlens-mtl
  - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
 
- - cd microlens-mtl
+ - cd microlens-ghc
  - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
