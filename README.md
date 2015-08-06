@@ -6,13 +6,13 @@
 
 ## What you get
 
-  * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`).
+  * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`, `at`, and `ix`).
 
   * Nice, comprehensive documentation.
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
-  * **No** dependencies. And the whole package builds in ~4s on my laptop.
+  * **No** dependencies. And the whole package builds in ~4s on my laptop. There are separate packages (only [microlens-ghc][] for now) which provide additional instances and let you use `each` and friends with various container types.
 
   * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens.
 
@@ -21,6 +21,7 @@
   * All `INLINE` pragmas sprinkled thru lens were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
 
 [microlens-th]: http://hackage.haskell.org/package/microlens-th
+[microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
 
 ## Competitors
 
