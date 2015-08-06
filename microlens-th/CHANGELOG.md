@@ -1,6 +1,7 @@
 # 0.2.1.0
 
-* Bumped `base` version.
+* Bumped base version.
+* Bumped microlens version.
 
 # 0.2.0.0
 
