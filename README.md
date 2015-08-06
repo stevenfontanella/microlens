@@ -112,6 +112,15 @@ class Conjoined p => Indexable i p
 
 Perhaps it is for the best.
 
+-----------------------------------------------------------------------------
+
+Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages, which is understandable, because otherwise we'd have to have [vector][] as a dependency (the alternative is having orphan instances, which I'm not afraid of). However, even instances for libraries shipped with GHC (such as [array][]) are in [their own package][microlens-ghc]. There are 2 reasons for this:
+
+* I *really* want to be able to say “this library has no dependencies”.
+* All those instances actually take quite some time to build (for the same reason not all instances for tuples are included in the main package).
+
+[array]: http://hackage.haskell.com/package/array
+
 ## Motivation
 
 [lens][] is awesome. It's also huge, and requires lots of dependencies; not only [vector][] and [text][] (which you probably have anyway), but:
