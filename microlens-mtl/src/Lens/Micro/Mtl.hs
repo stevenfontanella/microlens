@@ -40,6 +40,7 @@ import Control.Monad.Trans.Maybe
 -- microlens
 import Lens.Micro
 import Lens.Micro.Extras
+import Lens.Micro.Internal
 -- Internal modules
 import Lens.Micro.Mtl.Zoom
 

@@ -19,8 +19,6 @@ KindSignatures
 module Lens.Micro.Mtl.Zoom where
 
 
-import Lens.Micro.Internal
-
 import Control.Applicative
 import Control.Monad.Reader as Reader
 import Control.Monad.Trans.State.Lazy as Lazy
