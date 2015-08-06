@@ -26,7 +26,7 @@ import Data.Monoid
 import Control.Applicative
 
 #if __GLASGOW_HASKELL__ < 710
-import Data.Foldable
+import Data.Foldable as F
 import Data.Traversable
 #endif
   
@@ -55,7 +55,7 @@ traversed = traverse
 'mapped' – the most powerful getter, but can't be used as a setter.
 -}
 folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
-folded = foldring foldr
+folded = foldring F.foldr
 {-# INLINE folded #-}
 
 foldring :: (Applicative (Const r)) => ((a -> Const r a -> Const r a) -> Const r a -> s -> Const r a) -> (a -> Const r b) -> s -> Const r t
