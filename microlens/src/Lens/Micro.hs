@@ -370,7 +370,7 @@ both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 
 {- $prisms-note
 
-Prisms are traversals which always target 0 or 1 values. Moreover, it's possible to /reverse/ a prism, using it to construct a structure instead of peeking into it. Here's an example from the lens library:
+Prisms are traversals that always target 0 or 1 values. Moreover, it's possible to /reverse/ a prism, using it to construct a structure instead of peeking into it. Here's an example from the lens library:
 
 @
 >>> over _Left (+1) (Left 2)
