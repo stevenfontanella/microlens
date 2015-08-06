@@ -1,12 +1,9 @@
 # 0.1.5.0
 
+* Added `ix` and `at`.
 * Added `traversed`.
 * Moved some things into `Lens.Micro.Internal`.
-
-# 0.1.4.0
-
 * Bumped base version.
-* Added `ix` and `at`.
 
 # 0.1.3.0
 
