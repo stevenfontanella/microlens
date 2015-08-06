@@ -26,7 +26,7 @@ module Lens.Micro
   (^.),
 
   -- * Folds (getters returning multiple elements)
-  (^..), toListOf,
+  (^..),
   (^?),
   (^?!),
   folded,
@@ -263,17 +263,10 @@ Gathering all values in a list of tuples:
 [1,2,3,4]
 -}
 (^..) :: s -> Getting (Endo [a]) s a -> [a]
-s ^.. l = toListOf l s
+s ^.. l = foldrOf l (:) [] s
 {-# INLINE (^..) #-}
 
 infixl 8 ^..
-
-{- |
-'toListOf' is a synonym for ('^..').
--}
-toListOf :: Getting (Endo [a]) s a -> s -> [a]
-toListOf l = foldrOf l (:) []
-{-# INLINE toListOf #-}
 
 {- |
 @s ^? t@ returns the 1st element @t@ returns, or 'Nothing' if @t@ doesn't return anything. It's trivially implemented by passing the 'First' monoid to the getter.
@@ -393,12 +386,10 @@ However, it's not possible for microlens to export prisms, because their type de
 {- |
 '_Left' targets the value contained in an 'Either', provided it's a 'Left'.
 
-Gathering all @Left@s in a structure (like the 'Data.Either.lefts' function):
+Gathering all @Left@s in a structure (like the 'Data.Either.lefts' function, but not necessarily just for lists):
 
-@
-'toListOf' ('each' '.' '_Left') :: ['Either' a b] -> [a]
-'toListOf' ('each' '.' '_Left') = 'Data.Either.lefts'
-@
+>>> [Left 1, Right 'c', Left 3] ^.. each._Just
+[1,3]
 
 Checking whether an 'Either' is a 'Left' (like 'Data.Either.isLeft'):
 
@@ -413,7 +404,7 @@ Extracting a value (if you're sure it's a 'Left'):
 >>> Left 1 ^?! _Left
 1
 
-Mapping over all @Left@s:
+Mapping over all 'Left's:
 
 >>> (each._Left %~ map toUpper) [Left "foo", Right "bar"]
 [Left "FOO",Right "bar"]
@@ -463,7 +454,7 @@ See documentation for '_Left' (as these 2 are pretty similar). In particular, it
     'Data.Maybe.maybeToList' = ('^..' '_Just')
     @
 
-  * Gathering all @Just@s in a list:
+  * Gathering all 'Just's in a list:
 
     @
     'Data.Maybe.catMaybes' = ('^..' 'each' '.' '_Just')
