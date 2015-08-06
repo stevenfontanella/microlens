@@ -24,9 +24,9 @@ import Lens.Micro.Type
 import Data.Functor.Identity
 import Data.Monoid
 import Control.Applicative
+import Data.Foldable as F
 
 #if __GLASGOW_HASKELL__ < 710
-import Data.Foldable as F
 import Data.Traversable
 #endif
   
