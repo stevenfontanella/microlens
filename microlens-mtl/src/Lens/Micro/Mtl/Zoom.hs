@@ -19,6 +19,8 @@ KindSignatures
 module Lens.Micro.Mtl.Zoom where
 
 
+import Lens.Micro.Internal
+
 import Control.Applicative
 import Control.Monad.Reader as Reader
 import Control.Monad.Trans.State.Lazy as Lazy
@@ -33,32 +35,8 @@ import Control.Monad.Trans.List
 import Control.Monad.Trans.Identity
 import Control.Monad.Trans.Maybe
 
-#if __GLASGOW_HASKELL__ >= 708
-import Data.Coerce
-#else
-import Unsafe.Coerce
-#endif
-
 #if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
-#endif
-
-------------------------------------------------------------------------------
--- Data.Profunctor.Unsafe
-------------------------------------------------------------------------------
-
-#if __GLASGOW_HASKELL__ >= 708
-( #. ) :: Coercible c b => (b -> c) -> (a -> b) -> (a -> c)
-( #. ) _ = coerce (\x -> x :: b) :: forall a b. Coercible b a => a -> b
-
-( .# ) :: Coercible b a => (b -> c) -> (a -> b) -> (a -> c)
-( .# ) pbc _ = coerce pbc
-#else
-( #. ) :: (b -> c) -> (a -> b) -> (a -> c)
-( #. ) _ = unsafeCoerce
-
-( .# ) :: (b -> c) -> (a -> b) -> (a -> c)
-( .# ) pbc _ = unsafeCoerce pbc
 #endif
 
 ------------------------------------------------------------------------------
