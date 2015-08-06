@@ -88,7 +88,9 @@ instance Each (Complex a) (Complex b) a b where
   each f (a :+ b) = (:+) <$> f a <*> f b
   {-# INLINE each #-}
 
-instance Each [a] [b] a b
+instance Each [a] [b] a b where
+  each = traversed
+  {-# INLINE each #-}
 
 instance Each (Maybe a) (Maybe b) a b
 
