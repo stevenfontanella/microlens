@@ -59,16 +59,8 @@ folded = foldring F.foldr
 {-# INLINE folded #-}
 
 foldring :: (Applicative (Const r)) => ((a -> Const r a -> Const r a) -> Const r a -> s -> Const r a) -> (a -> Const r b) -> s -> Const r t
-foldring fr f = coerce . fr (\a fa -> f a *> fa) noEffect
+foldring fr f = phantom . fr (\a fa -> f a *> fa) noEffect
 {-# INLINE foldring #-}
-
-coerce :: Const r a -> Const r b
-coerce = Const . getConst
-{-# INLINE coerce #-}
-
-noEffect :: Applicative (Const r) => Const r a
-noEffect = coerce (pure ())
-{-# INLINE noEffect #-}
 
 foldrOf :: Getting (Endo r) s a -> (a -> r -> r) -> r -> s -> r
 foldrOf l f z = flip appEndo z . foldMapOf l (Endo . f)
@@ -84,3 +76,16 @@ foldMapOf l f = getConst . l (Const . f)
 sets :: ((a -> b) -> s -> t) -> ASetter s t a b
 sets f g = Identity . f (runIdentity . g)
 {-# INLINE sets #-}
+
+------------------------------------------------------------------------------
+-- Control.Lens.Internal.Getter
+------------------------------------------------------------------------------
+
+-- was renamed from “coerce”
+phantom :: Const r a -> Const r b
+phantom = Const . getConst
+{-# INLINE phantom #-}
+
+noEffect :: Applicative (Const r) => Const r a
+noEffect = phantom (pure ())
+{-# INLINE noEffect #-}
