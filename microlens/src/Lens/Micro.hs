@@ -41,6 +41,7 @@ module Lens.Micro
   -- * Traversals (lenses iterating over several elements)
   Traversal, Traversal',
   both,
+  traversed,
   each,
   ix,
 
@@ -406,6 +407,25 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 both :: Traversal (a, a) (b, b) a b
 both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 {-# INLINE both #-}
+
+{- |
+'traversed' traverses any 'Traversable' container (list, vector, @Map@, 'Maybe', you name it):
+
+>>> Just 1 ^.. traversed
+[1]
+
+'traversed' is the same as 'traverse', but can be faster thanks to magic rewrite rules.
+-}
+traversed :: Traversable f => Traversal (f a) (f b) a b
+traversed = traverse
+{-# INLINE [0] traversed #-}
+
+{-# RULES
+"traversed -> mapped"
+  traversed = sets fmap :: Functor f => ASetter (f a) (f b) a b;
+"traversed -> folded"
+  traversed = folded :: Foldable f => Getting (Endo r) (f a) a;
+  #-}
 
 -- Prisms ------------------------------------------------------------------
 
