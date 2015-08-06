@@ -1,4 +1,4 @@
-# next
+# 0.1.5.0
 
 * Added `traversed`.
 * Moved some things into `Lens.Micro.Internal`.
