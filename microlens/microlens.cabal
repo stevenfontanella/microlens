@@ -50,6 +50,7 @@ library
   exposed-modules:     Lens.Micro
                        Lens.Micro.Extras
                        Lens.Micro.Classes
+                       Lens.Micro.Internal
                        Lens.Micro.Type
   -- other-modules:       
   -- other-extensions:    

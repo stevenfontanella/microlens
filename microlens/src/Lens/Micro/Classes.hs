@@ -28,6 +28,7 @@ where
 
 
 import Lens.Micro.Type
+import Lens.Micro.Internal
 
 #if __GLASGOW_HASKELL__ < 710
 import Data.Traversable

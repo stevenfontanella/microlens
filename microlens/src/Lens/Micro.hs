@@ -55,14 +55,11 @@ where
 
 import Lens.Micro.Classes
 import Lens.Micro.Type
+import Lens.Micro.Internal
 
 import Control.Applicative
 import Data.Functor.Identity
 import Data.Monoid
-
-#if __GLASGOW_HASKELL__ < 710
-import Data.Foldable
-#endif
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
@@ -110,13 +107,6 @@ or this:
 -}
 
 -- Setting -----------------------------------------------------------------
-
-{- |
-'sets' creates an 'ASetter' from an ordinary function. (The only thing it does is wrapping and unwrapping 'Identity'.)
--}
-sets :: ((a -> b) -> s -> t) -> ASetter s t a b
-sets f g = Identity . f (runIdentity . g)
-{-# INLINE sets #-}
 
 {- |
 ('%~') applies a function to the target; an alternative explanation is that it is an inverse of 'sets', which turns a setter into an ordinary function. @'mapped' '%~' 'reverse'@ is the same thing as @'fmap' 'reverse'@.
@@ -259,15 +249,6 @@ infixl 8 ^.
 
 -- Folds -------------------------------------------------------------------
 
--- | A 'Monoid' for a 'Contravariant' 'Applicative'.
-newtype Folding f a = Folding { getFolding :: f a }
-
-instance (Applicative (Const r)) => Monoid (Folding (Const r) a) where
-  mempty = Folding (Const . getConst $ pure ())
-  {-# INLINE mempty #-}
-  Folding fr `mappend` Folding fs = Folding (fr *> fs)
-  {-# INLINE mappend #-}
-
 {- |
 @s ^.. t@ returns the list of all values that @t@ gets from @s@.
 
@@ -327,22 +308,6 @@ s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
 {-# INLINE (^?!) #-}
 
 infixl 8 ^?!
-
-foldrOf :: Getting (Endo r) s a -> (a -> r -> r) -> r -> s -> r
-foldrOf l f z = flip appEndo z . foldMapOf l (Endo . f)
-{-# INLINE foldrOf #-}
-
-foldMapOf :: Getting r s a -> (a -> r) -> s -> r
-foldMapOf l f = getConst . l (Const . f)
-{-# INLINE foldMapOf #-}
-
-{- |
-'folded' is a fold for anything 'Foldable'. In a way, it's an opposite of
-'mapped' – the most powerful getter, but can't be used as a setter.
--}
-folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
-folded f = Const . getConst . getFolding . foldMap (Folding . f)
-{-# INLINE folded #-}
 
 {- |
 'has' checks whether a getter (any getter, including lenses, traversals, and folds) returns at least 1 value.
@@ -407,25 +372,6 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 both :: Traversal (a, a) (b, b) a b
 both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 {-# INLINE both #-}
-
-{- |
-'traversed' traverses any 'Traversable' container (list, vector, @Map@, 'Maybe', you name it):
-
->>> Just 1 ^.. traversed
-[1]
-
-'traversed' is the same as 'traverse', but can be faster thanks to magic rewrite rules.
--}
-traversed :: Traversable f => Traversal (f a) (f b) a b
-traversed = traverse
-{-# INLINE [0] traversed #-}
-
-{-# RULES
-"traversed -> mapped"
-  traversed = sets fmap :: Functor f => ASetter (f a) (f b) a b;
-"traversed -> folded"
-  traversed = folded :: Foldable f => Getting (Endo r) (f a) a;
-  #-}
 
 -- Prisms ------------------------------------------------------------------
 
