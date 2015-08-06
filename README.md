@@ -8,7 +8,7 @@
 
   * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`, `at`, and `ix`).
 
-  * Nice, comprehensive documentation.
+  * Nice, mostly comprehensive documentation. (“mostly” – because I was a bit lazy to document `+~` and `+=`. Let's see whether anyone would want to send a pull request!)
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
@@ -20,8 +20,18 @@
 
   * All `INLINE` pragmas sprinkled thru lens were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
 
+[microlens]: http://hackage.haskell.org/package/microlens
+[microlens-mtl]: http://hackage.haskell.org/package/microlens-mtl
 [microlens-th]: http://hackage.haskell.org/package/microlens-th
 [microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
+
+## All packages in the family
+
+  * [microlens][] – all basic functionality, plus `each`/`at`/`ix`
+  * [microlens-mtl][] – `+=` and friends, `use`, `zoom`/`magnify`
+  * [microlens-th][] – `makeLenses` and `makeFields`
+  * [microlens-ghc][] – instances to make `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
+  * microlens-platform – haven't written it yet, but it'll have instances for `Text`, `Vector`, and `HashMap`
 
 ## Competitors
 
@@ -54,6 +64,8 @@ I hate it when people advertise things without also describing their disadvantag
   * If Edward et al. continue using incomprehensible dark magic to make lens faster, one day I *might* give up and stop backporting all their changes to microlens.
 
   * Scary orphan instances (in the [microlens-ghc][] package) are scary. (I don't think they're as scary as they seem, but some people disagree.)
+
+  * There are `set` and `over` in the basic package, but no `view`. (There's `view` in [microlens-mtl][], but I can't have `view` in both packages at once, and having `view` in the basic package would add an mtl dependency.)
 
 ## Design decisions
 
@@ -91,9 +103,9 @@ So, don't write `Of` functions yet, it's not their time. Also, this suffix is ug
 
 -----------------------------------------------------------------------------
 
-All those `<<&&=` operators aren't included. My opinion is that they shouldn't exist, and that all code for which it's “really nice” to have all those operators available should either be using normal operators instead (if it's an open-source project with code meant to be read by others), or should define them locally (if it's production code), or *at least* import them implicitly from some module called `Weird.Operators`. (It's a pity Haskell doesn't have something like "operator modifiers"; it would solve this problem nicely, as well as “let's have lifted versions of `==` and stuff because `liftA2 (==)` is too long” and other similar ones. You can use Hayoo to find out how many different versions of `==` there are on Hackage.)
+All those `<<&&=` operators aren't included. I don't know how useful they are – I never used them – and I don't like them because it feels like they do more harm than good, but they're not included merely because there's too many of them and I don't know how to pick which ones to include.
 
-Operators like `+=` or `.=` are available from microlens-mtl. Operators like `~+` are available from `Lens.Micro.Extras` (a module in microlens), but not from the main module. The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
+Operators like `+=` or `.=` are available from [microlens-mtl][]. Operators like `~+` are available from `Lens.Micro.Extras` (a module in [microlens][]), but not from the main module. The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
 
 -----------------------------------------------------------------------------
 
