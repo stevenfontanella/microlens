@@ -8,7 +8,7 @@
 
   * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`, `at`, and `ix`).
 
-  * Nice, comprehensive documentation.
+  * More beginner-friendly documentation.
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
