@@ -40,7 +40,7 @@ import Data.Complex
 
 class Each s t a b | s -> a, t -> b, s b -> t, t a -> s where
   {- |
-'each' tries to be a universal 'Traversal' – it behaves like 'traverse' in most situations, but also adds support for e.g. tuples with same-typed values:
+'each' tries to be a universal 'Traversal' – it behaves like 'traversed' in most situations, but also adds support for e.g. tuples with same-typed values:
 
 >>> (1,2) & each %~ succ
 (2,3)
@@ -48,7 +48,7 @@ class Each s t a b | s -> a, t -> b, s b -> t, t a -> s where
 >>> ["x", "y", "z"] ^. each
 "xyz"
 
-However, note that 'each' doesn't work on /every/ instance of 'Traversable'. If you have a 'Traversable' which isn't supported by 'each', you can use 'traverse' instead. Personally, I like using 'each' instead of 'traverse' whenever possible – it's shorter and more descriptive.
+However, note that 'each' doesn't work on /every/ instance of 'Traversable'. If you have a 'Traversable' which isn't supported by 'each', you can use 'traversed' instead. Personally, I like using 'each' instead of 'traversed' whenever possible – it's shorter and more descriptive.
 
 You can use 'each' with these things:
 

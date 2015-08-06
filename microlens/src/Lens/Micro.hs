@@ -196,7 +196,7 @@ set l b = runIdentity . l (\_ -> Identity b)
 {-# INLINE set #-}
 
 {- |
-'mapped' is a setter for everything contained in a functor. You can use it to map over lists, @Maybe@, or even @IO@ (which is something you can't do with 'traverse' or 'each').
+'mapped' is a setter for everything contained in a functor. You can use it to map over lists, @Maybe@, or even @IO@ (which is something you can't do with 'traversed' or 'each').
 
 Here 'mapped' is used to turn a value to all non-'Nothing' values in a list:
 
