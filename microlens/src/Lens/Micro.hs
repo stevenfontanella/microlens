@@ -26,6 +26,7 @@ module Lens.Micro
   (^.),
 
   -- * Folds (getters returning multiple elements)
+  -- $folds-note
   (^..),
   (^?),
   (^?!),
@@ -248,6 +249,37 @@ s ^. l = getConst (l Const s)
 infixl 8 ^.
 
 -- Folds -------------------------------------------------------------------
+
+{- $folds-note
+
+Folds are getters that can traverse more than one element (or no elements at all). The only fold here which isn't simultaneously a 'Traversal' is 'folded' (traversals are folds that also can modify elements they're traversing).
+
+You can apply folds to values by using operators like ('^..'), ('^?'), etc:
+
+>>> (1,2) ^.. both
+[1,2]
+
+A nice thing about folds is that you can combine them with ('Data.Monoid.<>') to concatenate their outputs:
+
+>>> (1,2,3) ^.. (_2 <> _1)  -- in reversed order because why not
+[2,1]
+
+You can build more complicated getters with it when 'each' would be unhelpful:
+
+>>> ([1,2], 3, [Nothing, Just 4]) ^.. (_1.each <> _2 <> _3.each._Just)
+[1,2,3,4]
+
+It plays nicely with ('^?'), too:
+
+>>> [0..9] ^? (ix 9 <> ix 5)
+Just 9
+>>> [0..8] ^? (ix 9 <> ix 5)
+Just 5
+>>> [0..3] ^? (ix 9 <> ix 5)
+Nothing
+
+(Unfortunately, this trick won't help you with setting or modifying.)
+-}
 
 {- |
 @s ^.. t@ returns the list of all values that @t@ gets from @s@.
