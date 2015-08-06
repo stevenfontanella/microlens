@@ -9,9 +9,9 @@ This module is needed to give other packages from the microlens family (like <ht
 -}
 module Lens.Micro.Internal
 (
-  Folding(..),
   traversed,
   folded,
+  foldring,
   foldrOf,
   foldMapOf,
   sets,
@@ -30,17 +30,6 @@ import Data.Foldable
 import Data.Traversable
 #endif
   
-
-{- |
-A 'Monoid' for a @Contravariant@ 'Applicative'.
--}
-newtype Folding f a = Folding { getFolding :: f a }
-
-instance (Applicative (Const r)) => Monoid (Folding (Const r) a) where
-  mempty = Folding (Const . getConst $ pure ())
-  {-# INLINE mempty #-}
-  Folding fr `mappend` Folding fs = Folding (fr *> fs)
-  {-# INLINE mappend #-}
 
 {- |
 'traversed' traverses any 'Traversable' container (list, vector, @Map@, 'Maybe', you name it):
@@ -66,8 +55,20 @@ traversed = traverse
 'mapped' – the most powerful getter, but can't be used as a setter.
 -}
 folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
-folded f = Const . getConst . getFolding . foldMap (Folding . f)
+folded = foldring foldr
 {-# INLINE folded #-}
+
+foldring :: (Applicative (Const r)) => ((a -> Const r a -> Const r a) -> Const r a -> s -> Const r a) -> (a -> Const r b) -> s -> Const r t
+foldring fr f = coerce . fr (\a fa -> f a *> fa) noEffect
+{-# INLINE foldring #-}
+
+coerce :: Const r a -> Const r b
+coerce = Const . getConst
+{-# INLINE coerce #-}
+
+noEffect :: Applicative (Const r) => Const r a
+noEffect = coerce (pure ())
+{-# INLINE noEffect #-}
 
 foldrOf :: Getting (Endo r) s a -> (a -> r -> r) -> r -> s -> r
 foldrOf l f z = flip appEndo z . foldMapOf l (Endo . f)
