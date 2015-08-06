@@ -41,6 +41,20 @@
 
 For *most* usecases microlens is a better library than any of those libraries, but... well, like, c'mon, if you somehow accidentally happen to have used only the functions that reasonable-lens provides, and you are sure won't need any other functions, then reasonable-lens might win over microlens simply because with microlens you'd have to import 2–3 packages (depending on whether you need e.g. Template Haskell), and with reasonable-lens – only 1, which means that I can't claim with a straight face that microlens is *strictly* better.
 
+## What's bad about this package
+
+I hate it when people advertise things without also describing their disadvantages, so I'll list the ones I can think of here.
+
+  * No prisms, no isomorphisms, no indexed traversals, and probably never will be.
+
+  * Having to depend on 2–4 packages (if you're using a bigger chunk of lens's functionality) can be annoying. (But I hope that build times are worth it!)
+
+  * This package doesn't actually let you write everything full lens-style (for instance, there's no `to`, no myriads of functions generalised for lenses by adding the `Of` suffix, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you can most likely afford depending on the full package.
+
+  * If Edward et al. continue using incomprehensible dark magic to make lens faster, one day I *might* give up and stop backporting all their changes to microlens.
+
+  * Scary orphan instances (in the [microlens-ghc][] package) are scary. (I don't think they're as scary as they seem, but some people disagree.)
+
 ## Design decisions
 
 microlens doesn't include anything lens doesn't include, even tho sometimes I'm very tempted to improve something in microlens just because I have control over it.
