@@ -70,13 +70,13 @@ type Fold s a = forall r. Applicative (Const r) => Getting r s a
 -- Lens functions which would've been in Lens.Micro if it wasn't “micro”
 
 elemOf :: Eq a => Getting (Endo [a]) s a -> a -> s -> Bool
-elemOf l x = elem x . toListOf l
+elemOf l x s = elem x (s ^.. l)
 
 lengthOf :: Getting (Endo [a]) s a -> s -> Int
-lengthOf l = length . toListOf l
+lengthOf l s = length (s ^.. l)
 
 setOf :: Ord a => Getting (Endo [a]) s a -> s -> Set a
-setOf l = Set.fromList . toListOf l
+setOf l s = Set.fromList (s ^.. l)
 
 _ForallT :: Traversal' Type ([TyVarBndr], Cxt, Type)
 _ForallT f (ForallT a b c) = (\(x, y, z) -> ForallT x y z) <$> f (a, b, c)
@@ -600,7 +600,7 @@ makeFieldOpticsForDec rules dec = case dec of
     makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) [con]
   _ -> fail "makeFieldOptics: Expected data or newtype type-constructor"
   where
-  mkS tyName vars = tyName `conAppsT` map VarT (toListOf typeVars vars)
+  mkS tyName vars = tyName `conAppsT` map VarT (vars ^.. typeVars)
 
 
 -- Compute the field optics for a deconstructed Dec
@@ -608,7 +608,7 @@ makeFieldOpticsForDec rules dec = case dec of
 makeFieldOpticsForDec' :: LensRules -> Name -> Type -> [Con] -> DecsQ
 makeFieldOpticsForDec' rules tyName s cons =
   do fieldCons <- traverse normalizeConstructor cons
-     let allFields  = toListOf (folded . _2 . folded . _1 . folded) fieldCons
+     let allFields  = fieldCons ^.. folded._2.folded._1.folded
      let defCons    = over normFieldLabels (expandName allFields) fieldCons
          allDefs    = setOf (normFieldLabels . folded) defCons
      perDef <- sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
