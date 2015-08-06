@@ -65,7 +65,7 @@ You can use 'each' with these things:
 'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
 @
 
-To use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers>, import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package.
+Additionally, you can use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by importing @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package.
   -}
   each :: Traversal s t a b
   default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
@@ -138,6 +138,8 @@ The following instances are provided in this package:
 
 'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
 @
+
+Additionally, you can use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by importing @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package.
   -}
   ix :: Index m -> Traversal' m (IxValue m)
   default ix :: (At m) => Index m -> Traversal' m (IxValue m)
@@ -163,6 +165,8 @@ Data.Map.delete k m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Nothing
 'at' doesn't work for arrays, because you can't delete an arbitrary element from an array.
 
 If you want to modify an already existing value, you should use 'ix' instead because then you won't have to deal with 'Maybe' ('ix' is available for all types that have 'at').
+
+This package doesn't actually provide any instances for 'at', but you can import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package and get instances for @Map@ and @IntMap@.
   -}
   at :: Index m -> Lens' m (Maybe (IxValue m))
 
