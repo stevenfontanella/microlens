@@ -1,7 +1,9 @@
 {-# LANGUAGE
 CPP,
 FlexibleContexts,
-FlexibleInstances
+FlexibleInstances,
+RankNTypes,
+ScopedTypeVariables
   #-}
 
 {- |
@@ -15,6 +17,8 @@ module Lens.Micro.Internal
   foldrOf,
   foldMapOf,
   sets,
+  ( #. ),
+  ( .# ),
 )
 where
 
@@ -28,6 +32,12 @@ import Data.Foldable as F
 
 #if __GLASGOW_HASKELL__ < 710
 import Data.Traversable
+#endif
+
+#if __GLASGOW_HASKELL__ >= 708
+import Data.Coerce
+#else
+import Unsafe.Coerce
 #endif
   
 
@@ -63,18 +73,18 @@ foldring fr f = phantom . fr (\a fa -> f a *> fa) noEffect
 {-# INLINE foldring #-}
 
 foldrOf :: Getting (Endo r) s a -> (a -> r -> r) -> r -> s -> r
-foldrOf l f z = flip appEndo z . foldMapOf l (Endo . f)
+foldrOf l f z = flip appEndo z . foldMapOf l (Endo #. f)
 {-# INLINE foldrOf #-}
 
 foldMapOf :: Getting r s a -> (a -> r) -> s -> r
-foldMapOf l f = getConst . l (Const . f)
+foldMapOf l f = getConst #. l (Const #. f)
 {-# INLINE foldMapOf #-}
 
 {- |
 'sets' creates an 'ASetter' from an ordinary function. (The only thing it does is wrapping and unwrapping 'Identity'.)
 -}
 sets :: ((a -> b) -> s -> t) -> ASetter s t a b
-sets f g = Identity . f (runIdentity . g)
+sets f g = Identity #. f (runIdentity #. g)
 {-# INLINE sets #-}
 
 ------------------------------------------------------------------------------
@@ -89,3 +99,21 @@ phantom = Const . getConst
 noEffect :: Applicative (Const r) => Const r a
 noEffect = phantom (pure ())
 {-# INLINE noEffect #-}
+
+------------------------------------------------------------------------------
+-- Data.Profunctor.Unsafe
+------------------------------------------------------------------------------
+
+#if __GLASGOW_HASKELL__ >= 708
+( #. ) :: Coercible c b => (b -> c) -> (a -> b) -> (a -> c)
+( #. ) _ = coerce (\x -> x :: b) :: forall a b. Coercible b a => a -> b
+
+( .# ) :: Coercible b a => (b -> c) -> (a -> b) -> (a -> c)
+( .# ) pbc _ = coerce pbc
+#else
+( #. ) :: (b -> c) -> (a -> b) -> (a -> c)
+( #. ) _ = unsafeCoerce
+
+( .# ) :: (b -> c) -> (a -> b) -> (a -> c)
+( .# ) pbc _ = unsafeCoerce pbc
+#endif
