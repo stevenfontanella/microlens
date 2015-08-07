@@ -109,7 +109,7 @@ All those `<<&&=` operators aren't included. I don't know how useful they are �
 
 `Prism` and `Iso` aren't included. Long story short, I can't afford depending on [profunctors][]. This is explained better in the [Motivation](#motivation) section. It'd be cool if I could include them, but for now isos are nonexistent and those prisms/isos which are included are actually just traversals.
 
-[profunctors]: http://hackage.haskell.com/package/profunctors
+[profunctors]: http://hackage.haskell.org/package/profunctors
 
 -----------------------------------------------------------------------------
 
@@ -143,7 +143,7 @@ Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages,
 * I *really* want to be able to say “this library has no dependencies”.
 * All those instances actually take quite some time to build (for the same reason not all instances for tuples are included in the main package).
 
-[array]: http://hackage.haskell.com/package/array
+[array]: http://hackage.haskell.org/package/array
 
 ## Motivation
 
@@ -167,13 +167,13 @@ Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages,
   * unordered-containers
   * void
 
-[lens]: http://hackage.haskell.com/package/lens
-[vector]: http://hackage.haskell.com/package/vector
-[text]: http://hackage.haskell.com/package/text
+[lens]: http://hackage.haskell.org/package/lens
+[vector]: http://hackage.haskell.org/package/vector
+[text]: http://hackage.haskell.org/package/text
 
 Each of these packages is a nice one, solving a well-defined task, or providing a useful abstraction. Most of category-theoretical ones ([bifunctors][], etc.) only take seconds to install. However, having to depend on them all is a death by a thousand papercuts. It's alright for an application, but it's absolutely not alright for a library... until lens becomes a part of the Haskell Prelude, or subsumes it entirely. (If this was Edward Kmett's plan all along: sorry for spoiling it!)
 
-[bifunctors]: http://hackage.haskell.com/package/bifunctors
+[bifunctors]: http://hackage.haskell.org/package/bifunctors
 
 What Edward wants is a huge, huge, huge Swiss knife. And ne is smart and strong enough to carry such a knife with nem and benefit from it. I imagine that there are lots of applications in the world which depend on `lens` and use more than 20% of its possibilities; even if not, creating such a Swiss knife is an entirely legitimate goal in itself.
 
