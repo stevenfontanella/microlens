@@ -3,6 +3,8 @@ version:             0.1.0.1
 synopsis:            Orphan instances of microlens classes for packages coming with GHC (array, bytestring, containers)
 description:
   Orphan instances of <http://hackage.haskell.org/package/microlens microlens> classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>).
+  .
+  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom

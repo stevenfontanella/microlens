@@ -2,8 +2,9 @@ name:                microlens-mtl
 version:             0.1.3.1
 synopsis:            microlens support for Reader/Writer/State from mtl
 description:
-  This package contains functions (like 'view' or '+=') which work   
-  on 'MonadReader', 'MonadWriter', and 'MonadState' from the mtl package.
+  This package contains functions (like 'view' or '+=') which work on 'MonadReader', 'MonadWriter', and 'MonadState' from the mtl package.
+  .
+  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom
