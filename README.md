@@ -35,7 +35,7 @@
 
 ## Competitors
 
-  * [basic-lens][] – the smallest library ever, containing only `Lens`, `view`, `set`, and `over` (and no lenses whatsoever). Uses only 1 extension – `RankNTypes` – and thus can be used with e.g. JHC and really old GHCs. Otherwise, you probably should still use microlens instead unless you're dead sure you won't ever need anything other than `Lens` and won't actually need any lenses.
+  * [basic-lens][] – the smallest library ever, containing only `Lens`, `view`, `set`, and `over` (and no lenses whatsoever). Uses only 1 extension – `RankNTypes` – and thus can be used with e.g. JHC and really old GHCs. Otherwise, you probably should still use a bigger lens library instead unless you're sure you won't actually need any standard lenses (e.g. `_1`) in your code, or if you're fine with copying definitions of those lenses by hand when you need them (i.e. replicating parts of some other lens library in your project).
 
   * [reasonable-lens][] – a bigger library which has `Lens`, some utilities (like `view`, `use`, `+=`), `makeLenses` even, but little else – no lenses (except for `_1` ... `_4`), no `Traversal`, no documentation. Overall it looks like something slapped together in a hurry by someone who simply needed to get rid of a lens dependency in one of nir projects.
 
