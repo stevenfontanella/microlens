@@ -203,7 +203,7 @@ However, orphaned instances aren't the end of the world, and neither is loss of 
 
 Agreed.
 
-It definitely doesn't make much sense to create lens and leave TH bits out, just as it doesn't make sense to produce a 2000$ tv set where you can't switch between sound tracks when watching a file from a usb stick. Fuck you, Philips, so much.
+It definitely doesn't make much sense to create lens and leave TH bits out, just as it doesn't make sense to produce a 2000$ tv set where you can't switch between sound tracks when watching a film from a USB stick. Fuck you, Philips, so much.
 
 It makes sense, however, to leave TH bits out when they account for a 200% increase in build time, and they do in my case. So I moved them into a separate package.
 
