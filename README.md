@@ -219,8 +219,6 @@ Well, yep, if you've made an amazing knife for youself you might as well make it
 
 I'm afraid to depend on it, because it isn't *guaranteed* to be compatible and doesn't even try to be compatible.
 
-It's also hard to sell.
+I also don't want to waste time arguing with lens-family's maintainer about various things (I don't even know which things, I just know that it's a rare thing for people to share my goals in general).
 
-### Sell?
-
-I want people to use lenses and be happy. This requires “selling” some package to them. I can't sell lens because it's simply unsellable to people who can't depend on such a big package, and I can't sell lens-family because it's outside of my reach. I can't give promises of compatibility, I'm afraid to bother the maintainer whenever I want to reword a paragraph because it's good but not good enough, I can't even file an issue on Github because the library isn't on Github. It's really easier for me to just write a package from scratch (well, actually more like “by copypasting bits and pieces of lens”) than to either try to promote lens-family or convince its maintainer to let me do whatever I want to do to it.
+Yep, in a way it's [NIH](https://en.wikipedia.org/wiki/Not_invented_here). However, I think that in this case in this case NIH is justified, if only because most reasons NIH is bad (time spent rewriting the library could've been spent improving another library, different libraries are incompatible with each other and so the community is fractured, etc) don't really apply here.
