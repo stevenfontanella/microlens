@@ -13,6 +13,7 @@ FlexibleContexts
 #define MIN_VERSION_containers(x,y,z) 1
 #endif
 
+
 module Lens.Micro.TH
 (
   -- $compatnote
@@ -37,6 +38,7 @@ module Lens.Micro.TH
   generateLazyPatterns,
 )
 where
+
 
 import           Control.Applicative
 import           Control.Monad
