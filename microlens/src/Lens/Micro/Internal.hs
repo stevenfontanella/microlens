@@ -93,7 +93,7 @@ sets f g = Identity #. f (runIdentity #. g)
 
 -- was renamed from “coerce”
 phantom :: Const r a -> Const r b
-phantom = Const . getConst
+phantom = Const #. getConst
 {-# INLINE phantom #-}
 
 noEffect :: Applicative (Const r) => Const r a

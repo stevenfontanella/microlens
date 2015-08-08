@@ -153,7 +153,7 @@ Using @'over' '_2'@ as a replacement for 'Control.Arrow.second':
 (10,"20")
 -}
 over :: ASetter s t a b -> (a -> b) -> s -> t
-over l f = runIdentity . l (Identity . f)
+over l f = runIdentity #. l (Identity #. f)
 {-# INLINE over #-}
 
 {- |
@@ -193,7 +193,7 @@ Using it to rewrite ('Data.Functor.<$'):
 @
 -}
 set :: ASetter s t a b -> b -> s -> t
-set l b = runIdentity . l (\_ -> Identity b)
+set l b = runIdentity #. l (\_ -> Identity b)
 {-# INLINE set #-}
 
 {- |
@@ -320,7 +320,7 @@ Nothing
 Just 1
 -}
 (^?) :: s -> Getting (First a) s a -> Maybe a
-s ^? l = getFirst (foldMapOf l (First . Just) s)
+s ^? l = getFirst (foldMapOf l (First #. Just) s)
 {-# INLINE (^?) #-}
 
 infixl 8 ^?
@@ -348,7 +348,7 @@ You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a replace
 True
 -}
 has :: Getting Any s a -> s -> Bool
-has l = getAny . foldMapOf l (\_ -> Any True)
+has l = getAny #. foldMapOf l (\_ -> Any True)
 {-# INLINE has #-}
 
 -- Lenses ------------------------------------------------------------------
