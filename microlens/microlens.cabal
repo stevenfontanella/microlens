@@ -19,8 +19,6 @@ description:
   There's a longer readme <https://github.com/aelve/microlens#readme on Github>, you should read it if you're still interested about using this library.
   .
   Note that microlens has /no/ dependencies starting from GHC 7.10 (base-4.8). Prior to that, it has to depend on transformers-0.2 or above.
-  .
-  Also note that it's not done yet and there's a lot of things missing.
 license:             BSD3
 license-file:        LICENSE
 author:              Artyom
