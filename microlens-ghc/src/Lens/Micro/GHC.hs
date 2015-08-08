@@ -35,7 +35,6 @@ where
 
 
 import Lens.Micro
-import Lens.Micro.Classes
 import Lens.Micro.Internal
 
 import qualified Data.Map as Map
