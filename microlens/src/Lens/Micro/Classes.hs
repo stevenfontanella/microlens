@@ -113,7 +113,7 @@ This traversal lets you access (and update) an arbitrary element in a list, arra
 An example for lists:
 
 >>> [0..5] & ix 3 .~ 10
-[0,1,2,100,4,5]
+[0,1,2,10,4,5]
 
 You can use it for getting, too:
 
