@@ -54,7 +54,6 @@ module Lens.Micro
 where
 
 
-import Lens.Micro.Classes
 import Lens.Micro.Type
 import Lens.Micro.Internal
 
