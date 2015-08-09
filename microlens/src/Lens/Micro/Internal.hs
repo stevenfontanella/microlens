@@ -12,8 +12,13 @@ MultiParamTypeClasses,
 FunctionalDependencies
   #-}
 
+
 {- |
 This module is needed to give other packages from the microlens family (like <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>) access to functions and classes that don't need to be exported from "Lens.Micro" (because they just clutter the namespace). Also, okay, uh, e.g. 'traversed' is here because otherwise there'd be a dependency cycle.
+
+Classes like 'Each', 'Ixed', etc are provided for convenience – you're not supposed to export functions that work on all members of 'Ixed', for instance. Only microlens can do that. You mustn't declare instances of those classes for other types, either; these classes are incompatible with lens's classes, and by doing so you would divide the ecosystem.
+
+If you absolutely need to define an instance (e.g. for internal use), only do it for your own types, because otherwise I might add an instance to one of the microlens packages later and if our instances are different it might lead to subtle bugs.
 -}
 module Lens.Micro.Internal
 (

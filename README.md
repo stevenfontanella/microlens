@@ -35,7 +35,7 @@
 
 ## Competitors
 
-  * [basic-lens][] – the smallest library ever, containing only `Lens`, `view`, `set`, and `over` (and no lenses whatsoever). Uses only 1 extension – `RankNTypes` – and thus can be used with e.g. JHC and really old GHCs. Otherwise, you probably should still use a bigger lens library instead unless you're sure you won't actually need any standard lenses (e.g. `_1`) in your code, or if you're fine with copying definitions of those lenses by hand when you need them (i.e. replicating parts of some other lens library in your project).
+  * [basic-lens][] – the smallest library ever, containing only `Lens`, `view`, `set`, and `over` (and no lenses whatsoever). Uses only 1 extension – `RankNTypes` – and thus can be used with e.g. JHC and really old GHCs.
 
   * [reasonable-lens][] – a bigger library which has `Lens`, some utilities (like `view`, `use`, `+=`), `makeLenses` even, but little else – no lenses (except for `_1` ... `_4`), no `Traversal`, no documentation. Overall it looks like something slapped together in a hurry by someone who simply needed to get rid of a lens dependency in one of nir projects.
 
@@ -49,7 +49,15 @@
 [lens-family]: http://hackage.haskell.org/package/lens-family
 [data-lens-light]: http://hackage.haskell.org/package/data-lens-light
 
-For *most* usecases microlens is a better library than any of those libraries, but... well, like, c'mon, if you somehow accidentally happen to have used only the functions that reasonable-lens provides, and you are sure won't need any other functions, then reasonable-lens might win over microlens simply because with microlens you'd have to import 2–3 packages (depending on whether you need e.g. Template Haskell), and with reasonable-lens – only 1, which means that I can't claim with a straight face that microlens is *strictly* better.
+So, I recommend:
+
+  * [lens-simple][] if you specifically want a library with a clean, understandable implementation, even if it's sometimes more cumbersome to use and can be a bit slower.
+
+  * [lens-family][] if you like [lens-simple][] but don't want the Template Haskell dependency.
+
+  * [lens][] if you use anything that's not included in [microlens][].
+
+  * [microlens][] otherwise.
 
 ## What's bad about this package
 
@@ -61,11 +69,11 @@ I hate it when people advertise things without also describing their disadvantag
 
   * This package doesn't actually let you write everything full lens-style (for instance, there's no `to`, no myriads of functions generalised for lenses by adding the `Of` suffix, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you can most likely afford depending on the full package.
 
-  * If Edward et al. continue using incomprehensible dark magic to make lens faster, one day I *might* give up and stop backporting all their changes to microlens.
-
-  * Scary orphan instances (in the [microlens-ghc][] package) are scary. (I don't think they're as scary as they seem, but some people disagree.)
+  * There are orphan instances, e.g. in the [microlens-ghc][] package. (However, the only way someone can actually break things is by using `Lens.Micro.Internal` and ignoring the warnings there, so I think it's not a huge danger.)
 
   * There are `set` and `over` in the basic package, but no `view`. (There's `view` in [microlens-mtl][], but I can't have `view` in both packages at once, and having `view` in the basic package would add an mtl dependency.)
+
+  * It's as messy inside as [lens][] is (performance has its costs).
 
 ## Design decisions
 
@@ -138,7 +146,7 @@ Perhaps it is for the best.
 
 -----------------------------------------------------------------------------
 
-Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages, which is understandable, because otherwise we'd have to have [vector][] as a dependency (the alternative is having orphan instances, which I'm not afraid of). However, even instances for libraries shipped with GHC (such as [array][]) are in [their own package][microlens-ghc]. There are 2 reasons for this:
+Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages, which is understandable, because otherwise we'd have to have [vector][] as a dependency (the alternative is having orphan instances, which I'm not particularly afraid of). However, even instances for libraries shipped with GHC (such as [array][]) are in [their own package][microlens-ghc]. There are 2 reasons for this:
 
 * I *really* want to be able to say “this library has no dependencies”.
 * All those instances actually take quite some time to build (for the same reason not all instances for tuples are included in the main package).
