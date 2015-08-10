@@ -272,6 +272,13 @@ Data.Map.delete k m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Nothing
 
 If you want to modify an already existing value, you should use 'ix' instead because then you won't have to deal with 'Maybe' ('ix' is available for all types that have 'at').
 
+Note that 'at' isn't strict for @Map@, even if you're using @Data.Map.Strict@:
+
+>>> Data.Map.Strict.size (Data.Map.Strict.empty & at 1 .~ Just undefined)
+1
+
+The reason for such behavior is that there's actually no “strict @Map@” type; @Data.Map.Strict@ just provides some strict functions for ordinary @Map@s.
+
 This package doesn't actually provide any instances for 'at', but you can import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package and get instances for @Map@ and @IntMap@.
   -}
   at :: Index m -> Lens' m (Maybe (IxValue m))
