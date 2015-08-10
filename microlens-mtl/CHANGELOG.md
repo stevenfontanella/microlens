@@ -1,5 +1,6 @@
-# unreleased (0.1.3.2)
+# unreleased (0.1.4.0)
 
+* Added `preview` (a synonym for (`^?`)).
 * Bumped microlens version again.
 
 # 0.1.3.1

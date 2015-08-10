@@ -1,5 +1,4 @@
 {-# LANGUAGE
-CPP,
 MultiParamTypeClasses,
 FunctionalDependencies,
 FlexibleInstances,
@@ -14,6 +13,7 @@ TypeFamilies
 module Lens.Micro.Mtl
 (
   view,
+  preview,
   use,
   zoom,
   magnify,
@@ -24,6 +24,8 @@ where
 
 
 import Control.Applicative
+import Data.Monoid
+
 import Control.Monad.Reader as Reader
 import Control.Monad.State as State
 import Control.Monad.Trans.State.Lazy as Lazy
@@ -43,9 +45,6 @@ import Lens.Micro.Internal
 -- Internal modules
 import Lens.Micro.Mtl.Zoom
 
-#if __GLASGOW_HASKELL__ < 710
-import Data.Monoid
-#endif
 
 {- |
 'view' is a synonym for ('^.'), generalised for 'MonadReader' (we are able to use it instead of ('^.') since functions are instances of the 'MonadReader' class):
@@ -66,6 +65,16 @@ doSomething = do
 view :: MonadReader s m => Getting a s a -> m a
 view l = Reader.asks (getConst #. l Const)
 {-# INLINE view #-}
+
+{- |
+'preview' is a synonym for ('^?'), generalised for 'MonadReader' (same way as 'view' is a synonym for ('^.')).
+
+>>> preview each [1..5]
+Just 1
+-}
+preview :: MonadReader s m => Getting (First a) s a -> m (Maybe a)
+preview l = Reader.asks (getFirst #. foldMapOf l (First #. Just))
+{-# INLINE preview #-}
 
 {- |
 'use' is 'view' which implicitly operates on the state.
