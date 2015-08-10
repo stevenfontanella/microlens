@@ -16,6 +16,10 @@ FlexibleContexts
 
 module Lens.Micro.TH
 (
+  -- * A note about “not in scope” errors
+  -- $errornote
+  
+  -- * Types for compatibility
   -- $compatnote
   Getter,
   Fold,
@@ -60,6 +64,38 @@ import           Language.Haskell.TH
 import           Data.Traversable (traverse, sequenceA)
 #endif
 
+{- $errornote
+
+When you use Template Haskell, the order of declarations suddenly starts to matter. For instance, if you try to use 'makeLenses', 'makeFields', etc before the type is defined, you'll get a “not in scope” error:
+
+@
+'makeLenses' ''Foo
+
+data Foo = Foo {_foo :: Int}
+@
+
+@
+Not in scope: type constructor or class ‘Foo’ …
+    In the Template Haskell quotation ''Foo
+@
+
+You can't refer to generated lenses before you call 'makeLenses', either:
+
+@
+data Foo = Foo {_foo :: Int}
+
+bar :: Lens' Foo Int
+bar = foo
+
+'makeLenses' ''Foo
+@
+
+@
+Not in scope: ‘foo’ …
+    Perhaps you meant one of these:
+      data constructor ‘Foo’ (line 1), ‘_foo’ (line 1)
+@
+-}
 
 {- $compatnote
 
@@ -127,7 +163,7 @@ To use it, you have to enable Template Haskell first:
 \{\-\# LANGUAGE TemplateHaskell \#\-\}
 @
 
-Then, after declaring the datatype (let's say @Foo@), add @makeLenses ''Foo@ on a separate line:
+Then, after declaring the datatype (let's say @Foo@), add @makeLenses ''Foo@ on a separate line (if you do it before the type is declared, you'll get a “not in scope” error – see the section at the top of this page):
 
 @
 data Foo = Foo {
