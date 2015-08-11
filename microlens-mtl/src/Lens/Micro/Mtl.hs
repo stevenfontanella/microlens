@@ -67,7 +67,7 @@ view l = Reader.asks (getConst #. l Const)
 {-# INLINE view #-}
 
 {- |
-'preview' is a synonym for ('^?'), generalised for 'MonadReader' (same way as 'view' is a synonym for ('^.')).
+'preview' is a synonym for ('^?'), generalised for 'MonadReader' (just like 'view', which is a synonym for ('^.')).
 
 >>> preview each [1..5]
 Just 1
@@ -77,9 +77,15 @@ preview l = Reader.asks (getFirst #. foldMapOf l (First #. Just))
 {-# INLINE preview #-}
 
 {- |
-'use' is 'view' which implicitly operates on the state.
+'use' is 'view' which implicitly operates on the state; for instance, if your state is a record containing a field @foo@, you can write
 
-When your state type has lenses generated for it, most of the time you'll be using 'use' instead of 'State.gets'.
+@
+x \<- 'use' foo
+@
+
+to extract @foo@ from the state. In other words, 'use' is the same as 'State.gets', but for getters instead of functions.
+
+The implementation of 'use' is straightforward:
 
 @
 'use' l = 'State.gets' ('view' l)
@@ -95,21 +101,36 @@ infix  4 +=, -=, *=, //=
 infixr 2 `zoom`, `magnify`
 
 {- |
-Assign value to the target. This is ('.~') which works in 'MonadState'.
+Modify state by “assigning” a value to a part of the state.
+
+This is merely ('.~') which works in 'MonadState':
 
 @
-l '.=' b = 'State.modify' (l '.~' b)
+l '.=' x = 'State.modify' (l '.~' x)
 @
 -}
 (.=) :: MonadState s m => ASetter s s a b -> b -> m ()
-l .= b = State.modify (l .~ b)
+l .= x = State.modify (l .~ x)
 {-# INLINE (.=) #-}
 
 {- |
-Apply a function to the target. This is ('%~') which works in 'MonadState'.
+Modify state by applying a function to a part of the state. An example:
 
 >>> execState (do _1 %= (+1); _2 %= reverse) (1,"hello")
 (2,"olleh")
+
+Implementation:
+
+@
+l '%=' f = 'State.modify' (l '%~' f)
+@
+
+There are also a few specialised versions of ('%=') which mimic C operators:
+
+* ('+=') for addition
+* ('-=') for substraction
+* ('*=') for multiplication
+* ('//=') for division (since ('/=') is already taken)
 -}
 (%=) :: (MonadState s m) => ASetter s s a b -> (a -> b) -> m ()
 l %= f = State.modify (l %~ f)
