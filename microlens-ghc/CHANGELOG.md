@@ -1,6 +1,6 @@
-# 0.1.0.2
+# unreleased (0.2.0.0)
 
-* Bumped microlens version again.
+* Added instances for `Cons` and `Snoc`.
 
 # 0.1.0.1
 
