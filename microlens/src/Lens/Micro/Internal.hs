@@ -40,6 +40,8 @@ module Lens.Micro.Internal
   Field3(..),
   Field4(..),
   Field5(..),
+  Cons(..),
+  Snoc(..),
 )
 where
 
@@ -509,3 +511,19 @@ instance Field5 (a,b,c,d,e,f,g,h,i) (a,b,c,d,e',f,g,h,i) e e' where
   {-# INLINE _5 #-}
 
 -}
+
+class Cons s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  _Cons :: Traversal s t (a,s) (b,t)
+
+instance Cons [a] [b] a b where
+  _Cons f (a:as) = uncurry (:) <$> f (a, as)
+  _Cons _ []     = pure []
+  {-# INLINE _Cons #-}
+
+class Snoc s t a b | s -> a, t -> b, s b -> t, t a -> s where
+  _Snoc :: Traversal s t (s,a) (t,b)
+
+instance Snoc [a] [b] a b where
+  _Snoc _ [] = pure []
+  _Snoc f xs = (\(as,a) -> as ++ [a]) <$> f (init xs, last xs)
+  {-# INLINE _Snoc #-}

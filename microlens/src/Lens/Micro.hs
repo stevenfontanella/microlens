@@ -45,6 +45,7 @@ module Lens.Micro
   traversed,
   each,
   ix,
+  _head, _tail, _init, _last,
 
   -- * Prisms (traversals iterating over at most 1 element)
   -- $prisms-note
@@ -400,6 +401,82 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 both :: Traversal (a, a) (b, b) a b
 both f = \ ~(a, b) -> liftA2 (,) (f a) (f b)
 {-# INLINE both #-}
+
+{- |
+'_head' traverses the 1st element of something (usually a list, but can also be a @Seq@, etc):
+
+>>> [1..5] ^? _head
+Just 1
+
+It can be used to modify too, as in this example where the 1st letter of a sentence is capitalised:
+
+>>> "mary had a little lamb." & _head %~ toTitle
+"Mary had a little lamb."
+
+The reason it's a traversal and not a lens is that there's nothing to traverse when the list is empty:
+
+>>> [] ^? _head
+Nothing
+
+This package only lets you use '_head' on lists, but you can import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package and get instances for @ByteString@ and @Seq@.
+-}
+_head :: Cons s s a a => Traversal' s a
+_head = _Cons._1
+{-# INLINE _head #-}
+
+{- |
+'_tail' gives you access to the tail of a list (or @Seq@, etc):
+
+>>> [1..5] ^? _tail
+Just [2,3,4,5]
+
+You can modify the tail as well:
+
+>>> [4,1,2,3] & _tail %~ reverse
+[4,3,2,1]
+
+Since lists are monoids, you can use '_tail' with plain ('^.') (and then it'll return an empty list if you give it an empty list):
+
+>>> [1..5] ^. _tail
+[2,3,4,5]
+
+>>> [] ^. _tail
+[]
+
+If you want to traverse each /element/ of the tail, use '_tail' with 'each':
+
+>>> "I HATE CAPS." & _tail.each %~ toLower
+"I hate caps."
+
+This package only lets you use '_tail' on lists, but you can import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package and get instances for @ByteString@ and @Seq@.
+-}
+_tail :: Cons s s a a => Traversal' s s
+_tail = _Cons._2
+{-# INLINE _tail #-}
+
+{- |
+'_init' gives you access to all-but-the-last elements of the list:
+
+>>> "Hello." ^. _init
+"Hello"
+
+See documentation for '_tail', as '_init' and '_tail' are pretty similar.
+-}
+_init :: Snoc s s a a => Traversal' s s
+_init = _Snoc._1
+{-# INLINE _init #-}
+
+{- |
+'_last' gives you access to the last element of the list:
+
+>>> "Hello." ^? _last
+'.'
+
+See documentation for '_head', as '_last' and '_head' are pretty similar.
+-}
+_last :: Snoc s s a a => Traversal' s a
+_last = _Snoc._2
+{-# INLINE _last #-}
 
 -- Prisms ------------------------------------------------------------------
 
