@@ -117,7 +117,7 @@ Then define a bogus type (you can use any name in place of @M@, and you can use 
 
 This will generate lenses for @Foo@ and you'll be able to use them from GHCi.
 
-If you want, you can define the type and lenses for it simultaneously with @:{@ an @:}@:
+If you want, you can define the type and lenses for it simultaneously with @:{@ and @:}@:
 
 @
 >>> :{
