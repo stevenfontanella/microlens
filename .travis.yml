@@ -10,31 +10,31 @@ install:
 
 script:
  - cd microlens
- - cabal install --only-dependencies -v2
+ - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
 
  - cd microlens-mtl
- - cabal install --only-dependencies -v2
+ - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
 
  - cd microlens-ghc
- - cabal install --only-dependencies -v2
+ - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
 
  - cd microlens-th
- - cabal install --only-dependencies -v2
+ - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
 
  - cd microlens-platform
- - cabal install --only-dependencies -v2
+ - cabal install --only-dependencies
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
