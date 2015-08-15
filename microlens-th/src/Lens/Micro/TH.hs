@@ -17,26 +17,29 @@ FlexibleContexts
 module Lens.Micro.TH
 (
   -- * Dealing with “not in scope” errors
-  -- $errornote
+  -- $errors-note
 
   -- * Using this module in GHCi
-  -- $ghcinote
+  -- $ghci-note
   
   -- * Types for compatibility
-  -- $compatnote
+  -- $compat-note
   Getter,
   Fold,
+
   -- * Making lenses
   makeLenses,
   makeLensesFor,
   makeLensesWith,
   makeFields,
+
   -- * Default lens rules
   LensRules,
   DefName(..),
   lensRules,
   lensRulesFor,
   camelCaseFields,
+
   -- * Configuring lens rules
   lensField,
   simpleLenses,
@@ -67,7 +70,7 @@ import           Language.Haskell.TH
 import           Data.Traversable (traverse, sequenceA)
 #endif
 
-{- $errornote
+{- $errors-note
 
 When you use Template Haskell, the order of declarations suddenly starts to matter. For instance, if you try to use 'makeLenses', 'makeFields', etc before the type is defined, you'll get a “not in scope” error:
 
@@ -100,7 +103,7 @@ Not in scope: ‘foo’ …
 @
 -}
 
-{- $ghcinote
+{- $ghci-note
 
 You can use 'makeLenses' and friends to define lenses right from GHCi, but it's slightly tricky.
 
@@ -128,7 +131,7 @@ makeLenses ''Foobar
 @
 -}
 
-{- $compatnote
+{- $compat-note
 
 When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'Getter' and 'Fold'. These aren't true @Getter@ and @Fold@ from lens – they're not sufficiently polymorphic. Beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones.)
 -}
