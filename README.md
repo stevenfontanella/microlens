@@ -112,7 +112,7 @@ So, don't write `Of` functions yet, it's not their time. Also, this suffix is ug
 
 -----------------------------------------------------------------------------
 
-All those `<<&&=` operators aren't included. I don't know how useful they are – I never used them – and I don't like them because it feels like they do more harm than good, but they're not included merely because there's too many of them and I don't know how to pick which ones to include. Operators like `+=` or `.=` are available from [microlens-mtl][]. The only operators available from `Lens.Micro` are `%~`, `.~` and `&`.
+All those `<>~` and `+~` operators aren't included. Operators like `+=` or `.=` are available from [microlens-mtl][]. The only operators available from `Lens.Micro` are `&`, `%~`, `.~`, and their `<<` variants (`<%~`, `<<%~`, `<<.~`) which I thought could be useful sometimes and yet they aren't trivial to write by yourself.
 
 -----------------------------------------------------------------------------
 

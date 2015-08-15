@@ -18,6 +18,7 @@ module Lens.Micro
   sets,
   (%~), over,
   (.~), set,
+  (<%~), (<<%~), (<<.~),
   mapped,
 
   -- * Getting (retrieving a value)
@@ -59,6 +60,7 @@ import Lens.Micro.Type
 import Lens.Micro.Internal
 
 import Control.Applicative
+import Control.Monad
 import Data.Functor.Identity
 import Data.Monoid
 
@@ -213,6 +215,57 @@ Keep in mind that while 'mapped' is a more powerful setter than 'each', it can't
 mapped :: Functor f => ASetter (f a) (f b) a b
 mapped = sets fmap
 {-# INLINE mapped #-}
+
+{- |
+This is a version of ('%~') which modifies the structure and returns it along with the new value:
+
+>>> (1, 2) & _1 <%~ negate
+(-1, (-1, 2))
+
+Simpler type signatures:
+
+@
+('<%~') ::             'Lens' s t a b      -> (a -> b) -> s -> (b, t)
+('<%~') :: 'Monoid' b => 'Traversal' s t a b -> (a -> b) -> s -> (b, t)
+@
+-}
+(<%~) :: ((a -> (b, b)) -> s -> (b, t)) -> (a -> b) -> s -> (b, t)
+(<%~) l f = l (join (,) . f)
+{-# INLINE (<%~) #-}
+
+{- |
+This is a version of ('%~') which modifies the structure and returns it along with the old value:
+
+>>> (1, 2) & _1 <<%~ negate
+(1, (-1, 2))
+
+Simpler type signatures:
+
+@
+('<<%~') ::             'Lens' s t a b      -> (a -> b) -> s -> (a, t)
+('<<%~') :: 'Monoid' a => 'Traversal' s t a b -> (a -> b) -> s -> (a, t)
+@
+-}
+(<<%~) :: ((a -> (a, b)) -> s -> (a, t)) -> (a -> b) -> s -> (a, t)
+(<<%~) l f = l (\a -> (a, f a))
+{-# INLINE (<<%~) #-}
+
+{- |
+This is a version of ('.~') which modifies the structure and returns it along with the old value:
+
+>>> (1, 2) & _1 <<.~ 0
+(1, (0, 2))
+
+Simpler type signatures:
+
+@
+('<<.~') ::             'Lens' s t a b      -> b -> s -> (a, t)
+('<<.~') :: 'Monoid' a => 'Traversal' s t a b -> b -> s -> (a, t)
+@
+-}
+(<<.~) :: ((a -> (a, b)) -> s -> (a, t)) -> b -> s -> (a, t)
+(<<.~) l x = l (\a -> (a, x))
+{-# INLINE (<<.~) #-}
 
 -- Getting -----------------------------------------------------------------
 
