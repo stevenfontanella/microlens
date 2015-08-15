@@ -16,6 +16,8 @@ description:
   .
     * if you think lenses compose “in the wrong order” (in which case you're looking for <http://hackage.haskell.org/package/fclabels fclabels>)
   .
+  If you're writing an application which uses lenses more extnesively, look at <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it combines features of all other microlens packages (<http://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <http://hackage.haskell.org/package/microlens-th microlens-th>, <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>).
+  .
   There's a longer readme <https://github.com/aelve/microlens#readme on Github>, you should read it if you're still interested about using this library.
   .
   Note that microlens has /no/ dependencies starting from GHC 7.10 (base-4.8). Prior to that, it has to depend on transformers-0.2 or above.
