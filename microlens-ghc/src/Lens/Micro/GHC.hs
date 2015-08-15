@@ -201,36 +201,36 @@ instance (a ~ Word8, b ~ Word8) => Each BL.ByteString BL.ByteString a b where
 instance Cons (Seq a) (Seq b) a b where
   _Cons f s = case Seq.viewl s of
     x Seq.:< xs -> uncurry (Seq.<|) <$> f (x, xs)
-    Seq.EmptyL  -> pure mempty
+    Seq.EmptyL  -> pure Seq.empty
   {-# INLINE _Cons #-}
 
 instance Snoc (Seq a) (Seq b) a b where
   _Snoc f s = case Seq.viewr s of
     xs Seq.:> x -> uncurry (Seq.|>) <$> f (xs, x)
-    Seq.EmptyR  -> pure mempty
+    Seq.EmptyR  -> pure Seq.empty
   {-# INLINE _Snoc #-}
 
 instance Cons B.ByteString B.ByteString Word8 Word8 where
   _Cons f s = case B.uncons s of
     Just x  -> uncurry B.cons <$> f x
-    Nothing -> pure s
+    Nothing -> pure B.empty
   {-# INLINE _Cons #-}
 
 instance Cons BL.ByteString BL.ByteString Word8 Word8 where
   _Cons f s = case BL.uncons s of
     Just x  -> uncurry BL.cons <$> f x
-    Nothing -> pure s
+    Nothing -> pure BL.empty
   {-# INLINE _Cons #-}
 
 instance Snoc B.ByteString B.ByteString Word8 Word8 where
   _Snoc f s = if B.null s
-    then pure s
+    then pure B.empty
     else uncurry B.snoc <$> f (B.init s, B.last s)
   {-# INLINE _Snoc #-}
 
 instance Snoc BL.ByteString BL.ByteString Word8 Word8 where
   _Snoc f s = if BL.null s
-    then pure s
+    then pure BL.empty
     else uncurry BL.snoc <$> f (BL.init s, BL.last s)
   {-# INLINE _Snoc #-}
 
