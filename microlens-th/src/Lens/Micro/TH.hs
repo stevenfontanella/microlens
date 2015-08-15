@@ -16,8 +16,11 @@ FlexibleContexts
 
 module Lens.Micro.TH
 (
-  -- * A note about “not in scope” errors
+  -- * Dealing with “not in scope” errors
   -- $errornote
+
+  -- * Using this module in GHCi
+  -- $ghcinote
   
   -- * Types for compatibility
   -- $compatnote
@@ -94,6 +97,34 @@ bar = foo
 Not in scope: ‘foo’ …
     Perhaps you meant one of these:
       data constructor ‘Foo’ (line 1), ‘_foo’ (line 1)
+@
+-}
+
+{- $ghcinote
+
+You can use 'makeLenses' and friends to define lenses right from GHCi, but it's slightly tricky.
+
+First, enable Template Haskell:
+
+>>> :set -XTemplateHaskell
+
+Then define a bogus type (you can use any name in place of @M@, and you can use the same name many times), and follow the definition by the actual Template Haskell command you want to use:
+
+>>> data M; makeLenses ''Foo
+
+This will generate lenses for @Foo@ and you'll be able to use them from GHCi.
+
+If you want, you can define the type and lenses for it simultaneously with @:{@ an @:}@:
+
+@
+>>> :{
+data Foobar = Foobar {
+  _foo :: Int,
+  _bar :: Bool }
+  deriving (Eq, Show)
+
+makeLenses ''Foobar
+:}
 @
 -}
 
