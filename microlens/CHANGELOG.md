@@ -1,4 +1,4 @@
-# unreleased (0.3.0.0)
+# 0.3.0.0
 
 * Moved `Lens.Micro.Classes` into `Lens.Micro.Internal`.
 * Added `<%~`, `<<%~`, `<<.~`.

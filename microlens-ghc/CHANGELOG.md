@@ -1,4 +1,4 @@
-# unreleased (0.2.0.0)
+# 0.2.0.0
 
 * Added instances for `Cons` and `Snoc`.
 
