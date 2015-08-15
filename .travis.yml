@@ -32,3 +32,9 @@ script:
  - cabal install --ghc-options=-Werror
  - cabal configure && cabal sdist
  - cd ..
+
+ - cd microlens-platform
+ - cabal install --only-dependencies
+ - cabal install --ghc-options=-Werror
+ - cabal configure && cabal sdist
+ - cd ..

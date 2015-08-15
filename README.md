@@ -12,7 +12,7 @@
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
-  * **No** dependencies. And the whole package builds in ~4s on my laptop. There are separate packages (only [microlens-ghc][] for now) which provide additional instances and let you use `each` and friends with various container types.
+  * **No** dependencies. And the whole package builds in ~4s on my laptop. There are separate packages ([microlens-ghc][] and [microlens-platform][]) which provide additional instances and let you use `each` and friends with various container types.
 
   * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens. There are also no unique to microlens functions which you would have to rewrite when switching to lens (even tho I was tempted to add some).
 
@@ -24,6 +24,7 @@
 [microlens-mtl]: http://hackage.haskell.org/package/microlens-mtl
 [microlens-th]: http://hackage.haskell.org/package/microlens-th
 [microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
+[microlens-platform]: http://hackage.haskell.org/package/microlens-platform
 
 ## All packages in the family
 
@@ -31,7 +32,9 @@
   * [microlens-mtl][] – `+=` and friends, `use`, `zoom`/`magnify`
   * [microlens-th][] – `makeLenses` and `makeFields`
   * [microlens-ghc][] – instances to make `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
-  * microlens-platform – haven't written it yet, but it'll have instances for `Text`, `Vector`, and `HashMap`
+  * [microlens-platform][] – instances for `Text`, `Vector`, and `HashMap`; it also reexports everything from all other packages, which makes it a better replacement for `Control.Lens`
+
+If you're writing a library, use [microlens][] and other packages as needed; if you're writing an application, perhaps use [microlens-platform][].
 
 ## Competitors
 
@@ -64,8 +67,6 @@ So, I recommend:
 I hate it when people advertise things without also describing their disadvantages, so I'll list the ones I can think of here.
 
   * No prisms, no isomorphisms, no indexed traversals, and probably never will be.
-
-  * Having to depend on 2–4 packages (if you're using a bigger chunk of lens's functionality) can be annoying. (But I hope that build times are worth it!)
 
   * This package doesn't actually let you write everything full lens-style (for instance, there's no `to`, no myriads of functions generalised for lenses by adding the `Of` suffix, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you can most likely afford depending on the full package.
 
