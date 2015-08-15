@@ -61,6 +61,10 @@ import Data.Vector.Generic as Generic
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 
+#if !MIN_VERSION_base(4,8,0)
+import Control.Applicative
+#endif
+
 
 (<&>) :: Functor f => f a -> (a -> b) -> f b
 as <&> f = f <$> as
