@@ -42,6 +42,7 @@ module Lens.Micro
 
   -- * Traversals (lenses iterating over several elements)
   Traversal, Traversal',
+  failing,
   both,
   traversed,
   each,
@@ -444,6 +445,40 @@ lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
 
 -- Traversals --------------------------------------------------------------
+
+{- |
+'failing' lets you chain traversals together; if the 1st traversal fails, the 2nd traversal will be used.
+
+>>> ([1,2],[3]) & failing (_1.each) (_2.each) .~ 0
+([0,0],[3])
+
+>>> ([],[3]) & failing (_1.each) (_2.each) .~ 0
+([],[0])
+
+Note that the resulting traversal won't be valid unless either both traversals don't touch each others' elements, or both traversals return exactly the same results. To see an example of how 'failing' can generate invalid traversals, see <http://stackoverflow.com/questions/27138856/why-does-failing-from-lens-produce-invalid-traversals this Stackoverflow question>.
+-}
+failing :: Traversal s t a b -> Traversal s t a b -> Traversal s t a b
+failing left right afb s = case pins t of
+  [] -> right afb s
+  _  -> t afb
+  where
+    Bazaar t = left sell s
+    sell w = Bazaar ($ w)
+    pins f = getConst (f (\ra -> Const [Identity ra]))
+
+infixl 5 `failing`
+
+newtype Bazaar a b t = Bazaar (forall f. Applicative f => (a -> f b) -> f t)
+
+instance Functor (Bazaar a b) where
+  fmap f (Bazaar k) = Bazaar (fmap f . k)
+  {-# INLINE fmap #-}
+
+instance Applicative (Bazaar a b) where
+  pure a = Bazaar $ \_ -> pure a
+  {-# INLINE pure #-}
+  Bazaar mf <*> Bazaar ma = Bazaar $ \afb -> mf afb <*> ma afb
+  {-# INLINE (<*>) #-}
 
 {- |
 'both' traverses both fields of a tuple. Unlike @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Traversal.html#v:both both>@ from lens, it only works for pairs – not for triples or 'Either'.
