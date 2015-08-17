@@ -1,3 +1,7 @@
+# 0.3.1.0
+
+* Added `LensLike` and `LensLike'`.
+
 # 0.3.0.0
 
 * Moved `Lens.Micro.Classes` into `Lens.Micro.Internal`.

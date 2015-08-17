@@ -1,7 +1,11 @@
+# 0.1.4.1
+
+* Bumped microlens version.
+
 # 0.1.4.0
 
 * Added `preview` (a synonym for (`^?`)).
-* Bumped microlens version again.
+* Bumped microlens version.
 
 # 0.1.3.1
 

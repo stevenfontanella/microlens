@@ -52,6 +52,9 @@ module Lens.Micro
   -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
+
+  -- * Other types
+  LensLike, LensLike',
 )
 where
 
@@ -229,7 +232,7 @@ Simpler type signatures:
 ('<%~') :: 'Monoid' b => 'Traversal' s t a b -> (a -> b) -> s -> (b, t)
 @
 -}
-(<%~) :: ((a -> (b, b)) -> s -> (b, t)) -> (a -> b) -> s -> (b, t)
+(<%~) :: LensLike ((,) b) s t a b -> (a -> b) -> s -> (b, t)
 (<%~) l f = l (join (,) . f)
 {-# INLINE (<%~) #-}
 
@@ -246,7 +249,7 @@ Simpler type signatures:
 ('<<%~') :: 'Monoid' a => 'Traversal' s t a b -> (a -> b) -> s -> (a, t)
 @
 -}
-(<<%~) :: ((a -> (a, b)) -> s -> (a, t)) -> (a -> b) -> s -> (a, t)
+(<<%~) :: LensLike ((,) a) s t a b -> (a -> b) -> s -> (a, t)
 (<<%~) l f = l (\a -> (a, f a))
 {-# INLINE (<<%~) #-}
 
@@ -263,7 +266,7 @@ Simpler type signatures:
 ('<<.~') :: 'Monoid' a => 'Traversal' s t a b -> b -> s -> (a, t)
 @
 -}
-(<<.~) :: ((a -> (a, b)) -> s -> (a, t)) -> b -> s -> (a, t)
+(<<.~) :: LensLike ((,) a) s t a b -> b -> s -> (a, t)
 (<<.~) l x = l (\a -> (a, x))
 {-# INLINE (<<.~) #-}
 

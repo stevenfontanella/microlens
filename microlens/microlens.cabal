@@ -1,5 +1,5 @@
 name:                microlens
-version:             0.3.0.0
+version:             0.3.1.0
 synopsis:            A tiny part of the lens library which you can depend upon
 description:
   This is an extract from <http://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.

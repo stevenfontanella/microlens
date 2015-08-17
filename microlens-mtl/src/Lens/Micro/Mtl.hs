@@ -265,7 +265,7 @@ moveObstaclesNE = do
   ...
 @
   -}
-  zoom :: ((s -> Zoomed m c s) -> t -> Zoomed m c t) -> m c -> n c
+  zoom :: LensLike' (Zoomed m c) t s -> m c -> n c
 
 instance Monad z => Zoom (Strict.StateT s z) (Strict.StateT t z) s t where
   zoom l (Strict.StateT m) = Strict.StateT $ unfocusing #. l (Focusing #. m)
@@ -362,7 +362,7 @@ getBase = 'magnify' base $ do
   return (protocol ++ path)
 @
   -}
-  magnify :: ((b -> Magnified m c b) -> a -> Magnified m c a) -> m c -> n c
+  magnify :: LensLike' (Magnified m c) a b -> m c -> n c
 
 instance Monad m => Magnify (ReaderT b m) (ReaderT a m) b a where
   magnify l (ReaderT m) = ReaderT $ getEffect #. l (Effect #. m)

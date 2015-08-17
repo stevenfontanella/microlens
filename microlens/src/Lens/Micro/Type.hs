@@ -12,6 +12,7 @@ module Lens.Micro.Type
   Getting,
   Lens, Lens',
   Traversal, Traversal',
+  LensLike, LensLike',
 )
 where
 
@@ -169,3 +170,23 @@ type Traversal s t a b = forall f. Applicative f => (a -> f b) -> s -> f t
 This is a type alias for monomorphic traversals which don't change the type of the container (or of the values inside).
 -}
 type Traversal' s a = Traversal s s a a
+
+{- |
+'LensLike' is a type that is often used to make combinators as general as possible. For instance, take ('Lens.Micro.<<%~'), which only requires the passed lens to be able to work with the @(,) a@ functor (lenses and traversals can do that). The fully expanded type is as follows:
+
+@
+('Lens.Micro.<<%~') :: ((a -> (a, b)) -> s -> (a, t)) -> (a -> b) -> s -> (a, t)
+@
+
+With 'LensLike', the intent to use the @(,) a@ functor can be made a bit clearer:
+
+@
+('Lens.Micro.<<%~') :: LensLike ((,) a) s t a b -> (a -> b) -> s -> (a, t)
+@
+-}
+type LensLike f s t a b = (a -> f b) -> s -> f t
+
+{- |
+A type alias for monomorphic 'LensLike's.
+-}
+type LensLike' f s a = LensLike f s s a a
