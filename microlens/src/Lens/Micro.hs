@@ -25,6 +25,7 @@ module Lens.Micro
   -- $getters-note
   Getting,
   (^.),
+  to,
 
   -- * Folds (getters returning multiple elements)
   -- $folds-note
@@ -306,6 +307,35 @@ s ^. l = getConst (l Const s)
 {-# INLINE (^.) #-}
 
 infixl 8 ^.
+
+{- |
+'to' creates a getter from any function:
+
+@
+a '^.' 'to' f = f a
+@
+
+It's most useful in chains, because it lets you mix lenses and ordinary functions. Suppose you have a record which comes from some third-party library and doesn't have any lens accessors. You want to do something like this:
+
+@
+value ^. _1 . field . at 2
+@
+
+However, @field@ isn't a getter, and you have to do this instead:
+
+@
+field (value ^. _1) ^. at 2
+@
+
+but now @value@ is in the middle and it's hard to read the resulting code. A variant with 'to' is prettier and more readable:
+
+@
+value ^. _1 . to field . at 2
+@
+-}
+to :: (s -> a) -> Getting r s a
+to k f = phantom . f . k
+{-# INLINE to #-}
 
 -- Folds -------------------------------------------------------------------
 
