@@ -64,6 +64,7 @@ import           Data.Set (Set)
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
+import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
 
 #if __GLASGOW_HASKELL__ < 710
@@ -153,9 +154,6 @@ setOf l s = Set.fromList (s ^.. l)
 _ForallT :: Traversal' Type ([TyVarBndr], Cxt, Type)
 _ForallT f (ForallT a b c) = (\(x, y, z) -> ForallT x y z) <$> f (a, b, c)
 _ForallT _ other = pure other
-
-coerce :: Const r a -> Const r b
-coerce = Const . getConst
 
 -- Utilities
 
@@ -943,7 +941,7 @@ makeGetterClause conName fieldCount fields =
 
          fxs   = [ appE (varE f) (varE x) | x <- xs ]
          body  = foldl (\a b -> appsE [varE '(<*>), a, b])
-                       (appE (varE 'coerce) (head fxs))
+                       (appE (varE 'phantom) (head fxs))
                        (tail fxs)
 
      -- clause f (Con x1..xn) = coerce (f x1) <*> ... <*> f xn
