@@ -68,7 +68,7 @@ I hate it when people advertise things without also describing their disadvantag
 
   * No prisms, no isomorphisms, no indexed traversals, and probably never will be.
 
-  * This package doesn't actually let you write everything full lens-style (for instance, there's no `to`, no myriads of functions generalised for lenses by adding the `Of` suffix, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you can most likely afford depending on the full package.
+  * This package doesn't actually let you write everything full lens-style (for instance, there are few operators, no myriads of functions generalised for lenses by adding the `Of` suffix aren't included, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you probably can afford depending on the full package.
 
   * There are orphan instances, e.g. in the [microlens-ghc][] package. (However, the only way someone can actually break things is by using `Lens.Micro.Internal` and ignoring the warnings there, so I think it's not a huge danger.)
 
