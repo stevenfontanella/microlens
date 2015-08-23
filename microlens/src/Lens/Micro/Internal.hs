@@ -30,6 +30,7 @@ module Lens.Micro.Internal
   sets,
   ( #. ),
   ( .# ),
+  phantom,
   Each(..),
   Index,
   IxValue,
