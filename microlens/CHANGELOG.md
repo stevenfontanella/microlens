@@ -1,3 +1,7 @@
+# 0.3.2.0
+
+* Added `toListOf` back.
+
 # 0.3.1.0
 
 * Added `LensLike` and `LensLike'`.

@@ -28,7 +28,7 @@ module Lens.Micro
 
   -- * Folds (getters returning multiple elements)
   -- $folds-note
-  (^..),
+  (^..), toListOf,
   (^?),
   (^?!),
   folded,
@@ -354,10 +354,17 @@ Gathering all values in a list of tuples:
 [1,2,3,4]
 -}
 (^..) :: s -> Getting (Endo [a]) s a -> [a]
-s ^.. l = foldrOf l (:) [] s
+s ^.. l = toListOf l s
 {-# INLINE (^..) #-}
 
 infixl 8 ^..
+
+{- |
+'toListOf' is a synonym for ('^..').
+-}
+toListOf :: Getting (Endo [a]) s a -> s -> [a]
+toListOf l = foldrOf l (:) []
+{-# INLINE toListOf #-}
 
 {- |
 @s ^? t@ returns the 1st element @t@ returns, or 'Nothing' if @t@ doesn't return anything. It's trivially implemented by passing the 'First' monoid to the getter.
