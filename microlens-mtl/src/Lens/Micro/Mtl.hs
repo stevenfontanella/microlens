@@ -3,7 +3,8 @@ MultiParamTypeClasses,
 FunctionalDependencies,
 FlexibleInstances,
 UndecidableInstances,
-TypeFamilies
+TypeFamilies,
+Trustworthy
   #-}
 
 -- This is needed because ErrorT is deprecated.

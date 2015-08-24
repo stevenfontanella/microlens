@@ -1,5 +1,6 @@
 {-# LANGUAGE
-RankNTypes
+RankNTypes,
+Safe
   #-}
 
 

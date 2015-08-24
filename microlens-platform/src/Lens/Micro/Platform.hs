@@ -3,7 +3,8 @@ CPP,
 TypeFamilies,
 MultiParamTypeClasses,
 FlexibleInstances,
-UndecidableInstances
+UndecidableInstances,
+Trustworthy
   #-}
 
 -- without -fno-warn-dodgy-exports it complains about Lens.Micro.GHC
