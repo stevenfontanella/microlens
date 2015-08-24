@@ -1,3 +1,7 @@
+# 0.1.5.0
+
+* Added Safe Haskell pragmas.
+
 # 0.1.4.1
 
 * Bumped microlens version.
