@@ -8,7 +8,8 @@ UndecidableInstances,
 ScopedTypeVariables,
 RankNTypes,
 TypeFamilies,
-KindSignatures
+KindSignatures,
+Trustworthy
   #-}
 
 -- This is needed because ErrorT is deprecated.

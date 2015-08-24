@@ -4,7 +4,8 @@ FlexibleInstances,
 FlexibleContexts,
 UndecidableInstances,
 RankNTypes,
-ScopedTypeVariables
+ScopedTypeVariables,
+Trustworthy
   #-}
 
 

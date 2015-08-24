@@ -5,7 +5,8 @@ TypeFamilies,
 FlexibleContexts,
 FlexibleInstances,
 UndecidableInstances,
-BangPatterns
+BangPatterns,
+Trustworthy
   #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}

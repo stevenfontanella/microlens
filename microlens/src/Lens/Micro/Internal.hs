@@ -9,7 +9,8 @@ DefaultSignatures,
 KindSignatures,
 TypeFamilies,
 MultiParamTypeClasses,
-FunctionalDependencies
+FunctionalDependencies,
+Unsafe
   #-}
 
 
