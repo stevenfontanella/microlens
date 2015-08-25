@@ -20,6 +20,8 @@ description:
   .
   There's a longer readme <https://github.com/aelve/microlens#readme on Github>, you should read it if you're still interested about using this library.
   .
+  If you haven't ever used lenses before, read <http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html this tutorial>. (It's for lens, but it applies to microlens just as well.)
+  .
   Note that microlens has /no/ dependencies starting from GHC 7.10 (base-4.8). Prior to that, it has to depend on transformers-0.2 or above.
 license:             BSD3
 license-file:        LICENSE

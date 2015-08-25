@@ -4,7 +4,11 @@
 
 *A tiny part of the lens library which you can depend upon.*
 
-## What you get
+## If you're completely new to this whole lenses thing
+
+Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html). It's for [lens][], but it applies to microlens just as well (except for module names).
+
+## What you get from microlens
 
   * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`, `at`, and `ix`).
 
