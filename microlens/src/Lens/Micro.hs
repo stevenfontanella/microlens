@@ -45,6 +45,7 @@ module Lens.Micro
   -- * Traversals (lenses iterating over several elements)
   Traversal, Traversal',
   failing,
+  filtered,
   both,
   traversed,
   each,
@@ -517,6 +518,78 @@ instance Applicative (Bazaar a b) where
   {-# INLINE pure #-}
   Bazaar mf <*> Bazaar ma = Bazaar $ \afb -> mf afb <*> ma afb
   {-# INLINE (<*>) #-}
+
+{- |
+'filtered' is a traversal that filters elements “passing” thru it:
+
+>>> (1,2,3,4) ^.. each
+[1,2,3,4]
+
+>>> (1,2,3,4) ^.. each . filtered even
+[2,4]
+
+It also can be used to modify elements selectively:
+
+>>> (1,2,3,4) & each . filtered even %~ (*100)
+(1,200,3,400)
+
+The implementation of 'filtered' is very simple. Consider this traversal, which always “traverses” just the value it's given:
+
+@
+id :: 'Traversal'' a a
+id f s = f s
+@
+
+And this traversal, which traverses nothing (in other words, /doesn't/ traverse the value it's given):
+
+@
+ignored :: 'Traversal'' a a
+ignored f s = 'pure' s
+@
+
+And now combine them into a traversal that conditionally traverses the value it's given, and you get 'filtered':
+
+@
+filtered :: (a -> Bool) -> 'Traversal'' a a
+filtered p s = if p s then f s else 'pure' s
+@
+
+By the way, note that 'filtered' can generate illegal traversals – sometimes this can bite you. For instance, take @evens@:
+
+@
+evens = 'filtered' 'even'
+@
+
+If @evens@ was a legal traversal, you'd be able to fuse several applications of @evens@ like this:
+
+@
+'over' evens f '.' 'over' evens g = 'over' evens (f '.' g)
+@
+
+Unfortunately, in case of @evens@ this isn't a correct optimisation:
+
+  * the left-side variant applies @g@ to all even numbers, and then applies @f@ to all even numbers that are left after @f@ (because @f@ might've turned some even numbers into odd ones)
+
+  * the right-side variant applies @f@ and @g@ to all even numbers
+
+Of course, when you are careful and know what you're doing, you won't try to make such an optimisation. However, if you export an illegal traversal created with 'filtered' and someone tries to use it, ne might mistakenly assume that it's legal, do the optimisation, and silently get an incorrect result.
+
+If you are using 'filtered' with some another traversal that doesn't overlap with -whatever the predicate checks-, the resulting traversal will be legal. For instance, here the predicate looks at the 1st element of a tuple, but the resulting traversal only gives you access to the 2nd:
+
+@
+pairedWithEvens :: 'Traversal' [(Int, a)] [(Int, b)] a b
+pairedWithEvens = 'each' '.' 'filtered' ('even' '.' 'fst') '.' '_2'
+@
+
+Since you can't do anything with the 1st components thru this traversal, the following holds for any @f@ and @g@:
+
+@
+'over' pairedWithEvens f '.' 'over' pairedWithEvens g = 'over' pairedWithEvens (f '.' g)
+@
+-}
+filtered :: (a -> Bool) -> Traversal' a a
+filtered p f s = if p s then f s else pure s
+{-# INLINE filtered #-}
 
 {- |
 'both' traverses both fields of a tuple. Unlike @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Traversal.html#v:both both>@ from lens, it only works for pairs – not for triples or 'Either'.
