@@ -1,6 +1,7 @@
 # 0.1.3.0
 
 * Added Safe Haskell pragmas.
+* New minor release (microlens-0.3.3).
 
 # 0.1.2.0
 
