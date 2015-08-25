@@ -9,7 +9,7 @@ ScopedTypeVariables,
 RankNTypes,
 TypeFamilies,
 KindSignatures,
-Trustworthy
+Safe
   #-}
 
 -- This is needed because ErrorT is deprecated.
