@@ -209,10 +209,10 @@ This would generate the following lenses, which can be used to access the fields
 
 @
 x :: 'Lens'' Foo Int
-x f foo = (\\x' -> f {_x = x'}) '<$>' f (_x foo)
+x f foo = (\\x' -> foo {_x = x'}) '<$>' f (_x foo)
 
 y :: 'Lens'' Foo Bool
-y f foo = (\\y' -> f {_y = y'}) '<$>' f (_y foo)
+y f foo = (\\y' -> foo {_y = y'}) '<$>' f (_y foo)
 @
 
 (If you don't want a lens to be generated for some field, don't prefix it with “_”.)
