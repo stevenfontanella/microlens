@@ -7,9 +7,7 @@ UndecidableInstances,
 Trustworthy
   #-}
 
--- without -fno-warn-dodgy-exports it complains about Lens.Micro.GHC
--- exporting nothing (and I want the export to be seen in the Haddocks)
-{-# OPTIONS_GHC -fno-warn-orphans -fno-warn-dodgy-exports #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 #ifndef MIN_VERSION_base
 #define MIN_VERSION_base(x,y,z) 1
@@ -34,19 +32,17 @@ This module is an approximation for @<http://hackage.haskell.org/package/lens/do
 -}
 module Lens.Micro.Platform
 (
-  module Lens.Micro,
+  module Lens.Micro.GHC,
   module Lens.Micro.Mtl,
   module Lens.Micro.TH,
-  module Lens.Micro.GHC,
 )
 where
 
 
-import Lens.Micro
 import Lens.Micro.Internal
+import Lens.Micro.GHC
 import Lens.Micro.Mtl
 import Lens.Micro.TH
-import Lens.Micro.GHC ()
 
 import Data.Hashable
 import Data.Int
