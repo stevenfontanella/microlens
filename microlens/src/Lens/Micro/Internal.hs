@@ -175,7 +175,7 @@ You can use 'each' with these things:
 'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
 @
 
-Additionally, you can use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by importing @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package.
+Additionally, you can use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using @Lens.Micro.GHC@ from <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using @Lens.Micro.Platform@ from <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   each :: Traversal s t a b
   default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
@@ -249,7 +249,7 @@ The following instances are provided in this package:
 'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
 @
 
-Additionally, you can use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by importing @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package.
+Additionally, you can use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using @Lens.Micro.GHC@ from <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using @Lens.Micro.Platform@ from <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   ix :: Index m -> Traversal' m (IxValue m)
   default ix :: (At m) => Index m -> Traversal' m (IxValue m)
@@ -285,7 +285,7 @@ Note that 'at' isn't strict for @Map@, even if you're using @Data.Map.Strict@:
 
 The reason for such behavior is that there's actually no “strict @Map@” type; @Data.Map.Strict@ just provides some strict functions for ordinary @Map@s.
 
-This package doesn't actually provide any instances for 'at', but you can import @Lens.Micro.GHC@ from the <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> package and get instances for @Map@ and @IntMap@.
+This package doesn't actually provide any instances for 'at', but there are instances for @Map@ and @IntMap@ in <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> and an instance for @HashMap@ in <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   at :: Index m -> Lens' m (Maybe (IxValue m))
 
