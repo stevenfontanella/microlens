@@ -1,8 +1,8 @@
 name:                microlens-ghc
-version:             0.2.1.0
-synopsis:            Orphan instances of microlens classes for packages coming with GHC (array, bytestring, containers)
+version:             0.3.0.0
+synopsis:            microlens + all features depending on packages coming with GHC (array, bytestring, containers)
 description:
-  Orphan instances of <http://hackage.haskell.org/package/microlens microlens> classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>).
+  Use this package instead of <http://hackage.haskell.org/package/microlens microlens> if you don't mind depending on all dependencies here – @Lens.Micro.GHC@ reexports everything from @Lens.Micro@ and additionally provides orphan instances of microlens classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>).
   .
   This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
 license:             BSD3
@@ -26,7 +26,7 @@ library
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.5 && <5
-                     , microlens >=0.3.3 && <0.4
+                     , microlens ==0.3.4.*
                      , array >=0.3.0.2 && <0.6
                      , bytestring >=0.9.1.10 && <0.11
                      , containers >=0.4.0 && <0.6

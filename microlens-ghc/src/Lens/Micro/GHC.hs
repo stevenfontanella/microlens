@@ -17,7 +17,7 @@ Trustworthy
 
 
 {- |
-This module contains only instances. Import this module to get:
+By importing this module you get all functions and types from <http://hackage.haskell.org/package/microlens microlens>, as well as the following instances:
 
 * 'at' for 'Map' and 'IntMap'
 
@@ -36,6 +36,7 @@ This module contains only instances. Import this module to get:
 -}
 module Lens.Micro.GHC
 (
+  module Lens.Micro,
 )
 where
 
