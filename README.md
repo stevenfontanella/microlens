@@ -35,10 +35,16 @@ Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Contr
   * [microlens][] – all basic functionality, plus `each`/`at`/`ix`
   * [microlens-mtl][] – `+=` and friends, `use`, `zoom`/`magnify`
   * [microlens-th][] – `makeLenses` and `makeFields`
-  * [microlens-ghc][] – instances to make `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
-  * [microlens-platform][] – instances for `Text`, `Vector`, and `HashMap`; it also reexports everything from all other packages, which makes it a better replacement for `Control.Lens`
+  * [microlens-ghc][] – everything in microlens + instances to make `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
+  * [microlens-platform][] – microlens-ghc + microlens-mtl + microlens-th + instances for `Text`, `Vector`, and `HashMap`
 
 If you're writing a library, use [microlens][] and other packages as needed; if you're writing an application, perhaps use [microlens-platform][].
+
+Versions of microlens-ghc and microlens-platform are incremented whenever versions of their dependencies are incremented, so if you're using these packages it's always enough to specify just their versions and nothing else. In other words, there's no risk of the following happening:
+
+  * a new version of microlens is released, with several functions removed
+  * version of microlens-platform stays the same
+  * your code silently stops compiling as the result
 
 ## Competitors
 
