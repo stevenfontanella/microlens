@@ -276,6 +276,8 @@ Data.Map.delete k m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Nothing
 
 If you want to modify an already existing value, you should use 'ix' instead because then you won't have to deal with 'Maybe' ('ix' is available for all types that have 'at').
 
+'at' is often used with 'Lens.Micro.non'.
+
 Note that 'at' isn't strict for @Map@, even if you're using @Data.Map.Strict@:
 
 >>> Data.Map.Strict.size (Data.Map.Strict.empty & at 1 .~ Just undefined)

@@ -1,3 +1,7 @@
+# 0.3.4.0
+
+* Added `non`.
+
 # 0.3.3.0
 
 * Added `filtered`.

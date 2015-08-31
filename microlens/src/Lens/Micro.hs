@@ -40,6 +40,7 @@ module Lens.Micro
   Lens, Lens',
   lens,
   at,
+  non,
   _1, _2, _3, _4, _5,
 
   -- * Traversals (lenses iterating over several elements)
@@ -70,6 +71,7 @@ import Control.Applicative
 import Control.Monad
 import Data.Functor.Identity
 import Data.Monoid
+import Data.Maybe
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
@@ -482,6 +484,80 @@ When getting, the setter is completely unused; when setting, the getter is unuse
 lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
+
+{- |
+'non' lets you “relabel” a 'Maybe' by equating 'Nothing' to an arbitrary value (which you can choose):
+
+>>> Just 1 ^. non 0
+1
+
+>>> Nothing ^. non 0
+0
+
+The most useful thing about 'non' is that relabeling also works in other direction. If you try to 'set' the “forbidden” value, it'll be turned to 'Nothing':
+
+>>> Just 1 & non 0 .~ 0
+Nothing
+
+Setting anything else works just fine:
+
+>>> Just 1 & non 0 .~ 5
+Just 5
+
+Same happens if you try to modify a value:
+
+>>> Just 1 & non 0 %~ subtract 1
+Nothing
+
+>>> Just 1 & non 0 .~ (+ 1)
+Just 2
+
+'non' is often useful when combined with 'at'. For instance, if you have a map of songs and their playcounts, it makes sense not to store songs with 0 plays in the map; 'non' can act as a filter that wouldn't pass such entries.
+
+Decrease playcount of a song to 0, and it'll be gone:
+
+>>> fromList [("Soon",1),("Yesterday",3)] & at "Soon" . non 0 %~ subtract 1
+fromList [("Yesterday",3)]
+
+Try to add a song with 0 plays, and it won't be added:
+
+>>> fromList [("Yesterday",3)] & at "Soon" . non 0 .~ 0
+fromList [("Yesterday",3)]
+
+But it will be added if you set any other number:
+
+>>> fromList [("Yesterday",3)] & at "Soon" . non 0 .~ 1
+fromList [("Soon",1),("Yesterday",3)]
+
+'non' is also useful when working with nested maps. Here a nested map is created when it's missing:
+
+>>> Map.empty & at "Dez Mona" . non Map.empty . at "Soon" .~ Just 1
+fromList [("Dez Mona",fromList [("Soon",1)])]
+
+and here it is deleted when its last entry is deleted (notice that 'non' is used twice here):
+
+>>> fromList [("Dez Mona",fromList [("Soon",1)])] & at "Dez Mona" . non Map.empty . at "Soon" . non 0 %~ subtract 1
+fromList []
+
+To understand the last example better, observe the flow of values in it:
+
+* the map goes into @at \"Dez Mona\"@
+* the nested map (wrapped into @Just@) goes into @non Map.empty@
+* @Just@ is unwrapped and the nested map goes into @at \"Soon\"@
+* @Just 1@ is unwrapped by @non 0@
+
+Then the final value – i.e. 1 – is modified by @subtract 1@ and the result (which is 0) starts flowing backwards:
+
+* @non 0@ sees the 0 and produces a @Nothing@
+* @at \"Soon\"@ sees @Nothing@ and deletes the corresponding value from the map
+* the resulting empty map is passed to @non Map.empty@, which sees that it's empty and thus produces @Nothing@
+* @at \"Dez Mona\"@ sees @Nothing@ and removes the key from the map
+
+-}
+non :: Eq a => a -> Lens' (Maybe a) a
+non x afb s = f <$> afb (fromMaybe x s)
+  where f y = if x == y then Nothing else Just y
+{-# INLINE non #-}
 
 -- Traversals --------------------------------------------------------------
 
