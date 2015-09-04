@@ -2,7 +2,7 @@
 
 [![Build status](https://secure.travis-ci.org/aelve/microlens.svg)](http://travis-ci.org/aelve/microlens)
 
-*A tiny part of the lens library which you can depend upon.*
+*A tiny part of the lens library with no dependencies.*
 
 ## If you're completely new to this whole lenses thing
 
