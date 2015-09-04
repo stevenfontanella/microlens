@@ -1,3 +1,7 @@
+# 0.3.4.1
+
+* Changed the description of the package from “A tiny part of the lens library which you can depend upon” to “A tiny part of the lens library with no dependencies” because the previous one was ambiguous (I admit I kinda liked that ambiguity, tho).
+
 # 0.3.4.0
 
 * Added `non`.
