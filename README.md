@@ -212,6 +212,8 @@ Moreover, I can't include `Prism` and `Iso` anyway without depending on `profunc
 
 I don't know why Edward can't just make a separate package called “classes”, where `Profunctor` and `Contravariant` would reside along with their *only* instances people ever use, namely `Profunctor (->)` and `Contravariant (Const a)`, and all nir other packages would just depend on classes and provide useful `Tambara` and `Cotambara` instances, and then microlens could also depend on classes and provide prisms and isos. There's probably a good reason. Or maybe Edward just doesn't want to maintain yet another package, ne's got too many of them already. Or maybe Edward has more interesting things to think about (imagine having to continue maintaining something as huge as lens when you're no longer really passionate about it or just want to be doing something else).
 
+There were also plans to move `Profunctor` to base, but [it's complicated](https://www.reddit.com/r/haskell/comments/3kbj9r/edward_kmett_the_unreasonable_effectiveness_of/cuwucle).
+
 > Splitting `lens` would either lead to orphaned instances or loss of functionality.
 
 Agreed. Splitting anything reasonably complex into several parts would lead to loss of functionality.
