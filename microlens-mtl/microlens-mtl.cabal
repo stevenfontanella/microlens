@@ -24,7 +24,7 @@ source-repository head
 
 library
   exposed-modules:     Lens.Micro.Mtl
-  other-modules:       Lens.Micro.Mtl.Zoom
+                       Lens.Micro.Mtl.Internal
   -- other-extensions:    
   build-depends:       base >=4.5 && <5
                      , microlens >=0.3.3 && <0.4
