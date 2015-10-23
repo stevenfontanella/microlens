@@ -207,6 +207,7 @@ instance Applicative (k (Err e s)) => Applicative (FocusingErr e k s) where
 ------------------------------------------------------------------------------
 -- Zoom
 ------------------------------------------------------------------------------
+
 infixr 2 `zoom`
 
 class (Zoomed m ~ Zoomed n, MonadState s m, MonadState t n) => Zoom m n s t | m -> s, n -> t, m t -> n, n s -> m where
@@ -361,6 +362,7 @@ type instance Magnified (IdentityT m) = Magnified m
 ------------------------------------------------------------------------------
 -- Magnify
 ------------------------------------------------------------------------------
+
 infixr 2 `magnify`
 
 class (Magnified m ~ Magnified n, MonadReader b m, MonadReader a n) => Magnify m n b a | m -> b, n -> a, m a -> n, n b -> m where
