@@ -16,8 +16,19 @@ Trustworthy
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 
 
--- This module was copied practically verbatim from lens.
-module Lens.Micro.Mtl.Internal where
+{- |
+This module lets you define your own instances of 'Zoom' and 'Magnify'.
+
+The warning from "Lens.Micro.Internal" applies to this module as well. Don't export functions that have 'Zoom' or 'Magnify' in their type signatures. If you absolutely need to define an instance (e.g. for internal use), only do it for your own types, because otherwise I might add an instance to one of the microlens packages later and if our instances are different it might lead to subtle bugs.
+-}
+module Lens.Micro.Mtl.Internal
+(
+  Zoomed,
+  Zoom(..),
+  Magnified,
+  Magnify(..),
+)
+where
 
 
 import Control.Applicative
