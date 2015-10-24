@@ -1,3 +1,7 @@
+# 0.1.6.0
+
+* Added `Lens.Micro.Mtl.Internal` (which exports zooming type classes)
+
 # 0.1.5.0
 
 * Added Safe Haskell pragmas.
