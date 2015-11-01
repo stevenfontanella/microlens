@@ -1,3 +1,7 @@
+# 0.2.1.3
+
+* Bumped template-haskell (so that the package would compile with GHC HEAD).
+
 # 0.2.1.2
 
 * Bumped microlens version to be able to use phantom.
