@@ -1,3 +1,7 @@
+# 0.1.6.0
+
+* A missing instance of `At` for `HashMap` has been added.
+
 # 0.1.5.0
 
 * New minor release (microlens-mtl-0.1.6).
