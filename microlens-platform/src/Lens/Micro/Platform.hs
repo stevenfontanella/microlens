@@ -91,6 +91,13 @@ instance (Eq k, Hashable k) => Ixed (HashMap k a) where
      Nothing -> pure m
   {-# INLINE ix #-}
 
+instance (Eq k, Hashable k) => At (HashMap k a) where
+  at k f m = f mv <&> \r -> case r of
+    Nothing -> maybe m (const (HashMap.delete k m)) mv
+    Just v' -> HashMap.insert k v' m
+    where mv = HashMap.lookup k m
+  {-# INLINE at #-}
+
 instance Ixed (Vector.Vector a) where
   ix i f v
     | 0 <= i && i < Vector.length v = f (v Vector.! i) <&> \a -> v Vector.// [(i, a)]
