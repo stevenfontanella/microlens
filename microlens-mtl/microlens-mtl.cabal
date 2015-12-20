@@ -1,5 +1,5 @@
 name:                microlens-mtl
-version:             0.1.6.0
+version:             0.1.6.1
 synopsis:            microlens support for Reader/Writer/State from mtl
 description:
   This package contains functions (like 'view' or '+=') which work on 'MonadReader', 'MonadWriter', and 'MonadState' from the mtl package.
@@ -29,7 +29,7 @@ library
   build-depends:       base >=4.5 && <5
                      , microlens >=0.3.3 && <0.4
                      , mtl >=2.0.1 && <2.3
-                     , transformers >=0.2 && <0.5
+                     , transformers >=0.2 && <0.6
                      , transformers-compat >=0.4 && <1
 
   ghc-options:

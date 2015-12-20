@@ -1,3 +1,7 @@
+# 0.1.6.1
+
+* Bumped transformers version.
+
 # 0.1.6.0
 
 * Added `Lens.Micro.Mtl.Internal` (which exports zooming type classes)
