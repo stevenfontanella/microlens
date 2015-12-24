@@ -1,6 +1,7 @@
 # microlens
 
 [![Build status](https://secure.travis-ci.org/aelve/microlens.svg)](http://travis-ci.org/aelve/microlens)
+![BSD3 license](https://img.shields.io/badge/license-BSD3-blue.svg)
 
 *A tiny part of the lens library with no dependencies.*
 
