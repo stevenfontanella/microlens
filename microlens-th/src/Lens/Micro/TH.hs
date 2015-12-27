@@ -21,8 +21,8 @@ module Lens.Micro.TH
 
   -- * Using this module in GHCi
   -- $ghci-note
-  
-  -- * Types for compatibility
+
+  -- * Exports of @Getter@ and @Fold@
   -- $compat-note
   Getter,
   Fold,
@@ -64,6 +64,7 @@ import           Data.Set (Set)
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
+import           Lens.Micro.Extras (Getter, Fold)
 import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
 
@@ -134,11 +135,8 @@ makeLenses ''Foobar
 
 {- $compat-note
 
-When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'Getter' and 'Fold'. These aren't true @Getter@ and @Fold@ from lens – they're not sufficiently polymorphic. Beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones.)
+When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'Getter' and 'Fold', which come from "Lens.Micro.Extras" and are reexported here. These aren't true @Getter@ and @Fold@ from lens – they're not sufficiently polymorphic. Beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones.)
 -}
-
-type Getter s a = forall r. Getting r s a
-type Fold s a = forall r. Applicative (Const r) => Getting r s a
 
 -- Lens functions which would've been in Lens.Micro if it wasn't “micro”
 
