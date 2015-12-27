@@ -1,3 +1,7 @@
+# 0.3.1.0
+
+* New minor release (microlens-0.3.5).
+
 # 0.3.0.0
 
 * Made `Lens.Micro.GHC` export `Lens.Micro` (so, now microlens-ghc works like microlens-platform).

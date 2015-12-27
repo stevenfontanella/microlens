@@ -1,3 +1,7 @@
+# 0.1.7.0
+
+* New minor release (microlens-0.3.5, microlens-th-0.2.2, microlens-ghc-0.3.1).
+
 # 0.1.6.0
 
 * A missing instance of `At` for `HashMap` has been added.

@@ -1,3 +1,7 @@
+# 0.2.2.0
+
+* Moved `Getter` and `Fold` from this package to microlens (they're in `Lens.Micro.Extras`).
+
 # 0.2.1.3
 
 * Bumped template-haskell (so that the package would compile with GHC HEAD).

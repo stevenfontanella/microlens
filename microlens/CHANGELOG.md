@@ -1,3 +1,7 @@
+# 0.3.5.0
+
+* Added `Lens.Micro.Extras` with `view`, `preview`, `Getter`, and `Fold`. Now you no longer need microlens-mtl if the only thing you need from it is `view`.
+
 # 0.3.4.1
 
 * Changed the description of the package from “A tiny part of the lens library which you can depend upon” to “A tiny part of the lens library with no dependencies” because the previous one was ambiguous (I admit I kinda liked that ambiguity, tho).
