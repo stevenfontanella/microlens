@@ -5,6 +5,10 @@
 
 *A tiny part of the lens library with no dependencies.*
 
+## If you want to improve this library
+
+See <CONTRIBUTING.md>.
+
 ## If you're completely new to this whole lenses thing
 
 Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html). It's for [lens][], but it applies to microlens just as well (except for module names).
