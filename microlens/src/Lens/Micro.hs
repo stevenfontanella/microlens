@@ -284,7 +284,7 @@ Getters are a not-entirely-obvious way to use lenses to /carry out/ information 
 
 For details, see the documentation for 'Getting'.
 
-Including @Getter@ from lens is impossible, as then this package would have to depend on <http://hackage.haskell.org/package/contravariant contravariant> and it's a big dependency. If you absolutely need it, there's a variant of 'Lens.Micro.Extras.Getter' present in "Lens.Micro.Extras".
+Including @Getter@ from lens is impossible, as then this package would have to depend on <http://hackage.haskell.org/package/contravariant contravariant> and it's a big dependency. If you absolutely need it, there's a slightly less polymorphic 'Lens.Micro.Extras.Getter' present in "Lens.Micro.Extras".
 -}
 
 {- |
