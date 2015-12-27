@@ -83,7 +83,9 @@ I hate it when people advertise things without also describing their disadvantag
 
   * There are orphan instances, e.g. in the [microlens-ghc][] package. (However, the only way someone can actually break things is by using `Lens.Micro.Internal` and ignoring the warnings there, so I think it's not a huge danger.)
 
-  * There are `set` and `over` in the basic package, but no `view`. (There's `view` in [microlens-mtl][], but I can't have `view` in both packages at once, and having `view` in the basic package would add an mtl dependency.)
+  * There are `set` and `over` in the basic module (i.e. `Lens.Micro`), but `view` lives in `Lens.Micro.Extras` and it doesn't work in `MonadReader` (and the version that does is in [microlens-mtl][]).
+
+  * `makeLenses` can generate `Fold` and `Getter` that would be sli-ightly less general that versions in [lens][]. (If you're a lens user, you still can convert from those versions to fully general versions, so you're not doomed or anything. It's just a minor nuisance / opportunity for confusion.)
 
   * The implementation is as cryptic/complicated as [lens][]'s (performance has its costs).
 
