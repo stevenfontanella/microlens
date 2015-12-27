@@ -42,6 +42,7 @@ source-repository head
 
 library
   exposed-modules:     Lens.Micro
+                       Lens.Micro.Extras
                        Lens.Micro.Internal
                        Lens.Micro.Type
   -- other-modules:       

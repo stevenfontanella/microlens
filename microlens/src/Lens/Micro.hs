@@ -304,7 +304,7 @@ When ('^.') is used with a traversal, it combines all results using the 'Monoid'
 
 The reason for this is that traversals use 'Applicative', and the 'Applicative' instance for 'Const' uses monoid concatenation to combine “effects” of 'Const'.
 
-A non-operator version of ('^.') is called @view@, and it's not included in this package because it is a bit more general (it works in @MonadReader@ and thus requires a <http://hackage.haskell.org/package/mtl mtl> dependency). You can get it from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
+A non-operator version of ('^.') is called @view@, and it's a bit more general than ('^.') (it works in @MonadReader@). If you need the general version, you can get it from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>; otherwise there's 'Lens.Micro.Extras.view' available in "Lens.Micro.Extras".
 -}
 (^.) :: s -> Getting a s a -> a
 s ^. l = getConst (l Const s)
@@ -419,7 +419,7 @@ Nothing
 >>> Right 1 ^? _Right
 Just 1
 
-A non-operator version of ('^?') is called @preview@, and – like @view@ – it's not included in this package because it's more general and requires a <http://hackage.haskell.org/package/mtl mtl> dependency). As with @view@, you can get it from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
+A non-operator version of ('^?') is called @preview@, and – like @view@ – it's a bit more general than ('^?') (it works in @MonadReader@). If you need the general version, you can get it from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>; otherwise there's 'Lens.Micro.Extras.preview' available in "Lens.Micro.Extras".
 -}
 (^?) :: s -> Getting (First a) s a -> Maybe a
 s ^? l = getFirst (foldMapOf l (First #. Just) s)
