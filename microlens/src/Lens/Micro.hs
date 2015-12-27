@@ -372,6 +372,8 @@ Just 5
 Nothing
 
 (Unfortunately, this trick won't help you with setting or modifying.)
+
+Just like with @Getter@, including @Fold@ from lens in this module is impossible. If you absolutely need it, there's a slightly less polymorphic 'Lens.Micro.Extras.Fold' present in "Lens.Micro.Extras".
 -}
 
 {- |
