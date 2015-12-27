@@ -7,7 +7,7 @@
 
 ## If you want to improve this library
 
-See <CONTRIBUTING.md>.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## If you're completely new to this whole lenses thing
 

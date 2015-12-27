@@ -4,7 +4,7 @@ If you're not me, just open an issue or a pull request and we'll sort everything
 
 If you're me, here's a checklist:
 
-  * If there's a new package, add it to <install-order.txt>, <README.md>, and possibly [microlens.cabal](microlens/microlens.cabal).
+  * If there's a new package, add it to [install-order.txt](install-order.txt), [README.md](README.md), and possibly [microlens.cabal](microlens/microlens.cabal).
 
   * When bumping minor/major version, bump the following too:
 
@@ -21,3 +21,5 @@ If you're me, here's a checklist:
       * microlens-th → microlens-platform
       * microlens-mtl → microlens-platform
       * microlens-platform → \<nothing\>
+
+  * And generally don't forget to update the changelogs.
