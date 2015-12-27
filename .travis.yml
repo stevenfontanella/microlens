@@ -36,6 +36,17 @@ before_install:
  - unset CC
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
 
+# check whether install-order.txt lists all packages in the dir
+ - sort install-order.txt > install-order-sorted.txt;
+   ls -1 | grep microlens | sed 's/\///g' > all-libs.txt;
+   if ! diff -u install-order-sorted.txt all-libs.txt;
+   then
+     echo "there's some package not listed in install-order.txt";
+     exit 1;
+   fi;
+   rm install-order-sorted.txt;
+   rm all-libs.txt;
+
 install:
  - cabal --version
  - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
@@ -72,16 +83,23 @@ install:
       cp -a $HOME/.cabal/lib $HOME/.cabal/share $HOME/.cabal/bin installplan.txt $HOME/.cabsnap/;
    fi
 
-# Here starts the actual work to be performed for the package under test;
-# any command which exits with a non-zero exit code causes the build to fail.
+# We install packages in the order specified in install-order.txt;
+# if installing any package leads to *downloading* some microlens package,
+# it's a bug.
 script:
- - if [ -f configure.ac ]; then autoreconf -i; fi
- - cabal install --only-dependencies microlens*
- - cabal install microlens*
- - for lib in microlens*;
+ - while read lib;
    do
      cd $lib;
+     cabal install --only-dependencies --dry-run > plan.txt;
+     if grep -Fq microlens plan.txt;
+     then
+       cat plan.txt;
+       echo "installing $lib led to downloading some microlens package!"
+       exit 1;
+     fi;
+     rm plan.txt;
+     cabal install;
      cabal check;
      cabal sdist;
      cd ..;
-   done
+   done < install-order.txt
