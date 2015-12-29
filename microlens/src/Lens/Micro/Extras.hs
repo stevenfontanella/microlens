@@ -12,8 +12,8 @@ module Lens.Micro.Extras
 (
   view,
   preview,
-  Getter,
-  Fold,
+  SimpleGetter,
+  SimpleFold,
 )
 where
 
@@ -62,7 +62,7 @@ preview l = getFirst #. foldMapOf l (First #. Just)
 {-# INLINE preview #-}
 
 {- |
-A @Getter s a@ extracts @a@ from @s@; so, it's the same thing as @(s -> a)@, but you can use it in lens chains. For details, see 'Getting'.
+A @SimpleGetter s a@ extracts @a@ from @s@; so, it's the same thing as @(s -> a)@, but you can use it in lens chains. For details, see 'Getting'.
 
 The reason it's in this module is that the actual @Getter@ from lens is more general:
 
@@ -71,14 +71,14 @@ type Getter s a =
   forall f. (Contravariant f, Functor f) => (a -> f a) -> s -> f s
 @
 
-I'm not currently aware of any functions that take lens's @Getter@ but won't accept this @Getter@, but you should try to avoid exporting 'Getter's anyway to minimise confusion.
+I'm not currently aware of any functions that take lens's @Getter@ but won't accept 'SimpleGetter', but you should try to avoid exporting 'SimpleGetter's anyway to minimise confusion.
 
-Lens users: you can convert fake getters to real getters by applying @to . view@ to them.
+Lens users: you can convert a 'SimpleGetter' to @Getter@ by applying @to . view@ to it.
 -}
-type Getter s a = forall r. Getting r s a
+type SimpleGetter s a = forall r. Getting r s a
 
 {- |
-A @Fold s a@ extracts several @a@s from @s@; so, it's pretty much the same thing as @(s -> [a])@, but you can use it with lens operators.
+A @SimpleFold s a@ extracts several @a@s from @s@; so, it's pretty much the same thing as @(s -> [a])@, but you can use it with lens operators.
 
 The reason it's in this module is that the actual @Fold@ from lens is more general:
 
@@ -87,8 +87,14 @@ type Fold s a =
   forall f. (Contravariant f, Applicative f) => (a -> f a) -> s -> f s
 @
 
-I'm only aware of 2 functions that accept lens's @Fold@ but won't accept this @Fold@ – they are @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldByOf foldByOf>@ and @<http://hackage.haskell.org/package/lens-4.13/docs/Control-Lens-Fold.html#v:foldMapByOf foldMapByOf>@. They aren't used often, but you should try to avoid exporting 'Fold's anyway to minimise confusion (and to prevent people cursing you when they want to use @foldByOf@ with your fold).
+There are several functions in lens that accept lens's @Fold@ but won't accept 'SimpleFold'; I'm aware of
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:takingWhile takingWhile>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:droppingWhile droppingWhile>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:backwards backwards>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldByOf foldByOf>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldMapByOf foldMapByOf>@.
+For this reason, try not to use 'SimpleFold' if at all possible.
 
-Lens users: you can convert fake folds to real folds by applying @folded . toListOf@ to them.
+Lens users: you can convert a 'SimpleFold' to @Fold@ by applying @folded . toListOf@ to it.
 -}
-type Fold s a = forall r. Applicative (Const r) => Getting r s a
+type SimpleFold s a = forall r. Applicative (Const r) => Getting r s a

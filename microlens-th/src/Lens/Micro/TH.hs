@@ -22,10 +22,10 @@ module Lens.Micro.TH
   -- * Using this module in GHCi
   -- $ghci-note
 
-  -- * Exports of @Getter@ and @Fold@
-  -- $compat-note
-  Getter,
-  Fold,
+  -- * 'SimpleGetter' and 'SimpleFold'
+  -- $getter-fold-note
+  SimpleGetter,
+  SimpleFold,
 
   -- * Making lenses
   makeLenses,
@@ -64,13 +64,14 @@ import           Data.Set (Set)
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
-import           Lens.Micro.Extras (Getter, Fold)
+import           Lens.Micro.Extras (SimpleGetter, SimpleFold)
 import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
 
 #if __GLASGOW_HASKELL__ < 710
 import           Data.Traversable (traverse, sequenceA)
 #endif
+
 
 {- $errors-note
 
@@ -133,9 +134,9 @@ makeLenses ''Foobar
 @
 -}
 
-{- $compat-note
+{- $getter-fold-note
 
-When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'Getter' and 'Fold', which come from "Lens.Micro.Extras" and are reexported here. These aren't true @Getter@ and @Fold@ from lens – they're not sufficiently polymorphic. Beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones.)
+When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'SimpleGetter' and 'SimpleFold', which come from "Lens.Micro.Extras" and are reexported here. These aren't true @Getter@ and @Fold@ from lens, so beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones – for instance, @backwards@ and @takingWhile@ don't work on 'SimpleFold'.)
 -}
 
 -- Lens functions which would've been in Lens.Micro if it wasn't “micro”
@@ -421,7 +422,7 @@ generateSignatures f r =
   fmap (\x -> r { _generateSigs = x}) (f (_generateSigs r))
 
 {- |
-Generate “updateable” optics. When turned off, 'Fold's will be generated instead of 'Traversal's and 'Getter's will be generated instead of 'Lens'es.
+Generate “updateable” optics. When turned off, 'SimpleFold's will be generated instead of 'Traversal's and 'SimpleGetter's will be generated instead of 'Lens'es.
 
 This option is enabled by default. Disabling it can be useful for types with invariants (also known as “types with smart constructors”) – if you generate updateable optics, anyone would be able to use them to break your invariants.
 -}
@@ -744,14 +745,14 @@ buildScaffold rules s cons defName =
 
      let defType
            | Just (_,cx,a') <- a ^? _ForallT =
-               let optic | lensCase  = ''Getter
-                         | otherwise = ''Fold
+               let optic | lensCase  = ''SimpleGetter
+                         | otherwise = ''SimpleFold
                in OpticSa cx optic s' a'
 
            -- Getter and Fold are always simple
            | not (_allowUpdates rules) =
-               let optic | lensCase  = ''Getter
-                         | otherwise = ''Fold
+               let optic | lensCase  = ''SimpleGetter
+                         | otherwise = ''SimpleFold
                in OpticSa [] optic s' a
 
            -- Generate simple Lens and Traversal where possible
