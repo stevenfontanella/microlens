@@ -15,6 +15,7 @@ module Lens.Micro
   -- $ampersand-note
 
   -- * Setting (applying a function to values)
+  -- $setting-note
   ASetter, ASetter',
   sets,
   (%~), over,
@@ -120,6 +121,59 @@ or this:
 
 -- Setting -----------------------------------------------------------------
 
+{- $setting-note
+
+A setter is, broadly speaking, something that lets you modify a part of some value. Most likely you already know some setters:
+
+  * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@
+
+    (modifies 1st element of a pair; corresponds to 'Lens.Micro._1')
+
+  * @'Control.Arrow.left' :: (a -> b) -> 'Either' a x -> 'Either' b x@
+
+    (modifies left branch of 'Either'; corresponds to 'Lens.Micro._Left')
+
+  * @'map' :: (a -> b) -> [a] -> [b]@
+
+    (modifies every element in a list; corresponds to 'Lens.Micro.mapped')
+
+As you see, a setter takes a function, a value, and applies the function to some part (or several parts) of the value. Moreover, setters can be pretty specific – for instance, if you wrote
+
+@
+-- Modify 3rd element in a list, if present.
+modify3rd :: (a -> a) -> [a] -> [a]
+modify3rd f (a:b:c:xs) = a : b : f c : xs
+modify3rd _ xs         = xs
+@
+
+it'd be a setter too.
+
+A nice thing about setters is that they compose easily – you can write @map.left@ and it would be a function that takes a list of 'Either's and modifies all of them that are 'Left's.
+
+This library provides its own type for setters – 'ASetter'; it's needed so that some functions in this library (like '_1') would be usable both as setters and as getters. You can turn an ordinary function like 'map' to a “lensy” setter with 'sets'.
+
+To apply a setter to a value, use ('%~') or 'over':
+
+>>> [1,2,3] & mapped %~ succ
+[2,3,4]
+>>> over _head toUpper "jane"
+"Jane"
+
+To modify a value deeper inside the structure, use ('.'):
+
+>>> ["abc","def","ghi"] & ix 1 . ix 2 %~ toUpper
+["abc","deF","ghi"]
+
+To set a value instead of modifying it, use 'set' or ('.~'):
+
+>>> "abc" & mapped .~ 'x'
+"xxx"
+>>> set _2 'X' ('a','b','c')
+('a','X','c')
+
+It's also possible to get both the old and the new value back – see ('<%~') and ('<<%~').
+-}
+
 {- |
 ('%~') applies a function to the target; an alternative explanation is that it is an inverse of 'sets', which turns a setter into an ordinary function. @'mapped' '%~' 'reverse'@ is the same thing as @'fmap' 'reverse'@.
 
@@ -168,10 +222,11 @@ over l f = runIdentity #. l (Identity #. f)
 {-# INLINE over #-}
 
 {- |
-('.~') assigns a value to the target. These are equivalent:
+('.~') assigns a value to the target. It's the same thing as using ('%~') with 'const':
 
-* @l '.~' x@
-* @l '%~' 'const' x@
+@
+l '.~' x = l '%~' 'const' x
+@
 
 See 'set' if you want a non-operator synonym.
 
@@ -237,6 +292,8 @@ Simpler type signatures:
 ('<%~') ::             'Lens' s t a b      -> (a -> b) -> s -> (b, t)
 ('<%~') :: 'Monoid' b => 'Traversal' s t a b -> (a -> b) -> s -> (b, t)
 @
+
+Since it does getting in addition to setting, you can't use it with 'ASetter' (but you can use it with lens and traversals).
 -}
 (<%~) :: LensLike ((,) b) s t a b -> (a -> b) -> s -> (b, t)
 (<%~) l f = l (join (,) . f)

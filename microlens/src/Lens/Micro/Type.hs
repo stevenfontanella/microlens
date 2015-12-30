@@ -29,24 +29,6 @@ import Data.Functor.Identity
 type ASetter s t a b = (a -> b) -> s -> t
 @
 
-This means that examples of setters you might've already seen are:
-
-  * @'map' :: (a -> b) -> [a] -> [b]@
-
-    (which corresponds to 'Lens.Micro.mapped')
-
-  * @'fmap' :: 'Functor' f => (a -> b) -> f a -> f b@
-
-    (which corresponds to 'Lens.Micro.mapped' as well)
-
-  * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@
-
-    (which corresponds to 'Lens.Micro._1')
-
-  * @'Control.Arrow.left' :: (a -> b) -> 'Either' a x -> 'Either' b x@
-
-    (which corresponds to 'Lens.Micro._Left')
-
 The reason 'Identity' is used here is for 'ASetter' to be composable with other types, such as 'Lens'.
 
 Technically, if you're writing a library, you shouldn't use this type for setters you are exporting from your library; the right type to use is @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Setter.html#t:Setter Setter>@, but it is not provided by this package (because then we'd have to depend on <http://hackage.haskell.org/package/distributive distributive>). It's completely alright, however, to export functions which take an 'ASetter' as an argument.
