@@ -22,6 +22,10 @@ where
 import Control.Applicative
 import Data.Functor.Identity
 
+#if __GLASGOW_HASKELL__ < 710
+import Data.Monoid
+#endif
+
 
 {- |
 @ASetter s t a b@ is something that turns a function modifying a value into a function modifying a /structure/. If you ignore 'Identity' (as @Identity a@ is the same thing as @a@), the type is:
