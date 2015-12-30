@@ -524,6 +524,12 @@ has :: Getting Any s a -> s -> Bool
 has l = getAny #. foldMapOf l (\_ -> Any True)
 {-# INLINE has #-}
 
+{- |
+'folding' creates a fold out of any function that returns a 'F.Foldable' container (for instance, a list):
+
+>>> [1..5] ^.. folding tail
+[2,3,4,5]
+-}
 folding :: F.Foldable f => (s -> f a) -> SimpleFold s a
 folding sfa agb = phantom . F.traverse_ agb . sfa
 {-# INLINE folding #-}
