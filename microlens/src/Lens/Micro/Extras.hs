@@ -31,13 +31,13 @@ import Data.Monoid
 >>> view _1 (1, 2)
 1
 
-The reason it's in this module is that @view@ in lens has a more general signature:
+The reason it's not in "Lens.Micro" is that @view@ in lens has a more general signature:
 
 @
 view :: MonadReader s m => Getting a s a -> m a
 @
 
-So, you would be able to use this 'view' with functions, but not in various reader monads. For most people this shouldn't be an issue.
+So, you would be able to use this 'view' with functions, but not in various reader monads. For most people this shouldn't be an issue; if it is for you, use @view@ from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
 -}
 view :: Getting a s a -> s -> a
 view l = getConst #. l Const
@@ -49,13 +49,13 @@ view l = getConst #. l Const
 >>> preview _head [1,2,3]
 Just 1
 
-The reason it's in this module is that @preview@ in lens has a more general signature:
+The reason it's not in "Lens.Micro" is that @preview@ in lens has a more general signature:
 
 @
 preview :: MonadReader s m => Getting (First a) s a -> m (Maybe a)
 @
 
-So, just like with 'view', you would be able to use this 'preview' with functions, but not in reader monads.
+Just like with 'view', you would be able to use this 'preview' with functions, but not in reader monads; if this is an issue for you, use @preview@ from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
 -}
 preview :: Getting (First a) s a -> s -> Maybe a
 preview l = getFirst #. foldMapOf l (First #. Just)

@@ -31,7 +31,7 @@ type ASetter s t a b = (a -> b) -> s -> t
 
 The reason 'Identity' is used here is for 'ASetter' to be composable with other types, such as 'Lens'.
 
-Technically, if you're writing a library, you shouldn't use this type for setters you are exporting from your library; the right type to use is @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Setter.html#t:Setter Setter>@, but it is not provided by this package (because then we'd have to depend on <http://hackage.haskell.org/package/distributive distributive>). It's completely alright, however, to export functions which take an 'ASetter' as an argument.
+Technically, if you're writing a library, you shouldn't use this type for setters you are exporting from your library; the right type to use is @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Setter.html#t:Setter Setter>@, but it is not provided by this package (because then it'd have to depend on <http://hackage.haskell.org/package/distributive distributive>). It's completely alright, however, to export functions which take an 'ASetter' as an argument.
 -}
 type ASetter s t a b = (a -> Identity b) -> s -> Identity t
 

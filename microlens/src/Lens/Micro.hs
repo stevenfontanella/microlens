@@ -137,7 +137,7 @@ A setter is, broadly speaking, something that lets you modify a part of some val
 
     (modifies every element in a list; corresponds to 'Lens.Micro.mapped')
 
-As you see, a setter takes a function, a value, and applies the function to some part (or several parts) of the value. Moreover, setters can be pretty specific – for instance, if you wrote
+As you see, a setter takes a function, a value, and applies the function to some part (or several parts) of the value. Moreover, setters can be pretty specific – for instance, a function that modifies the 3rd element of a list is a setter too:
 
 @
 -- Modify 3rd element in a list, if present.
@@ -146,9 +146,7 @@ modify3rd f (a:b:c:xs) = a : b : f c : xs
 modify3rd _ xs         = xs
 @
 
-it'd be a setter too.
-
-A nice thing about setters is that they compose easily – you can write @map.left@ and it would be a function that takes a list of 'Either's and modifies all of them that are 'Left's.
+A nice thing about setters is that they compose easily – you can write @'map' . 'Control.Arrow.left'@ and it would be a function that takes a list of 'Either's and modifies all of them that are 'Left's.
 
 This library provides its own type for setters – 'ASetter'; it's needed so that some functions in this library (like '_1') would be usable both as setters and as getters. You can turn an ordinary function like 'map' to a “lensy” setter with 'sets'.
 
