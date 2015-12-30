@@ -10,7 +10,8 @@ This module provides just the types ('Lens', 'Traversal', etc). It's needed to b
 module Lens.Micro.Type
 (
   ASetter, ASetter',
-  Getting,
+  SimpleGetter, Getting,
+  SimpleFold,
   Lens, Lens',
   Traversal, Traversal',
   LensLike, LensLike',
@@ -41,15 +42,61 @@ This is a type alias for monomorphic setters which don't change the type of the 
 type ASetter' s a = ASetter s s a a
 
 {- |
-If you take a lens or a traversal and choose @'Const' r@ as your functor, you will get @Getting r s a@. This can be used to get something out of the structure instead of modifying it:
+A @SimpleGetter s a@ extracts @a@ from @s@; so, it's the same thing as @(s -> a)@, but you can use it in lens chains because its type looks like this:
 
 @
-s 'Lens.Micro.^.' l = 'getConst' (l 'Const' s)
+type SimpleGetter s a =
+  forall r. (a -> Const r a) -> s -> Const r s
 @
 
-Functions that operate on getters – such as ('Lens.Micro.^.'), ('Lens.Micro.^..'), ('Lens.Micro.^?') – use @Getter r s a@ (with different values of @r@) to describe what kind of getter they need. For instance, ('Lens.Micro.^.') needs the getter to be able to return a single value, and so it accepts a getter of type @Getting a s a@. ('Lens.Micro.^..') wants the getter to gather values together, so it uses @Getting (Endo [a]) s a@ (it could've used @Getting [a] s a@ instead, but it's faster with 'Data.Monoid.Endo'). The choice of @r@ depends on what you want to do with elements you're extracting from @s@.
+Since @Const r@ is a functor, 'SimpleGetter' has the same shape as other lens types and can be composed with them. To get @(s -> a)@ out of a 'SimpleGetter', choose @r ~ a@ and feed @Const :: a -> Const a a@ to the getter:
+
+@
+-- the actual signature is more permissive:
+-- 'Lens.Micro.Extras.view' :: 'Getting' a s a -> s -> a
+'Lens.Micro.Extras.view' :: 'SimpleGetter' s a -> s -> a
+'Lens.Micro.Extras.view' getter = 'getConst' . getter 'Const'
+@
+
+The actual @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Getter.html#t:Getter Getter>@ from lens is more general:
+
+@
+type Getter s a =
+  forall f. (Contravariant f, Functor f) => (a -> f a) -> s -> f s
+@
+
+I'm not currently aware of any functions that take lens's @Getter@ but won't accept 'SimpleGetter', but you should try to avoid exporting 'SimpleGetter's anyway to minimise confusion. Alternatively, look at <http://hackage.haskell.org/package/microlens-contra microlens-contra>, which provides a fully lens-compatible @Getter@.
+
+Lens users: you can convert a 'SimpleGetter' to @Getter@ by applying @to . view@ to it.
+-}
+type SimpleGetter s a = forall r. Getting r s a
+
+{- |
+Functions that operate on getters and folds – such as ('Lens.Micro.^.'), ('Lens.Micro.^..'), ('Lens.Micro.^?') – use @Getter r s a@ (with different values of @r@) to describe what kind of result they need. For instance, ('Lens.Micro.^.') needs the getter to be able to return a single value, and so it accepts a getter of type @Getting a s a@. ('Lens.Micro.^..') wants the getter to gather values together, so it uses @Getting (Endo [a]) s a@ (it could've used @Getting [a] s a@ instead, but it's faster with 'Data.Monoid.Endo'). The choice of @r@ depends on what you want to do with elements you're extracting from @s@.
 -}
 type Getting r s a = (a -> Const r a) -> s -> Const r s
+
+{- |
+A @SimpleFold s a@ extracts several @a@s from @s@; so, it's pretty much the same thing as @(s -> [a])@, but you can use it with lens operators.
+
+The actual @Fold@ from lens is more general:
+
+@
+type Fold s a =
+  forall f. (Contravariant f, Applicative f) => (a -> f a) -> s -> f s
+@
+
+There are several functions in lens that accept lens's @Fold@ but won't accept 'SimpleFold'; I'm aware of
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:takingWhile takingWhile>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:droppingWhile droppingWhile>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:backwards backwards>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldByOf foldByOf>@,
+@<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldMapByOf foldMapByOf>@.
+For this reason, try not to export 'SimpleFold's if at all possible. <http://hackage.haskell.org/package/microlens-contra microlens-contra> provides a fully lens-compatible @Fold@.
+
+Lens users: you can convert a 'SimpleFold' to @Fold@ by applying @folded . toListOf@ to it.
+-}
+type SimpleFold s a = forall r. Monoid r => Getting r s a
 
 {- |
 Lenses in a nutshell: use ('Lens.Micro.^.') to get, ('Lens.Micro..~') to set, ('Lens.Micro.%~') to modify. ('.') composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of in @B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses with 'Lens.Micro.lens', or you can write them by hand (see below).

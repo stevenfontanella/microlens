@@ -1,3 +1,7 @@
+# 0.3.0.0
+
+* `SimpleGetter` and `SimpleFold` are no longer reexported.
+
 # 0.2.2.0
 
 * Moved `Getter` and `Fold` from this package to microlens (they're in `Lens.Micro.Extras`).

@@ -1,6 +1,7 @@
-# unreleased
+# 0.1.6.1
 
 * Bumped transformers version.
+* Bumped microlens version.
 
 # 0.1.6.0
 

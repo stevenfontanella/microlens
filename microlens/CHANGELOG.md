@@ -1,3 +1,9 @@
+# 0.4.0.0
+
+* Added `folding`.
+* Renamed `Getter` and `Fold` to `SimpleGetter` and `SimpleFold` and put them into `Lens.Micro`. Genuine `Getter` and `Fold` are available in microlens-contra.
+* Replaced `Applicative (Const r)` constraints with `Monoid r` because it's the same thing but easier to understand.
+
 # 0.3.5.0
 
 * Added `Lens.Micro.Extras` with `view`, `preview`, `Getter`, and `Fold`. Now you no longer need microlens-mtl if the only thing you need from it is `view`.

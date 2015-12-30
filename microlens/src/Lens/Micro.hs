@@ -23,21 +23,24 @@ module Lens.Micro
   (<%~), (<<%~), (<<.~),
   mapped,
 
-  -- * Getting (retrieving a value)
-  -- $getters-note
+  -- * Getting (extracting a value)
+  -- $getting-note
+  SimpleGetter,
   Getting,
   (^.),
   to,
 
-  -- * Folds (getters returning multiple elements)
+  -- * Folds (extracting multiple elements)
   -- $folds-note
+  SimpleFold,
   (^..), toListOf,
   (^?),
   (^?!),
-  folded,
   has,
+  folded,
+  folding,
 
-  -- * Lenses (setters and getters at once)
+  -- * Lenses (combined getters-and-setters)
   Lens, Lens',
   lens,
   at,
@@ -73,6 +76,7 @@ import Control.Monad
 import Data.Functor.Identity
 import Data.Monoid
 import Data.Maybe
+import qualified Data.Foldable as F
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
@@ -333,13 +337,23 @@ Simpler type signatures:
 
 -- Getting -----------------------------------------------------------------
 
-{- $getters-note
+{- $getting-note
 
-Getters are a not-entirely-obvious way to use lenses to /carry out/ information from a structure (instead of changing something inside the structure). Any lens or traversal is a getter.
+A getter extracts something from a value; in fact, any function is a getter. However, same as with setters, this library uses a special type for getters so that functions like '_1' would be usable both as a setter and a getter. An ordinary function can be turned into a getter with 'to'.
 
-For details, see the documentation for 'Getting'.
+Using a getter is done with ('^.') or 'Lens.Micro.Extras.view' from "Lens.Micro.Extras":
 
-Including @Getter@ from lens is impossible, as then this package would have to depend on <http://hackage.haskell.org/package/contravariant contravariant> and it's a big dependency. If you absolutely need it, there's a slightly less polymorphic 'Lens.Micro.Extras.Getter' present in "Lens.Micro.Extras".
+>>> ('x','y') ^. _1
+'x'
+>>> view (ix 2) [0..5]
+2
+
+Getters can be composed with ('.'):
+
+>>> [(1,2),(3,4),(5,6)] ^. ix 1 . _2
+4
+
+A getter always returns exactly 1 element (getters that can return more than one element are called folds and are present in this library as well).
 -}
 
 {- |
@@ -392,7 +406,7 @@ but now @value@ is in the middle and it's hard to read the resulting code. A var
 value ^. _1 . to field . at 2
 @
 -}
-to :: (s -> a) -> Getting r s a
+to :: (s -> a) -> SimpleGetter s a
 to k f = phantom . f . k
 {-# INLINE to #-}
 
@@ -400,24 +414,26 @@ to k f = phantom . f . k
 
 {- $folds-note
 
-Folds are getters that can traverse more than one element (or no elements at all). The only fold here which isn't simultaneously a 'Traversal' is 'folded' (traversals are folds that also can modify elements they're traversing).
+Folds are getters that can return more than one element (or no elements at all). <http://comonad.com/reader/2015/free-monoids-in-haskell/ Except for some rare cases>, a fold is the same thing as @(s -> [a])@; you can use 'folding' to turn any function of type @(s -> f a)@ (where @f@ is 'F.Foldable') into a fold.
 
-You can apply folds to values by using operators like ('^..'), ('^?'), etc:
+Folds can be applied to values by using operators like ('^..'), ('^?'), etc:
 
 >>> (1,2) ^.. both
 [1,2]
 
 A nice thing about folds is that you can combine them with ('Data.Monoid.<>') to concatenate their outputs:
 
->>> (1,2,3) ^.. (_2 <> _1)  -- in reversed order because why not
+>>> (1,2,3) ^.. (_2 <> _1)
 [2,1]
 
-You can build more complicated getters with it when 'each' would be unhelpful:
+When you need to get all elements of the same type in a complicated structure, ('Data.Monoid.<>') can be more helpful than 'each':
 
 >>> ([1,2], 3, [Nothing, Just 4]) ^.. (_1.each <> _2 <> _3.each._Just)
 [1,2,3,4]
 
-It plays nicely with ('^?'), too:
+(Just like setters and getters before, folds can be composed with ('.').)
+
+The ('Data.Monoid.<>') trick works nicely with ('^?'), too. For instance, if you want to get the 9th element of the list, but would be fine with 5th too if the list is too short, you could combine @ix 9@ and @ix 5@:
 
 >>> [0..9] ^? (ix 9 <> ix 5)
 Just 9
@@ -427,8 +443,6 @@ Just 5
 Nothing
 
 (Unfortunately, this trick won't help you with setting or modifying.)
-
-Just like with @Getter@, including @Fold@ from lens in this module is impossible. If you absolutely need it, there's a slightly less polymorphic 'Lens.Micro.Extras.Fold' present in "Lens.Micro.Extras".
 -}
 
 {- |
@@ -509,6 +523,10 @@ True
 has :: Getting Any s a -> s -> Bool
 has l = getAny #. foldMapOf l (\_ -> Any True)
 {-# INLINE has #-}
+
+folding :: Foldable f => (s -> f a) -> SimpleFold s a
+folding sfa agb = phantom . F.traverse_ agb . sfa
+{-# INLINE folding #-}
 
 -- Lenses ------------------------------------------------------------------
 

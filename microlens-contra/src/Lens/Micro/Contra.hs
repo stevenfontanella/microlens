@@ -1,7 +1,8 @@
 {-# LANGUAGE
 TemplateHaskell,
 RankNTypes,
-FlexibleContexts
+FlexibleContexts,
+Safe
   #-}
 
 
@@ -19,7 +20,7 @@ where
 
 
 import Lens.Micro
-import Lens.Micro.Extras (SimpleGetter, SimpleFold, view)
+import Lens.Micro.Extras (view)
 
 import Data.Foldable (traverse_)
 import Data.Functor.Contravariant (phantom, Contravariant)

@@ -24,8 +24,6 @@ module Lens.Micro.TH
 
   -- * 'SimpleGetter' and 'SimpleFold'
   -- $getter-fold-note
-  SimpleGetter,
-  SimpleFold,
 
   -- * Making lenses
   makeLenses,
@@ -64,7 +62,6 @@ import           Data.Set (Set)
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
-import           Lens.Micro.Extras (SimpleGetter, SimpleFold)
 import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
 
@@ -136,7 +133,9 @@ makeLenses ''Foobar
 
 {- $getter-fold-note
 
-When updates aren't allowed, or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'SimpleGetter' and 'SimpleFold', which come from "Lens.Micro.Extras" and are reexported here. These aren't true @Getter@ and @Fold@ from lens, so beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones – for instance, @backwards@ and @takingWhile@ don't work on 'SimpleFold'.)
+When updates are forbidden (by using 'generateUpdateableOptics'), or when a field simply can't be updated (for instance, in the presence of @forall@), instead of 'Lens' and 'Traversal' we generate 'SimpleGetter' and 'SimpleFold'. These aren't true @Getter@ and @Fold@ from lens, so beware. (Still, they're compatible, it's just that you can't do some things with them that you can do with original ones – for instance, @backwards@ and @takingWhile@ don't work on 'SimpleFold'.)
+
+If you want to export true folds, it's recommended that you depend on <http://hackage.haskell.org/package/microlens-contra microlens-contra>, use 'makeLensesFor' to generate 'SimpleFold's with prefixes, and then export versions of those folds with @<http://hackage.haskell.org/package/microlens-contra/docs/Lens-Micro-Contra.html#v:fromSimpleFold fromSimpleFold>@ applied.
 -}
 
 -- Lens functions which would've been in Lens.Micro if it wasn't “micro”

@@ -93,7 +93,7 @@ traversed = traverse
 'folded' is a fold for anything 'Foldable'. In a way, it's an opposite of
 'mapped' – the most powerful getter, but can't be used as a setter.
 -}
-folded :: (Foldable f, Monoid r) => Getting r (f a) a
+folded :: Foldable f => SimpleFold (f a) a
 folded = foldring F.foldr
 {-# INLINE folded #-}
 
