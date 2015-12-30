@@ -1,7 +1,6 @@
 {-# LANGUAGE
-TemplateHaskell,
+CPP,
 RankNTypes,
-FlexibleContexts,
 Safe
   #-}
 
@@ -24,6 +23,10 @@ import Lens.Micro.Extras (view)
 
 import Data.Foldable (traverse_)
 import Data.Functor.Contravariant (phantom, Contravariant)
+
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative
+#endif
 
 
 type Getter s a =
