@@ -15,7 +15,10 @@ Unsafe
 
 
 {- |
-This module is needed to give other packages from the microlens family (like <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>) access to functions and classes that don't need to be exported from "Lens.Micro" (because they just clutter the namespace). Also, okay, uh, e.g. 'traversed' is here because otherwise there'd be a dependency cycle.
+This module is needed to give other packages from the microlens family (like <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>) access to functions and classes that don't need to be exported from "Lens.Micro" (because they just clutter the namespace). Also:
+
+  * 'traversed' is here because otherwise there'd be a dependency cycle
+  * 'sets' is here because it's used in RULEs
 
 Classes like 'Each', 'Ixed', etc are provided for convenience – you're not supposed to export functions that work on all members of 'Ixed', for instance. Only microlens can do that. You mustn't declare instances of those classes for other types, either; these classes are incompatible with lens's classes, and by doing so you would divide the ecosystem.
 
@@ -90,11 +93,11 @@ traversed = traverse
 'folded' is a fold for anything 'Foldable'. In a way, it's an opposite of
 'mapped' – the most powerful getter, but can't be used as a setter.
 -}
-folded :: (Foldable f, Applicative (Const r)) => Getting r (f a) a
+folded :: (Foldable f, Monoid r) => Getting r (f a) a
 folded = foldring F.foldr
 {-# INLINE folded #-}
 
-foldring :: (Applicative (Const r)) => ((a -> Const r a -> Const r a) -> Const r a -> s -> Const r a) -> (a -> Const r b) -> s -> Const r t
+foldring :: Monoid r => ((a -> Const r a -> Const r a) -> Const r a -> s -> Const r a) -> (a -> Const r b) -> s -> Const r t
 foldring fr f = phantom . fr (\a fa -> f a *> fa) noEffect
 {-# INLINE foldring #-}
 
@@ -122,7 +125,7 @@ phantom :: Const r a -> Const r b
 phantom = Const #. getConst
 {-# INLINE phantom #-}
 
-noEffect :: Applicative (Const r) => Const r a
+noEffect :: Monoid r => Const r a
 noEffect = phantom (pure ())
 {-# INLINE noEffect #-}
 
