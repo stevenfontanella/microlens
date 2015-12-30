@@ -34,6 +34,7 @@ Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Contr
 [microlens-th]: http://hackage.haskell.org/package/microlens-th
 [microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
 [microlens-platform]: http://hackage.haskell.org/package/microlens-platform
+[microlens-contra]: http://hackage.haskell.org/package/microlens-contra
 
 ## All packages in the family
 
@@ -42,6 +43,7 @@ Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Contr
   * [microlens-th][] – `makeLenses` and `makeFields`
   * [microlens-ghc][] – everything in microlens + instances to make `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
   * [microlens-platform][] – microlens-ghc + microlens-mtl + microlens-th + instances for `Text`, `Vector`, and `HashMap`
+  * [microlens-contra][] – `Fold` and `Getter` that are copies of types in lens (the reason they're in a separate library is that those types depend on [contravariant][])
 
 If you're writing a library, use [microlens][] and other packages as needed; if you're writing an application, perhaps use [microlens-platform][].
 
@@ -89,7 +91,7 @@ I hate it when people advertise things without also describing their disadvantag
 
   * There are `set` and `over` in the basic module (i.e. `Lens.Micro`), but `view` lives in `Lens.Micro.Extras` and it doesn't work in `MonadReader` (and the version that does is in [microlens-mtl][]).
 
-  * `makeLenses` can generate `Fold` and `Getter` that would be sli-ightly less general that versions in [lens][]. (If you're a lens user, you still can convert from those versions to fully general versions, so you're not doomed or anything. It's just a minor nuisance / opportunity for confusion.)
+  * `makeLenses` can generate `SimpleFold` and `SimpleGetter` which are sli-ightly less general that `Fold` and `Getter` in [lens][]. (If you're a lens user, you still can convert from those versions to fully general versions, so you're not doomed or anything – it's just a minor nuisance / opportunity for confusion. Also, [microlens-contravariant][] provides true `Fold` and `Getter`.)
 
   * The implementation is as cryptic/complicated as [lens][]'s (performance has its costs).
 
