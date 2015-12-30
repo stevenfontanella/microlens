@@ -45,6 +45,8 @@ Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Contr
   * [microlens-platform][] – microlens-ghc + microlens-mtl + microlens-th + instances for `Text`, `Vector`, and `HashMap`
   * [microlens-contra][] – `Fold` and `Getter` that are copies of types in lens (the reason they're in a separate library is that those types depend on [contravariant][])
 
+[contravariant]: http://hackage.haskell.org/package/contravariant
+
 If you're writing a library, use [microlens][] and other packages as needed; if you're writing an application, perhaps use [microlens-platform][].
 
 Versions of microlens-ghc and microlens-platform are incremented whenever versions of their dependencies are incremented, so if you're using these packages it's always enough to specify just their versions and nothing else. In other words, there's no risk of the following happening:
@@ -91,7 +93,7 @@ I hate it when people advertise things without also describing their disadvantag
 
   * There are `set` and `over` in the basic module (i.e. `Lens.Micro`), but `view` lives in `Lens.Micro.Extras` and it doesn't work in `MonadReader` (and the version that does is in [microlens-mtl][]).
 
-  * `makeLenses` can generate `SimpleFold` and `SimpleGetter` which are sli-ightly less general that `Fold` and `Getter` in [lens][]. (If you're a lens user, you still can convert from those versions to fully general versions, so you're not doomed or anything – it's just a minor nuisance / opportunity for confusion. Also, [microlens-contravariant][] provides true `Fold` and `Getter`.)
+  * `makeLenses` can generate `SimpleFold` and `SimpleGetter` which are sli-ightly less general that `Fold` and `Getter` in [lens][]. (If you're a lens user, you still can convert from those versions to fully general versions, so you're not doomed or anything – it's just a minor nuisance / opportunity for confusion. Also, [microlens-contra][] provides true `Fold` and `Getter`.)
 
   * The implementation is as cryptic/complicated as [lens][]'s (performance has its costs).
 
