@@ -76,13 +76,10 @@ import Control.Monad
 import Data.Functor.Identity
 import Data.Monoid
 import Data.Maybe
+import qualified Data.Foldable as F
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
-#endif
-
-#if __GLASGOW_HASKELL < 710
-import Data.Foldable
 #endif
 
 
@@ -417,7 +414,7 @@ to k f = phantom . f . k
 
 {- $folds-note
 
-Folds are getters that can return more than one element (or no elements at all). <http://comonad.com/reader/2015/free-monoids-in-haskell/ Except for some rare cases>, a fold is the same thing as @(s -> [a])@; you can use 'folding' to turn any function of type @(s -> f a)@ (where @f@ is 'Foldable') into a fold.
+Folds are getters that can return more than one element (or no elements at all). <http://comonad.com/reader/2015/free-monoids-in-haskell/ Except for some rare cases>, a fold is the same thing as @(s -> [a])@; you can use 'folding' to turn any function of type @(s -> f a)@ (where @f@ is 'F.Foldable') into a fold.
 
 Folds can be applied to values by using operators like ('^..'), ('^?'), etc:
 
@@ -527,7 +524,7 @@ has :: Getting Any s a -> s -> Bool
 has l = getAny #. foldMapOf l (\_ -> Any True)
 {-# INLINE has #-}
 
-folding :: Foldable f => (s -> f a) -> SimpleFold s a
+folding :: F.Foldable f => (s -> f a) -> SimpleFold s a
 folding sfa agb = phantom . F.traverse_ agb . sfa
 {-# INLINE folding #-}
 
