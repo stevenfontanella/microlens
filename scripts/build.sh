@@ -12,7 +12,7 @@ function buildlib {
   fi
   rm plan.txt
   cabal install
-  cabal check
+  # cabal check
   cabal sdist
   cd ..
 }
