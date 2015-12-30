@@ -14,8 +14,8 @@ module Lens.Micro
   (&),
   -- $ampersand-note
 
-  -- * Setting (applying a function to values)
-  -- $setting-note
+  -- * Setter: modifies something in a structure
+  -- $setters-note
   ASetter, ASetter',
   sets,
   (%~), over,
@@ -23,14 +23,14 @@ module Lens.Micro
   (<%~), (<<%~), (<<.~),
   mapped,
 
-  -- * Getting (extracting a value)
-  -- $getting-note
+  -- * Getter: extracts a value from a structure
+  -- $getters-note
   SimpleGetter,
   Getting,
   (^.),
   to,
 
-  -- * Folds (extracting multiple elements)
+  -- * Fold: extracts multiple elements
   -- $folds-note
   SimpleFold,
   (^..), toListOf,
@@ -40,14 +40,14 @@ module Lens.Micro
   folded,
   folding,
 
-  -- * Lenses (combined getters-and-setters)
+  -- * Lens: a combined getter-and-setter
   Lens, Lens',
   lens,
   at,
   non,
   _1, _2, _3, _4, _5,
 
-  -- * Traversals (lenses iterating over several elements)
+  -- * Traversal: a lens iterating over several elements
   Traversal, Traversal',
   failing,
   filtered,
@@ -57,7 +57,7 @@ module Lens.Micro
   ix,
   _head, _tail, _init, _last,
 
-  -- * Prisms (traversals iterating over at most 1 element)
+  -- * Prism: a traversal iterating over at most 1 element
   -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
@@ -125,21 +125,21 @@ or this:
 
 -- Setting -----------------------------------------------------------------
 
-{- $setting-note
+{- $setters-note
 
 A setter is, broadly speaking, something that lets you modify a part of some value. Most likely you already know some setters:
 
   * @'Control.Arrow.first' :: (a -> b) -> (a, x) -> (b, x)@
 
-    (modifies 1st element of a pair; corresponds to 'Lens.Micro._1')
+      (modifies 1st element of a pair; corresponds to 'Lens.Micro._1')
 
   * @'Control.Arrow.left' :: (a -> b) -> 'Either' a x -> 'Either' b x@
 
-    (modifies left branch of 'Either'; corresponds to 'Lens.Micro._Left')
+      (modifies left branch of 'Either'; corresponds to 'Lens.Micro._Left')
 
   * @'map' :: (a -> b) -> [a] -> [b]@
 
-    (modifies every element in a list; corresponds to 'Lens.Micro.mapped')
+      (modifies every element in a list; corresponds to 'Lens.Micro.mapped')
 
 As you see, a setter takes a function, a value, and applies the function to some part (or several parts) of the value. Moreover, setters can be pretty specific – for instance, a function that modifies the 3rd element of a list is a setter too:
 
@@ -150,7 +150,7 @@ modify3rd f (a:b:c:xs) = a : b : f c : xs
 modify3rd _ xs         = xs
 @
 
-A nice thing about setters is that they compose easily – you can write @'map' . 'Control.Arrow.left'@ and it would be a function that takes a list of 'Either's and modifies all of them that are 'Left's.
+A nice thing about setters is that they compose easily – you can write @'map' '.' 'Control.Arrow.left'@ and it would be a function that takes a list of 'Either's and modifies all of them that are 'Left's.
 
 This library provides its own type for setters – 'ASetter'; it's needed so that some functions in this library (like '_1') would be usable both as setters and as getters. You can turn an ordinary function like 'map' to a “lensy” setter with 'sets'.
 
@@ -337,7 +337,7 @@ Simpler type signatures:
 
 -- Getting -----------------------------------------------------------------
 
-{- $getting-note
+{- $getters-note
 
 A getter extracts something from a value; in fact, any function is a getter. However, same as with setters, this library uses a special type for getters so that functions like '_1' would be usable both as a setter and a getter. An ordinary function can be turned into a getter with 'to'.
 
