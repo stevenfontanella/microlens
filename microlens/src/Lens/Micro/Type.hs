@@ -1,4 +1,5 @@
 {-# LANGUAGE
+CPP,
 RankNTypes,
 Safe
   #-}
