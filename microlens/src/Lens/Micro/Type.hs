@@ -5,7 +5,7 @@ Safe
 
 
 {- |
-This module provides just the types ('Lens', 'Traversal', etc). It's needed to break the dependency cycle – "Lens.Micro" depends on "Lens.Micro.Classes", but "Lens.Micro.Classes" needs types like 'Lens', so 'Lens' can't be defined in "Lens.Micro".
+This module provides just the types ('Lens', 'Traversal', etc). It's needed to break the dependency cycle – "Lens.Micro" depends on "Lens.Micro.Internal", but "Lens.Micro.Internal" needs types like 'Lens', so 'Lens' can't be defined in "Lens.Micro".
 -}
 module Lens.Micro.Type
 (
