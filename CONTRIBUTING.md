@@ -8,7 +8,7 @@ If you're me, here's a checklist:
 
   * When bumping minor/major version, bump the following too:
 
-      * microlens → microlens-ghc, microlens-th, microlens-mtl, microlens-platform
+      * microlens → microlens-ghc, microlens-th, microlens-mtl, microlens-platform, microlens-contra
       * microlens-ghc → microlens-platform
       * microlens-th → microlens-platform
       * microlens-mtl → microlens-platform
