@@ -4,7 +4,12 @@ If you're not me, just open an issue or a pull request and we'll sort everything
 
 If you're me, here's a checklist:
 
-  * If there's a new package, add it to [install-order.txt](install-order.txt), [README.md](README.md), and possibly [microlens.cabal](microlens/microlens.cabal).
+  * If there's a new package:
+
+      * add it to [install-order.txt](install-order.txt)
+      * add it to [README.md](README.md)
+      * possibly mention it in [microlens.cabal](microlens/microlens.cabal)
+      * [create a Stackage pull request](https://github.com/fpco/stackage/edit/master/build-constraints.yaml)
 
   * When bumping minor/major version, bump the following too:
 
