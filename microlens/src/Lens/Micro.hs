@@ -5,6 +5,7 @@ FlexibleContexts,
 UndecidableInstances,
 RankNTypes,
 ScopedTypeVariables,
+MonoLocalBinds,
 Trustworthy
   #-}
 
