@@ -1,3 +1,7 @@
+# 0.4.0.1
+
+* Fixed a bug that wasn't letting the package compile with GHC 8.0 (see issue #63).
+
 # 0.4.0.0
 
 * Added `folding`.
