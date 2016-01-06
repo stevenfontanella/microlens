@@ -29,6 +29,8 @@ This module is an approximation for @<http://hackage.haskell.org/package/lens/do
 
     * 'Vector.Vector' and variants
     * strict and lazy @Text@
+
+* 'strict' and 'lazy' for @Text@
 -}
 module Lens.Micro.Platform
 (
@@ -270,3 +272,9 @@ vectorTraverse f v = Generic.fromListN (Generic.length v) <$> traversed f (Gener
 "vectorTraverse -> mapped" vectorTraverse  = sets Generic.map         :: (Generic.Vector v a, Generic.Vector v b) => ASetter (v a) (v b) a b;
 "vectorTraverse -> foldr"  vectorTraverse  = foldring Generic.foldr   :: Generic.Vector v a => Getting (Endo r) (v a) a;
  #-}
+
+instance Strict TL.Text T.Text where
+  strict f s = TL.fromStrict <$> f (TL.toStrict s)
+  {-# INLINE strict #-}
+  lazy f s = TL.toStrict <$> f (TL.fromStrict s)
+  {-# INLINE lazy #-}

@@ -33,6 +33,11 @@ By importing this module you get all functions and types from <http://hackage.ha
 
     * 'Seq'
     * strict and lazy bytestrings
+
+* 'strict' and 'lazy' for
+
+    * bytestrings
+    * @StateT@, @WriterT@, @RWST@
 -}
 module Lens.Micro.GHC
 (
@@ -55,6 +60,13 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Internal as BI
 import qualified Data.ByteString.Unsafe as BU
+
+import Control.Monad.Trans.State.Lazy as Lazy
+import Control.Monad.Trans.State.Strict as Strict
+import Control.Monad.Trans.Writer.Lazy as Lazy
+import Control.Monad.Trans.Writer.Strict as Strict
+import Control.Monad.Trans.RWS.Lazy as Lazy
+import Control.Monad.Trans.RWS.Strict as Strict
 
 import Data.Tree
 import Data.Array.IArray as Array
@@ -303,6 +315,14 @@ fromStrict = \x -> BL.fromChunks [x]
 #endif
 {-# INLINE fromStrict #-}
 
+toStrict :: BL.ByteString -> B.ByteString
+#if MIN_VERSION_bytestring(0,10,0)
+toStrict = BL.toStrict
+#else
+toStrict = B.concat . BL.toChunks
+#endif
+{-# INLINE toStrict #-}
+
 foldrChunks :: (B.ByteString -> r -> r) -> r -> BL.ByteString -> r
 #if MIN_VERSION_bytestring(0,10,0)
 foldrChunks = BL.foldrChunks
@@ -310,3 +330,33 @@ foldrChunks = BL.foldrChunks
 foldrChunks f z b = foldr f z (BL.toChunks b)
 #endif
 {-# INLINE foldrChunks #-}
+
+instance Strict BL.ByteString B.ByteString where
+  strict f s = fromStrict <$> f (toStrict s)
+  {-# INLINE strict #-}
+  lazy f s = toStrict <$> f (fromStrict s)
+  {-# INLINE lazy #-}
+
+instance Strict (Lazy.StateT s m a) (Strict.StateT s m a) where
+  strict f s = Lazy.StateT . Strict.runStateT <$>
+               f (Strict.StateT (Lazy.runStateT s))
+  {-# INLINE strict #-}
+  lazy f s = Strict.StateT . Lazy.runStateT <$>
+             f (Lazy.StateT (Strict.runStateT s))
+  {-# INLINE lazy #-}
+
+instance Strict (Lazy.WriterT w m a) (Strict.WriterT w m a) where
+  strict f s = Lazy.WriterT . Strict.runWriterT <$>
+               f (Strict.WriterT (Lazy.runWriterT s))
+  {-# INLINE strict #-}
+  lazy f s = Strict.WriterT . Lazy.runWriterT <$>
+             f (Lazy.WriterT (Strict.runWriterT s))
+  {-# INLINE lazy #-}
+
+instance Strict (Lazy.RWST r w s m a) (Strict.RWST r w s m a) where
+  strict f s = Lazy.RWST . Strict.runRWST <$>
+               f (Strict.RWST (Lazy.runRWST s))
+  {-# INLINE strict #-}
+  lazy f s = Strict.RWST . Lazy.runRWST <$>
+             f (Lazy.RWST (Strict.runRWST s))
+  {-# INLINE lazy #-}

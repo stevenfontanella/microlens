@@ -1,8 +1,8 @@
 name:                microlens-ghc
-version:             0.4.0.0
-synopsis:            microlens + all features depending on packages coming with GHC (array, bytestring, containers)
+version:             0.4.1.0
+synopsis:            microlens + array, bytestring, containers, transformers
 description:
-  Use this package instead of <http://hackage.haskell.org/package/microlens microlens> if you don't mind depending on all dependencies here – @Lens.Micro.GHC@ reexports everything from @Lens.Micro@ and additionally provides orphan instances of microlens classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>).
+  Use this package instead of <http://hackage.haskell.org/package/microlens microlens> if you don't mind depending on all dependencies here – @Lens.Micro.GHC@ reexports everything from @Lens.Micro@ and additionally provides orphan instances of microlens classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>, <http://hackage.haskell.org/package/transfromers transformers>).
   .
   The minor and major versions of microlens-ghc are incremented whenever the minor and major versions of microlens are incremented, so you can depend on the exact version of microlens-ghc without specifying the version of microlens you need.
   .
@@ -27,11 +27,12 @@ library
   exposed-modules:     Lens.Micro.GHC
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.5 && <5
-                     , microlens ==0.4.0.*
-                     , array >=0.3.0.2 && <0.6
+  build-depends:       array >=0.3.0.2 && <0.6
+                     , base >=4.5 && <5
                      , bytestring >=0.9.1.10 && <0.11
                      , containers >=0.4.0 && <0.6
+                     , microlens ==0.4.1.*
+                     , transformers >=0.2 && <0.6
 
   ghc-options:
     -Wall -fwarn-tabs

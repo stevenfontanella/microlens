@@ -47,6 +47,7 @@ module Lens.Micro.Internal
   Field5(..),
   Cons(..),
   Snoc(..),
+  Strict(..),
 )
 where
 
@@ -534,3 +535,35 @@ instance Snoc [a] [b] a b where
   _Snoc _ [] = pure []
   _Snoc f xs = (\(as,a) -> as ++ [a]) <$> f (init xs, last xs)
   {-# INLINE _Snoc #-}
+
+class Strict lazy strict | lazy -> strict, strict -> lazy where
+  {- |
+'strict' lets you convert between strict and lazy versions of a datatype:
+
+>>> let someText = "hello" :: Lazy.Text
+>>> someText ^. strict
+"hello" :: Strict.Text
+
+It can also be useful if you have a function that works on a strict type but your type is lazy:
+
+@
+stripDiacritics :: Strict.Text -> Strict.Text
+stripDiacritics = ...
+@
+
+>>> let someText = "Paul Erdős" :: Lazy.Text
+>>> someText & strict %~ stripDiacritics
+"Paul Erdos" :: Lazy.Text
+
+'strict' works on @ByteString@ and @StateT@\/@WriterT@\/@RWST@ if you use <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, and additionally on @Text@ if you use <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+  -}
+  strict :: Lens' lazy strict
+
+  {- |
+'lazy' is like 'strict' but works in opposite direction:
+
+>>> let someText = "hello" :: Strict.Text
+>>> someText ^. lazy
+"hello" :: Lazy.Text
+  -}
+  lazy   :: Lens' strict lazy

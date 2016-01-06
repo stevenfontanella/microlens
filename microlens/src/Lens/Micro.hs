@@ -45,8 +45,12 @@ module Lens.Micro
   Lens, Lens',
   lens,
   at,
-  non,
   _1, _2, _3, _4, _5,
+
+  -- * Iso: a lens that only changes the representation
+  -- $isos-note
+  strict, lazy,
+  non,
 
   -- * Traversal: a lens iterating over several elements
   Traversal, Traversal',
@@ -567,6 +571,19 @@ lens :: (s -> a) -> (s -> b -> t) -> Lens s t a b
 lens sa sbt afb s = sbt s <$> afb (sa s)
 {-# INLINE lens #-}
 
+-- Isos --------------------------------------------------------------------
+
+{- $isos-note
+
+Isos (or isomorphisms) are lenses that convert a value instead of targeting a part of it; in other words, inside of every list lives a reversed list, inside of every strict @Text@ lives a lazy @Text@, and inside of every @(a, b)@ lives a @(b, a)@. Since an isomorphism doesn't lose any information, it's possible to /reverse/ it and use it in the opposite direction by using @from@ from the lens library:
+
+@
+from :: Iso' s a -> Iso' a s
+@
+
+However, it's not possible for microlens to export isomorphisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Profunctor Profunctor>@, which resides in the <http://hackage.haskell.org/package/profunctors profunctors> library, which is a somewhat huge dependency. So, all isomorphisms included here are lenses instead (and thus you can't use them in the opposite direction).
+-}
+
 {- |
 'non' lets you “relabel” a 'Maybe' by equating 'Nothing' to an arbitrary value (which you can choose):
 
@@ -634,7 +651,6 @@ Then the final value – i.e. 1 – is modified by @subtract 1@ and the result (
 * @at \"Soon\"@ sees @Nothing@ and deletes the corresponding value from the map
 * the resulting empty map is passed to @non Map.empty@, which sees that it's empty and thus produces @Nothing@
 * @at \"Dez Mona\"@ sees @Nothing@ and removes the key from the map
-
 -}
 non :: Eq a => a -> Lens' (Maybe a) a
 non x afb s = f <$> afb (fromMaybe x s)
@@ -852,7 +868,7 @@ Left 3
 Left 5
 @
 
-However, it's not possible for microlens to export prisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@, which resides in the <http://hackage.haskell.org/package/profunctors profunctors> library, which is a somewhat huge dependency. So, all prisms included here are traversals instead.
+However, it's not possible for microlens to export prisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@ from <http://hackage.haskell.org/package/profunctors profunctors>. So, all prisms included here are traversals instead (and you can't reverse them).
 -}
 
 {- |

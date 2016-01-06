@@ -1,3 +1,8 @@
+# 0.4.1.0
+
+* Added instances for `Strict`.
+* New minor release (microlens-0.4.1).
+
 # 0.4.0.0
 
 * New major release (microlens-0.4).
