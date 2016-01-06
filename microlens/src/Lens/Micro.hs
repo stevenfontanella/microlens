@@ -794,7 +794,7 @@ The reason it's a traversal and not a lens is that there's nothing to traverse w
 >>> [] ^? _head
 Nothing
 
-This package only lets you use '_head' on lists, but you can use @Lens.Micro.GHC@ from <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> and get instances for @ByteString@ and @Seq@, or use @Lens.Micro.Platform@ from <http://hackage.haskell.org/package/microlens-platform microlens-platform> and additionally get instances for @Text@ and @Vector@.
+This package only lets you use '_head' on lists, but if you use <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> you get instances for @ByteString@ and @Seq@, and if you use <http://hackage.haskell.org/package/microlens-platform microlens-platform> you additionally get instances for @Text@ and @Vector@.
 -}
 _head :: Cons s s a a => Traversal' s a
 _head = _Cons._1
@@ -824,7 +824,7 @@ If you want to traverse each /element/ of the tail, use '_tail' with 'each':
 >>> "I HATE CAPS." & _tail.each %~ toLower
 "I hate caps."
 
-This package only lets you use '_tail' on lists, but you can use @Lens.Micro.GHC@ from <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> and get instances for @ByteString@ and @Seq@, or use @Lens.Micro.Platform@ from <http://hackage.haskell.org/package/microlens-platform microlens-platform> and additionally get instances for @Text@ and @Vector@.
+This package only lets you use '_tail' on lists, but if you use <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> you get instances for @ByteString@ and @Seq@, and if you use <http://hackage.haskell.org/package/microlens-platform microlens-platform> you additionally get instances for @Text@ and @Vector@.
 -}
 _tail :: Cons s s a a => Traversal' s s
 _tail = _Cons._2

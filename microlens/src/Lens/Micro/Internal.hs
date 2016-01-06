@@ -179,7 +179,7 @@ You can use 'each' with these things:
 'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
 @
 
-Additionally, you can use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using @Lens.Micro.GHC@ from <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using @Lens.Micro.Platform@ from <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+You can also use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   each :: Traversal s t a b
   default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
@@ -253,7 +253,7 @@ The following instances are provided in this package:
 'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
 @
 
-Additionally, you can use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using @Lens.Micro.GHC@ from <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using @Lens.Micro.Platform@ from <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+You can also use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   ix :: Index m -> Traversal' m (IxValue m)
   default ix :: (At m) => Index m -> Traversal' m (IxValue m)
