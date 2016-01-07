@@ -11,7 +11,7 @@ function buildlib {
     exit 1
   fi
   rm plan.txt
-  cabal install
+  cabal install --ghc-options "-Werror"
   # cabal check
   cabal sdist
   cd ..
