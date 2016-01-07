@@ -48,6 +48,9 @@ import Foreign.ForeignPtr
 import Foreign.ForeignPtr.Safe
 #endif
 import GHC.ForeignPtr (mallocPlainForeignPtrBytes)
+#if !MIN_VERSION_bytestring(0,10,4)
+import Foreign.ForeignPtr.Unsafe (unsafeForeignPtrToPtr)
+#endif
 import GHC.IO (unsafeDupablePerformIO)
 import GHC.Base (unsafeChr)
 
