@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:     Lens.Micro.GHC
+                       Lens.Micro.GHC.Internal
   -- other-modules:       
   -- other-extensions:    
   build-depends:       array >=0.3.0.2 && <0.6

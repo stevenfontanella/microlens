@@ -2,10 +2,8 @@
 CPP,
 MultiParamTypeClasses,
 TypeFamilies,
-FlexibleContexts,
 FlexibleInstances,
 UndecidableInstances,
-BangPatterns,
 Trustworthy
   #-}
 
@@ -42,12 +40,16 @@ By importing this module you get all functions and types from <http://hackage.ha
 module Lens.Micro.GHC
 (
   module Lens.Micro,
+  packedBytes, unpackedBytes,
+  packedChars, unpackedChars,
+  chars,
 )
 where
 
 
 import Lens.Micro
 import Lens.Micro.Internal
+import Lens.Micro.GHC.Internal
 
 import qualified Data.Map as Map
 import           Data.Map (Map)
@@ -58,8 +60,6 @@ import           Data.Sequence (Seq)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString.Internal as BI
-import qualified Data.ByteString.Unsafe as BU
 
 import Control.Monad.Trans.State.Lazy as Lazy
 import Control.Monad.Trans.State.Strict as Strict
@@ -74,17 +74,6 @@ import Data.Array.Unboxed
 
 import Data.Int
 import Data.Word
-import Data.Monoid
-import Foreign.Storable
-import Foreign.Ptr
-import Data.Bits
-#if MIN_VERSION_base(4,8,0)
-import Foreign.ForeignPtr
-#else
-import Foreign.ForeignPtr.Safe
-#endif
-import GHC.ForeignPtr (mallocPlainForeignPtrBytes)
-import GHC.IO (unsafeDupablePerformIO)
 
 #if !MIN_VERSION_base(4,8,0)
 import Control.Applicative
@@ -247,89 +236,6 @@ instance Snoc BL.ByteString BL.ByteString Word8 Word8 where
     then pure BL.empty
     else uncurry BL.snoc <$> f (BL.init s, BL.last s)
   {-# INLINE _Snoc #-}
-
-------------------------------------------------------------------------------
--- Control.Lens.Internal.ByteString
-------------------------------------------------------------------------------
-
-grain :: Int
-grain = 32
-{-# INLINE grain #-}
-
-traversedStrictTree :: Traversal' B.ByteString Word8
-traversedStrictTree afb bs = unsafeCreate len <$> go 0 len
- where
-   len = B.length bs
-   go !i !j
-     | i + grain < j, k <- i + shiftR (j - i) 1 = (\l r q -> l q >> r q) <$> go i k <*> go k j
-     | otherwise = run i j
-   run !i !j
-     | i == j    = pure (\_ -> return ())
-     | otherwise = let !x = BU.unsafeIndex bs i
-                   in (\y ys q -> pokeByteOff q i y >> ys q) <$> afb x <*> run (i + 1) j
-{-# INLINE [0] traversedStrictTree #-}
-
-{-# RULES
-"bytes -> map"
-  traversedStrictTree = sets B.map :: ASetter' B.ByteString Word8;
-"bytes -> foldr"
-  traversedStrictTree = foldring B.foldr :: Getting (Endo r) B.ByteString Word8;
-  #-}
-
--- A way of creating ByteStrings outside the IO monad. The @Int@
--- argument gives the final size of the ByteString. Unlike
--- 'createAndTrim' the ByteString is not reallocated if the final size
--- is less than the estimated size.
-unsafeCreate :: Int -> (Ptr Word8 -> IO ()) -> B.ByteString
-unsafeCreate l f = unsafeDupablePerformIO (create l f)
-{-# INLINE unsafeCreate #-}
-
--- Create ByteString of size @l@ and use action @f@ to fill it's contents.
-create :: Int -> (Ptr Word8 -> IO ()) -> IO B.ByteString
-create l f = do
-    fp <- mallocPlainForeignPtrBytes l
-    withForeignPtr fp $ \p -> f p
-    return $! BI.PS fp 0 l
-{-# INLINE create #-}
-
-traversedLazy :: Traversal' BL.ByteString Word8
-traversedLazy afb = \lbs -> foldrChunks go (pure BL.empty) lbs
-  where
-  go c fcs = BL.append . fromStrict
-             <$> traversedStrictTree afb c
-             <*> fcs
-{-# INLINE [1] traversedLazy #-}
-
-{-# RULES
-"sets lazy bytestring"
-  traversedLazy = sets BL.map :: ASetter' BL.ByteString Word8;
-"gets lazy bytestring"
-  traversedLazy = foldring BL.foldr :: Getting (Endo r) BL.ByteString Word8;
-  #-}
-
-fromStrict :: B.ByteString -> BL.ByteString
-#if MIN_VERSION_bytestring(0,10,0)
-fromStrict = BL.fromStrict
-#else
-fromStrict = \x -> BL.fromChunks [x]
-#endif
-{-# INLINE fromStrict #-}
-
-toStrict :: BL.ByteString -> B.ByteString
-#if MIN_VERSION_bytestring(0,10,0)
-toStrict = BL.toStrict
-#else
-toStrict = B.concat . BL.toChunks
-#endif
-{-# INLINE toStrict #-}
-
-foldrChunks :: (B.ByteString -> r -> r) -> r -> BL.ByteString -> r
-#if MIN_VERSION_bytestring(0,10,0)
-foldrChunks = BL.foldrChunks
-#else
-foldrChunks f z b = foldr f z (BL.toChunks b)
-#endif
-{-# INLINE foldrChunks #-}
 
 instance Strict BL.ByteString B.ByteString where
   strict f s = fromStrict <$> f (toStrict s)

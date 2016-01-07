@@ -1,5 +1,6 @@
 # 0.4.1.0
 
+* Added `chars`, `packedBytes`, `packedChars`, `unpackedBytes`, `unpackedChars`.
 * Added instances for `Strict`.
 * New minor release (microlens-0.4.1).
 
