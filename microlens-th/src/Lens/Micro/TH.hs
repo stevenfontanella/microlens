@@ -48,7 +48,6 @@ module Lens.Micro.TH
 where
 
 
-import           Control.Applicative
 import           Control.Monad
 import           Data.Char
 import           Data.Data
@@ -66,6 +65,7 @@ import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
 
 #if __GLASGOW_HASKELL__ < 710
+import           Control.Applicative
 import           Data.Traversable (traverse, sequenceA)
 #endif
 
