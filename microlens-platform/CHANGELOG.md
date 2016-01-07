@@ -1,5 +1,6 @@
 # 0.2.1.0
 
+* Added `packed` and `unpacked`.
 * Added instances for `Strict`.
 * New minor release (microlens-0.4.1, microlens-ghc-0.4.1).
 

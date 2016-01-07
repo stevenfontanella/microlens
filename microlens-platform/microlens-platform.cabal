@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:     Lens.Micro.Platform
+                       Lens.Micro.Platform.Internal
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.5 && <5
