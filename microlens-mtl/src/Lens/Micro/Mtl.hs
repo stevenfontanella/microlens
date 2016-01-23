@@ -13,9 +13,8 @@ Trustworthy
 
 module Lens.Micro.Mtl
 (
-  view,
-  preview,
-  use,
+  view, preview,
+  use, preuse,
   zoom,
   magnify,
   (.=), (%=),
@@ -67,7 +66,7 @@ preview l = Reader.asks (getFirst #. foldMapOf l (First #. Just))
 {-# INLINE preview #-}
 
 {- |
-'use' is 'view' which implicitly operates on the state; for instance, if your state is a record containing a field @foo@, you can write
+'use' is ('^.) (or 'view') which implicitly operates on the state; for instance, if your state is a record containing a field @foo@, you can write
 
 @
 x \<- 'use' foo
@@ -80,10 +79,23 @@ The implementation of 'use' is straightforward:
 @
 'use' l = 'State.gets' ('view' l)
 @
+
+If you need to extract something with a fold or traversal, you need 'preuse'.
 -}
 use :: MonadState s m => Getting a s a -> m a
 use l = State.gets (view l)
 {-# INLINE use #-}
+
+{- |
+'preuse' is ('^?') (or 'preview') which implicitly operates on the state – it takes the state and applies a traversal (or fold) to it to extract the 1st element the traversal points at.
+
+@
+'preuse' l = 'State.gets' ('preview' l)
+@
+-}
+preuse :: MonadState s m => Getting (First a) s a -> m (Maybe a)
+preuse l = State.gets (preview l)
+{-# INLINE preuse #-}
 
 
 infix  4 .=, %=
