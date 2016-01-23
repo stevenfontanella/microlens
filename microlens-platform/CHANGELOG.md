@@ -1,3 +1,7 @@
+# 0.2.2.0
+
+* New minor release (microlens-mtl-0.1.7).
+
 # 0.2.1.0
 
 * Added `packed` and `unpacked`.

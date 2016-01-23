@@ -1,3 +1,7 @@
+# 0.1.7.0
+
+* Added `preuse`.
+
 # 0.1.6.1
 
 * Bumped transformers version.
