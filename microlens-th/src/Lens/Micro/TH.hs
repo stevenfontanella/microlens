@@ -576,11 +576,19 @@ instance HasName TyVarBndr where
 instance HasName Name where
   name = id
 
+-- | On @template-haskell-2.11.0.0@ or later, if a 'GadtC' or 'RecGadtC' has
+-- multiple 'Name's, the leftmost 'Name' will be chosen.
 instance HasName Con where
   name f (NormalC n tys)       = (`NormalC` tys) <$> f n
   name f (RecC n tys)          = (`RecC` tys) <$> f n
   name f (InfixC l n r)        = (\n' -> InfixC l n' r) <$> f n
   name f (ForallC bds ctx con) = ForallC bds ctx <$> name f con
+#if MIN_VERSION_template_haskell(2,11,0)
+  name f (GadtC ns argTys retTy) =
+    (\n -> GadtC [n] argTys retTy) <$> f (head ns)
+  name f (RecGadtC ns argTys retTy) =
+    (\n -> RecGadtC [n] argTys retTy) <$> f (head ns)
+#endif
 
 -- Provides for the extraction of free type variables, and alpha renaming.
 class HasTypeVars t where
@@ -624,6 +632,14 @@ instance HasTypeVars Con where
   typeVarsEx s f (ForallC bs ctx c) =
     ForallC bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f c
       where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
+#if MIN_VERSION_template_haskell(2,11,0)
+  typeVarsEx s f (GadtC ns argTys retTy) =
+    GadtC ns <$> (traverse . _2) (typeVarsEx s f) argTys
+             <*> typeVarsEx s f retTy
+  typeVarsEx s f (RecGadtC ns argTys retTy) =
+    RecGadtC ns <$> (traverse . _3) (typeVarsEx s f) argTys
+                <*> typeVarsEx s f retTy
+#endif
 
 instance HasTypeVars t => HasTypeVars [t] where
   typeVarsEx s = traverse . typeVarsEx s
@@ -658,6 +674,16 @@ makeFieldOptics rules tyName =
 
 makeFieldOpticsForDec :: LensRules -> Dec -> DecsQ
 makeFieldOpticsForDec rules dec = case dec of
+#if MIN_VERSION_template_haskell(2,11,0)
+  DataD    _ tyName vars _ cons _ ->
+    makeFieldOpticsForDec' rules tyName (mkS tyName vars) cons
+  NewtypeD _ tyName vars _ con  _ ->
+    makeFieldOpticsForDec' rules tyName (mkS tyName vars) [con]
+  DataInstD _ tyName args _ cons _ ->
+    makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) cons
+  NewtypeInstD _ tyName args _ con _ ->
+    makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) [con]
+#else
   DataD    _ tyName vars cons _ ->
     makeFieldOpticsForDec' rules tyName (mkS tyName vars) cons
   NewtypeD _ tyName vars con  _ ->
@@ -666,6 +692,7 @@ makeFieldOpticsForDec rules dec = case dec of
     makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) cons
   NewtypeInstD _ tyName args con _ ->
     makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) [con]
+#endif
   _ -> fail "makeFieldOptics: Expected data or newtype type-constructor"
   where
   mkS tyName vars = tyName `conAppsT` map VarT (vars ^.. typeVars)
@@ -707,6 +734,8 @@ makeFieldOpticsForDec' rules tyName s cons =
 -- Normalized the Con type into a uniform positional representation,
 -- eliminating the variance between records, infix constructors, and normal
 -- constructors.
+-- 
+-- For 'GadtC' and 'RecGadtC', the leftmost name is chosen.
 normalizeConstructor ::
   Con ->
   Q (Name, [(Maybe Name, Type)]) -- constructor name, field name, field type
@@ -724,6 +753,13 @@ normalizeConstructor (ForallC _ _ con) =
   do con' <- normalizeConstructor con
      return (set (_2 . mapped . _1) Nothing con')
 
+#if MIN_VERSION_template_haskell(2,11,0)
+normalizeConstructor (GadtC ns xs _) =
+  return (head ns, [ (Nothing, ty) | (_,ty) <- xs])
+ 
+normalizeConstructor (RecGadtC ns xs _) =
+  return (head ns, [ (Just fieldName, ty) | (fieldName,_,ty) <- xs])
+#endif
 
 data OpticType = GetterType | LensType -- or IsoType
 
