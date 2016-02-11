@@ -1,3 +1,7 @@
+# 0.3.0.1
+
+* The library is now compatible with GHC 8.
+
 # 0.3.0.0
 
 * `SimpleGetter` and `SimpleFold` are no longer reexported.
