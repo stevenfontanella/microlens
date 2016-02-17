@@ -54,6 +54,7 @@ module Lens.Micro
 
   -- * Traversal: a lens iterating over several elements
   Traversal, Traversal',
+  singular,
   failing,
   filtered,
   both,
@@ -82,11 +83,16 @@ import Data.Functor.Identity
 import Data.Monoid
 import Data.Maybe
 import qualified Data.Foldable as F
+import Unsafe.Coerce
 
 #if __GLASGOW_HASKELL__ >= 710
 import Data.Function ((&))
 #endif
 
+-- This is for the reimplementation of State
+#if MIN_VERSION_base(4,9,0)
+import qualified Control.Monad.Fail as Fail
+#endif
 
 {- $setup
 -- >>> import Data.Char (toUpper)
@@ -660,6 +666,40 @@ non x afb s = f <$> afb (fromMaybe x s)
 -- Traversals --------------------------------------------------------------
 
 {- |
+'singular' turns a traversal into a lens that behaves like a single-element traversal:
+
+>>> [1,2,3] ^. signular each
+1
+
+>>> [1,2,3] & singular each %~ negate
+[-1,2,3]
+
+If there is nothing to return, it'll throw an error:
+
+>>> [] ^. singular each
+*** Exception: Lens.Micro.singular: empty traversal
+
+However, it won't fail if you are merely setting the value:
+
+>>> [] & singular each %~ negate
+-}
+singular :: Traversal s t a a -> Lens s t a a
+singular l afb s = case ins b of
+  (w:ws) -> unsafeOuts b . (:ws) <$> afb w
+  []     -> unsafeOuts b . return <$>
+              afb (error "Lens.Micro.singular: empty traversal")
+  where
+    Bazaar b = l sell s
+    sell w = Bazaar ($ w)
+    ins f = (unsafeCoerce :: [Identity a] -> [a])
+              (getConst (f (\ra -> Const [Identity ra])))
+    unsafeOuts f = evalState (f (\_ -> state (unconsWithDefault fakeVal)))
+      where fakeVal = error "unsafeOuts: not enough elements were supplied"
+    unconsWithDefault d []     = (d,[])
+    unconsWithDefault _ (x:xs) = (x,xs)
+{-# INLINE singular #-}
+
+{- |
 'failing' lets you chain traversals together; if the 1st traversal fails, the 2nd traversal will be used.
 
 >>> ([1,2],[3]) & failing (_1.each) (_2.each) .~ 0
@@ -671,27 +711,15 @@ non x afb s = f <$> afb (fromMaybe x s)
 Note that the resulting traversal won't be valid unless either both traversals don't touch each others' elements, or both traversals return exactly the same results. To see an example of how 'failing' can generate invalid traversals, see <http://stackoverflow.com/questions/27138856/why-does-failing-from-lens-produce-invalid-traversals this Stackoverflow question>.
 -}
 failing :: Traversal s t a b -> Traversal s t a b -> Traversal s t a b
-failing left right afb s = case pins t of
+failing left right afb s = case pins b of
   [] -> right afb s
-  _  -> t afb
+  _  -> b afb
   where
-    Bazaar t = left sell s
+    Bazaar b = left sell s
     sell w = Bazaar ($ w)
     pins f = getConst (f (\ra -> Const [Identity ra]))
 
 infixl 5 `failing`
-
-newtype Bazaar a b t = Bazaar (forall f. Applicative f => (a -> f b) -> f t)
-
-instance Functor (Bazaar a b) where
-  fmap f (Bazaar k) = Bazaar (fmap f . k)
-  {-# INLINE fmap #-}
-
-instance Applicative (Bazaar a b) where
-  pure a = Bazaar $ \_ -> pure a
-  {-# INLINE pure #-}
-  Bazaar mf <*> Bazaar ma = Bazaar $ \afb -> mf afb <*> ma afb
-  {-# INLINE (<*>) #-}
 
 {- |
 'filtered' is a traversal that filters elements “passing” thru it:
@@ -975,3 +1003,63 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
+
+-- Some of the guts of lens
+
+newtype Bazaar a b t = Bazaar (forall f. Applicative f => (a -> f b) -> f t)
+
+instance Functor (Bazaar a b) where
+  fmap f (Bazaar k) = Bazaar (fmap f . k)
+  {-# INLINE fmap #-}
+
+instance Applicative (Bazaar a b) where
+  pure a = Bazaar $ \_ -> pure a
+  {-# INLINE pure #-}
+  Bazaar mf <*> Bazaar ma = Bazaar $ \afb -> mf afb <*> ma afb
+  {-# INLINE (<*>) #-}
+
+-- A reimplementation of State
+
+newtype StateT s m a = StateT { runStateT :: s -> m (a, s) }
+
+type State s = StateT s Identity
+
+state :: Monad m => (s -> (a, s)) -> StateT s m a
+state f = StateT (return . f)
+
+evalState :: State s a -> s -> a
+evalState m s = fst (runState m s)
+
+runState :: State s a -> s -> (a, s)
+runState m = runIdentity . runStateT m
+
+instance (Functor m) => Functor (StateT s m) where
+    fmap f m = StateT $ \ s ->
+        fmap (\ ~(a, s') -> (f a, s')) $ runStateT m s
+    {-# INLINE fmap #-}
+
+instance (Functor m, Monad m) => Applicative (StateT s m) where
+    pure a = StateT $ \ s -> return (a, s)
+    {-# INLINE pure #-}
+    StateT mf <*> StateT mx = StateT $ \ s -> do
+        ~(f, s') <- mf s
+        ~(x, s'') <- mx s'
+        return (f x, s'')
+    {-# INLINE (<*>) #-}
+
+instance (Monad m) => Monad (StateT s m) where
+#if !(MIN_VERSION_base(4,8,0))
+    return a = StateT $ \ s -> return (a, s)
+    {-# INLINE return #-}
+#endif
+    m >>= k  = StateT $ \ s -> do
+        ~(a, s') <- runStateT m s
+        runStateT (k a) s'
+    {-# INLINE (>>=) #-}
+    fail str = StateT $ \ _ -> fail str
+    {-# INLINE fail #-}
+
+#if MIN_VERSION_base(4,9,0)
+instance (Fail.MonadFail m) => Fail.MonadFail (StateT s m) where
+    fail str = StateT $ \ _ -> Fail.fail str
+#endif
