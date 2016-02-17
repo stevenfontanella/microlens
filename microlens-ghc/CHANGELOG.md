@@ -1,3 +1,7 @@
+# 0.4.2.0
+
+* New minor release (microlens-0.4.2).
+
 # 0.4.1.0
 
 * Added `chars`, `packedBytes`, `packedChars`, `unpackedBytes`, `unpackedChars`.
