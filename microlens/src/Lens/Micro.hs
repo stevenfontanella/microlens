@@ -1026,12 +1026,15 @@ type State s = StateT s Identity
 
 state :: Monad m => (s -> (a, s)) -> StateT s m a
 state f = StateT (return . f)
+{-# INLINE state #-}
 
 evalState :: State s a -> s -> a
 evalState m s = fst (runState m s)
+{-# INLINE evalState #-}
 
 runState :: State s a -> s -> (a, s)
 runState m = runIdentity . runStateT m
+{-# INLINE runState #-}
 
 instance (Functor m) => Functor (StateT s m) where
     fmap f m = StateT $ \ s ->
