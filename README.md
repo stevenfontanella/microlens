@@ -210,7 +210,7 @@ So, microlens attempts to be a library that would be a nearly *unquestionable* w
 
 [lens-family][] is another small lenses library which is mostly compatible with lens (unless I decide to nitpick and say that its `makeLensesBy` and `intAt` aren't present in lens at all), which has few dependencies, and which provides Template Haskell in a separate package as well.
 
-[lens-family]: http://hackage.haskell.org/packages/lens-family
+[lens-family]: http://hackage.haskell.org/package/lens-family
 
 It looks like lens-family values cleanness and simplicity, which unfortunately means that it might've been hard for me (if possible at all) to convince its maintainer to make changes which would bring it closer to lens (`INLINE` pragmas, using unsafe `#.` operator, adding `each`, etc). I actually like cleanness and dislike excessive optimisation (especially of the kind that is used in lens) too, but making a library *I* would like wasn't my goal. The goal was to push people who aren't using a lens library towards using one.
 
