@@ -5,23 +5,19 @@
 
 *A tiny part of the lens library with no dependencies.*
 
-## If you want to improve this library
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
 ## If you're completely new to this whole lenses thing
 
 Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html). It's for [lens][], but it applies to microlens just as well (except for module names).
 
-## What you get from microlens
+## What is microlens?
 
-  * Essential lenses and traversals, as well as ones which are simply nice to have (like `each`, `at`, and `ix`).
+microlens is a lens library, just like [lens][], but smaller. It provides essential lenses and traversals (like `_1` and `_Just`), as well as ones which are simply nice to have (like `each`, `at`, and `ix`), and some combinators (like `failing` and `singular`), but everything else is stripped. As the result, microlens has *no* dependencies (and the whole package builds in ~4s on my laptop). However, there are also separate packages ([microlens-ghc][] and [microlens-platform][]) which provide additional instances and let you use `each` and friends with various container types.
 
-  * More beginner-friendly documentation.
+Other features:
+
+  * Nicer documentation.
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
-
-  * **No** dependencies. And the whole package builds in ~4s on my laptop. There are separate packages ([microlens-ghc][] and [microlens-platform][]) which provide additional instances and let you use `each` and friends with various container types.
 
   * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens. There are also no unique to microlens functions which you would have to rewrite when switching to lens (even tho I was tempted to add some).
 
