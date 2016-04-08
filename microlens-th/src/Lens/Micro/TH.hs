@@ -48,6 +48,7 @@ module Lens.Micro.TH
   -- * Configuring lens rules
   lensField,
   lensClass,
+  createClass,
   simpleLenses,
   generateSignatures,
   generateUpdateableOptics,
@@ -572,6 +573,15 @@ For 'makeLenses' and 'makeFields' this is just @const Nothing@. For 'makeClassy'
 -}
 lensClass :: Lens' LensRules (Name -> Maybe (Name, Name))
 lensClass f r = fmap (\x -> r { _classyLenses = x }) (f (_classyLenses r))
+
+{- |
+Decide whether generation of classes is allowed at all.
+
+If this is disabled, neither 'makeFields' nor 'makeClassy' would work, regardless of values of 'lensField' or 'lensClass'. On the other hand, if 'lensField' and 'lensClass' don't generate any classes, enabling this won't have any effect.
+-}
+createClass :: Lens' LensRules Bool
+createClass f r =
+  fmap (\x -> r { _generateClasses = x}) (f (_generateClasses r))
 
 {- |
 Lens rules used by default (i.e. in 'makeLenses'):
