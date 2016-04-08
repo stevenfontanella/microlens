@@ -1,3 +1,7 @@
+# 0.2.3.1
+
+* Added forgotten copyright/authorship information.
+
 # 0.2.3.0
 
 * New minor release (microlens-0.4.2, microlens-ghc-0.4.2).

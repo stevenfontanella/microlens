@@ -6,6 +6,10 @@ Safe
 
 
 {- |
+Module      :  Lens.Micro.Type
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+License     :  BSD-style (see the file LICENSE)
+
 This module provides just the types ('Lens', 'Traversal', etc). It's needed to break the dependency cycle – "Lens.Micro" depends on "Lens.Micro.Internal", but "Lens.Micro.Internal" needs types like 'Lens', so 'Lens' can't be defined in "Lens.Micro".
 -}
 module Lens.Micro.Type

@@ -1,5 +1,5 @@
 name:                microlens-platform
-version:             0.2.3.0
+version:             0.2.3.1
 synopsis:            Feature-complete microlens
 description:
   This package exports a module which is the recommended starting point for using <http://hackage.haskell.org/package/microlens microlens> if you aren't trying to keep your dependencies minimal. By importing @Lens.Micro.Platform@ you get all functions and instances from <http://hackage.haskell.org/package/microlens microlens>, <http://hackage.haskell.org/package/microlens-th microlens-th>, <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, as well as instances for @Vector@, @Text@, and @HashMap@.
@@ -9,7 +9,7 @@ description:
   This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
-author:              Artyom
+author:              Edward Kmett, Artyom
 maintainer:          Artyom <yom@artyom.me>
 homepage:            http://github.com/aelve/microlens
 bug-reports:         http://github.com/aelve/microlens/issues

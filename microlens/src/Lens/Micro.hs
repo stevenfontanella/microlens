@@ -10,6 +10,11 @@ Trustworthy
   #-}
 
 
+{- |
+Module      :  Lens.Micro
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+License     :  BSD-style (see the file LICENSE)
+-}
 module Lens.Micro
 (
   (&),

@@ -1,3 +1,7 @@
+# 0.1.7.1
+
+* Added forgotten copyright/authorship information.
+
 # 0.1.7.0
 
 * Added `preuse`.

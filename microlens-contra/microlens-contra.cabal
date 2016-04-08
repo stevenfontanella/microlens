@@ -1,5 +1,5 @@
 name:                microlens-contra
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            True folds and getters for microlens
 description:
   This package provides @Fold@ and @Getter@ that are fully compatible with lens; the downside is that this package depends on contravariant, which in its turn depends on a lot of other packages (but still less than lens).
@@ -9,7 +9,7 @@ description:
   This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
-author:              Artyom
+author:              Edward Kmett, Artyom
 maintainer:          Artyom <yom@artyom.me>
 homepage:            http://github.com/aelve/microlens
 bug-reports:         http://github.com/aelve/microlens/issues

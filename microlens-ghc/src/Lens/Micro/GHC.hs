@@ -15,6 +15,10 @@ Trustworthy
 
 
 {- |
+Module      :  Lens.Micro.GHC
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+License     :  BSD-style (see the file LICENSE)
+
 By importing this module you get all functions and types from <http://hackage.haskell.org/package/microlens microlens>, as well as the following instances:
 
 * 'at' for 'Map' and 'IntMap'
