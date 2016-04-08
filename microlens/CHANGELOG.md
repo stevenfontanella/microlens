@@ -55,6 +55,7 @@
 
 * Moved `Lens.Micro.Classes` into `Lens.Micro.Internal`.
 * Added `<%~`, `<<%~`, `<<.~`.
+* Added `_head`, `_tail`, `_init`, `_last`.
 
 # 0.2.0.0
 
