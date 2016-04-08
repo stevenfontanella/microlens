@@ -164,13 +164,6 @@ _ForallT _ other = pure other
 
 -- Utilities
 
--- Modify element at some index in a list.
-setIx :: Int -> a -> [a] -> [a]
-setIx i x s
-  | i < 0 || i >= length s = s
-  | otherwise              = let (l, _:r) = splitAt i s
-                             in  l ++ [x] ++ r
-
 -- This is like @rewrite@ from uniplate.
 rewrite :: (Data a, Data b) => (a -> Maybe a) -> b -> b
 rewrite f mbA = case cast mbA of
@@ -186,10 +179,6 @@ fromSet = Map.fromSet
 #else
 fromSet f x = Map.fromDistinctAscList [ (k,f k) | k <- Set.toAscList x ]
 #endif
-
-overHead :: (a -> a) -> [a] -> [a]
-overHead _ []     = []
-overHead f (x:xs) = f x : xs
 
 -- Control.Lens.TH
 
@@ -642,7 +631,7 @@ camelCaseNamer tyName fields field = maybeToList $ do
   return (MethodName (mkName cls) (mkName method))
 
   where
-  expectedPrefix = optUnderscore ++ overHead toLower (nameBase tyName)
+  expectedPrefix = optUnderscore ++ over _head toLower (nameBase tyName)
 
   optUnderscore  = ['_' | any (isPrefixOf "_" . nameBase) fields ]
 
@@ -1185,7 +1174,7 @@ makeFieldOpticClause conName fieldCount (field:fields) irref =
      xs <- replicateM fieldCount          (newName "x")
      ys <- replicateM (1 + length fields) (newName "y")
 
-     let xs' = foldr (\(i,x) -> setIx i x) xs (zip (field:fields) ys)
+     let xs' = foldr (\(i,x) -> set (ix i) x) xs (zip (field:fields) ys)
 
          mkFx i = appE (varE f) (varE (xs !! i))
 
