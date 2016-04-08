@@ -220,7 +220,7 @@ y f foo = (\\y' -> foo {_y = y'}) '<$>' f (_y foo)
 
 (If you don't want a lens to be generated for some field, don't prefix it with “_”.)
 
-If you want to creat lenses for many types, you can do it all in one place like this (of course, instead you just can use 'makeLenses' several times if you feel it would be more readable):
+If you want to create lenses for many types, you can do it all in one place like this (of course, instead you just can use 'makeLenses' several times if you feel it would be more readable):
 
 @
 data Foo = ...
