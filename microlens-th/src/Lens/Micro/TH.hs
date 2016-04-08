@@ -14,6 +14,13 @@ FlexibleContexts
 #endif
 
 
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Lens.Micro.TH
+-- Copyright   :  (C) 2013-2016 Eric Mertens, Edward Kmett, Artyom
+-- License     :  BSD-style (see the file LICENSE)
+--
+----------------------------------------------------------------------------
 module Lens.Micro.TH
 (
   -- * Dealing with “not in scope” errors

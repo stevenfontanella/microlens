@@ -1,3 +1,7 @@
+# 0.3.0.2
+
+* Added forgotten copyright/authorship information.
+
 # 0.3.0.1
 
 * The library is now compatible with GHC 8.
