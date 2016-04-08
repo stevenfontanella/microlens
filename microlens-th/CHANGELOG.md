@@ -20,7 +20,7 @@
 
 # 0.2.1.2
 
-* Bumped microlens version to be able to use phantom.
+* Bumped microlens version to be able to use `phantom`.
 
 # 0.2.1.1
 
