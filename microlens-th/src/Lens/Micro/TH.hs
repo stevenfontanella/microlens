@@ -35,16 +35,19 @@ module Lens.Micro.TH
   makeLensesFor,
   makeLensesWith,
   makeFields,
+  makeClassy,
 
   -- * Default lens rules
   LensRules,
   DefName(..),
   lensRules,
   lensRulesFor,
+  classyRules,
   camelCaseFields,
 
   -- * Configuring lens rules
   lensField,
+  lensClass,
   simpleLenses,
   generateSignatures,
   generateUpdateableOptics,
@@ -387,10 +390,74 @@ The prefix must be the same as the name of the name of the data type (/not/ the 
 
 If you want to use 'makeFields' on types declared in different modules, you can do it, but then you would have to export the @Has*@ classes from one of the modules – 'makeFields' creates a class if it's not in scope yet, so the class must be in scope or else there would be duplicate classes and you would get an “Ambiguous occurrence” error.
 
-Finally, 'makeFields' is implemented as @'makeLenses' 'camelCaseFields'@, so you can build on 'camelCaseFields' if you want to customise behavior of 'makeFields'.
+Finally, 'makeFields' is implemented as @'makeLensesWith' 'camelCaseFields'@, so you can build on 'camelCaseFields' if you want to customise behavior of 'makeFields'.
 -}
 makeFields :: Name -> DecsQ
 makeFields = makeFieldOptics camelCaseFields
+
+{- |
+Generate overloaded lenses without ad-hoc classes; useful when there's a collection of fields that you want to make common for several types.
+
+Like 'makeFields', each lens is a member of a class. However, the classes are per-type and not per-field. Let's take the following type:
+
+@
+data Person = Person {
+  _name :: String,
+  _age :: Double }
+@
+
+'makeClassy' would generate a single class with 3 methods:
+
+@
+class HasPerson c where
+  person :: Lens' c Person
+
+  age :: Lens' c Double
+  age = person.age
+
+  name :: Lens' c String
+  name = person.name
+@
+
+And an instance:
+
+@
+instance HasPerson Person where
+  person = id
+
+  name = ...
+  age = ...
+@
+
+So, you can use @name@ and @age@ to refer to the @_name@ and @_age@ fields, as usual. However, the extra lens – @person@ – allows you to do a kind of subtyping. Let's say that there's a type called @Worker@ and every worker has the same fields that a person has, but also a @job@. If you were using 'makeFields', you'd do the following:
+
+@
+data Worker = Worker {
+  _workerName :: String,
+  _workerAge :: Double,
+  _workerJob :: String }
+@
+
+However, with 'makeClassy' you can say “every worker is a person” in a more principled way:
+
+@
+data Worker = Worker {
+  _workerPerson :: Person,
+  _job :: String }
+
+makeClassy ''Worker
+
+instance HasPerson Worker where person = workerPerson
+@
+
+Now you can use @age@ and @name@ to access name\/age of a @Worker@, but you also can use @person@ to “downgrade” a @Worker@ to a @Person@ (and e.g. apply some @Person@-specific function to it).
+
+Unlike 'makeFields', 'makeClassy' doesn't make use of prefixes. @_workerPerson@ could've just as well been named @_foobar@.
+
+'makeClassy' is implemented as @'makeLensesWith' 'classyRules'@, so you can build on 'classyRules' if you want to customise behavior of 'makeClassy'.
+-}
+makeClassy :: Name -> DecsQ
+makeClassy = makeFieldOptics classyRules
 
 {- |
 Generate simple (monomorphic) lenses even when type-changing lenses are possible – i.e. 'Lens'' instead of 'Lens' and 'Traversal'' instead of 'Traversal'. Just in case, here's an example of a situation when type-changing lenses would be normally generated:
@@ -492,13 +559,29 @@ lensField :: Lens' LensRules (Name -> [Name] -> Name -> [DefName])
 lensField f r = fmap (\x -> r { _fieldToDef = x}) (f (_fieldToDef r))
 
 {- |
+This lets you choose whether a class would be generated for the type itself (like 'makeClassy' does). If so, you can choose the name of the class and the name of the type-specific lens.
+
+For 'makeLenses' and 'makeFields' this is just @const Nothing@. For 'makeClassy' this function is defined like this:
+
+@
+\\n ->
+  case 'nameBase' n of
+    x:xs -> Just ('mkName' ("Has" ++ x:xs), 'mkName' ('toLower' x : xs))
+    []   -> Nothing
+@
+-}
+lensClass :: Lens' LensRules (Name -> Maybe (Name, Name))
+lensClass f r = fmap (\x -> r { _classyLenses = x }) (f (_classyLenses r))
+
+{- |
 Lens rules used by default (i.e. in 'makeLenses'):
 
 * 'generateSignatures' is turned on
 * 'generateUpdateableOptics' is turned on
 * 'generateLazyPatterns' is turned off
 * 'simpleLenses' is turned off
-* 'lensField' strips “_” off the field name, lowercases the next character after “_”, and skips the field entirely if it doesn't start with “_” (you can see how it's implemented in the docs for 'lensField').
+* 'lensField' strips “_” off the field name, lowercases the next character after “_”, and skips the field entirely if it doesn't start with “_” (you can see how it's implemented in the docs for 'lensField')
+* 'lensClass' isn't used (i.e. defined as @const Nothing@)
 -}
 lensRules :: LensRules
 lensRules = LensRules
@@ -508,7 +591,7 @@ lensRules = LensRules
   -- , _allowIsos       = True
   , _allowUpdates    = True
   , _lazyPatterns    = False
-  -- , _classyLenses    = const Nothing
+  , _classyLenses    = const Nothing
   , _fieldToDef      = \_ _ n ->
        case nameBase n of
          '_':x:xs -> [TopName (mkName (toLower x:xs))]
@@ -535,6 +618,7 @@ Lens rules used by 'makeFields':
 * 'generateLazyPatterns' is turned off
 * 'simpleLenses' is turned on (unlike in 'lensRules')
 * 'lensField' is more complicated – it takes fields which are prefixed with the name of the type they belong to (e.g. “fooFieldName” for “Foo”), strips that prefix, and generates a class called “HasFieldName” with a single method called “fieldName”. If some fields are prefixed with underscores, underscores would be stripped too, but then fields without underscores won't have any lenses generated for them. Also note that e.g. “foolish” won't have a lens called “lish” generated for it – the prefix must be followed by a capital letter (or else it wouldn't be camel case).
+* 'lensClass' isn't used (i.e. defined as @const Nothing@)
 -}
 camelCaseFields :: LensRules
 camelCaseFields = defaultFieldRules
@@ -563,8 +647,39 @@ defaultFieldRules = LensRules
   -- , _allowIsos       = False -- generating Isos would hinder field class reuse
   , _allowUpdates    = True
   , _lazyPatterns    = False
-  -- , _classyLenses    = const Nothing
+  , _classyLenses    = const Nothing
   , _fieldToDef      = camelCaseNamer
+  }
+
+underscoreNoPrefixNamer :: Name -> [Name] -> Name -> [DefName]
+underscoreNoPrefixNamer _ _ n =
+  case nameBase n of
+    '_':x:xs -> [TopName (mkName (toLower x:xs))]
+    _        -> []
+
+{- |
+Lens rules used by 'makeClassy':
+
+* 'generateSignatures' is turned on
+* 'generateUpdateableOptics' is turned on
+* 'generateLazyPatterns' is turned off
+* 'simpleLenses' is turned on (unlike in 'lensRules')
+* 'lensField' is the same as in 'lensRules'
+* 'lensClass' just adds “Has” to the name of the type (so for “Person” the generated class would be called “HasPerson” and the type-specific lens in that class would be called “person”)
+-}
+classyRules :: LensRules
+classyRules = LensRules
+  { _simpleLenses    = True
+  , _generateSigs    = True
+  , _generateClasses = True
+  -- , _allowIsos       = False -- generating Isos would hinder "subtyping"
+  , _allowUpdates    = True
+  , _lazyPatterns    = False
+  , _classyLenses    = \n ->
+        case nameBase n of
+          x:xs -> Just (mkName ("Has" ++ x:xs), mkName (toLower x:xs))
+          []   -> Nothing
+  , _fieldToDef      = underscoreNoPrefixNamer
   }
 
 -- Language.Haskell.TH.Lens
@@ -714,15 +829,11 @@ makeFieldOpticsForDec' rules tyName s cons =
      perDef <- sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
 
      let defs = Map.toList perDef
---     case _classyLenses rules tyName of
---       Just (className, methodName) ->
---         makeClassyDriver rules className methodName s defs
---       Nothing -> do decss  <- traverse (makeFieldOptic rules) defs
---                     return (concat decss)
-
-     -- just don't make anything classy
-     decss  <- traverse (makeFieldOptic rules) defs
-     return (concat decss)
+     case _classyLenses rules tyName of
+       Just (className, methodName) ->
+         makeClassyDriver rules className methodName s defs
+       Nothing -> do decss  <- traverse (makeFieldOptic rules) defs
+                     return (concat decss)
 
   where
 
@@ -735,6 +846,71 @@ makeFieldOpticsForDec' rules tyName s cons =
   expandName allFields (Just n) = _fieldToDef rules tyName allFields n
   expandName _ _ = []
 
+makeClassyDriver ::
+  LensRules ->
+  Name ->
+  Name ->
+  Type {- ^ Outer 's' type -} ->
+  [(DefName, (OpticType, OpticStab, [(Name, Int, [Int])]))] ->
+  DecsQ
+makeClassyDriver rules className methodName s defs = sequenceA (cls ++ inst)
+
+  where
+  cls | _generateClasses rules = [makeClassyClass className methodName s defs]
+      | otherwise = []
+
+  inst = [makeClassyInstance rules className methodName s defs]
+
+makeClassyClass ::
+  Name ->
+  Name ->
+  Type {- ^ Outer 's' type -} ->
+  [(DefName, (OpticType, OpticStab, [(Name, Int, [Int])]))] ->
+  DecQ
+makeClassyClass className methodName s defs = do
+  let ss   = map (stabToS . (^. _2._2)) defs
+  (sub,s') <- unifyTypes (s : ss)
+  c <- newName "c"
+  let vars = toListOf typeVars s'
+      fd   | null vars = []
+           | otherwise = [FunDep [c] vars]
+
+
+  classD (cxt[]) className (map PlainTV (c:vars)) fd
+    $ sigD methodName (return (''Lens' `conAppsT` [VarT c, s']))
+    : concat
+      [ [sigD defName (return ty)
+        ,valD (varP defName) (normalB body) []
+        ] ++
+        inlinePragma defName
+      | (TopName defName, (_, stab, _)) <- defs
+      , let body = appsE [varE '(.), varE methodName, varE defName]
+      , let ty   = quantifyType' (Set.fromList (c:vars))
+                                 (stabToContext stab)
+                 $ stabToOptic stab `conAppsT`
+                       [VarT c, applyTypeSubst sub (stabToA stab)]
+      ]
+
+makeClassyInstance ::
+  LensRules ->
+  Name ->
+  Name ->
+  Type {- ^ Outer 's' type -} ->
+  [(DefName, (OpticType, OpticStab, [(Name, Int, [Int])]))] ->
+  DecQ
+makeClassyInstance rules className methodName s defs = do
+  methodss <- traverse (makeFieldOptic rules') defs
+
+  instanceD (cxt[]) (return instanceHead)
+    $ valD (varP methodName) (normalB (varE 'id)) []
+    : map return (concat methodss)
+
+  where
+  instanceHead = className `conAppsT` (s : map VarT vars)
+  vars         = toListOf typeVars s
+  rules'       = rules { _generateSigs    = False
+                       , _generateClasses = False
+                       }
 
 -- Normalized the Con type into a uniform positional representation,
 -- eliminating the variance between records, infix constructors, and normal
@@ -1100,8 +1276,8 @@ data LensRules = LensRules
   , _lazyPatterns    :: Bool
   -- Type Name -> Field Names -> Target Field Name -> Definition Names
   , _fieldToDef      :: Name -> [Name] -> Name -> [DefName]
-  -- , _classyLenses    :: Name -> Maybe (Name,Name)
-       -- type name to class name and top method
+  -- Type Name -> (Class Name, Top Method)
+  , _classyLenses    :: Name -> Maybe (Name,Name)
   }
 
 {- |
