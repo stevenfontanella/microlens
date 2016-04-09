@@ -26,6 +26,7 @@ module Lens.Micro
   sets,
   (%~), over,
   (.~), set,
+  (?~),
   (<%~), (<<%~), (<<.~),
   mapped,
 
@@ -279,6 +280,24 @@ Using it to rewrite ('Data.Functor.<$'):
 set :: ASetter s t a b -> b -> s -> t
 set l b = runIdentity #. l (\_ -> Identity b)
 {-# INLINE set #-}
+
+{- |
+('?~') is a version of ('.~') that wraps the value into 'Just' before setting.
+
+@
+l ?~ b = l .~ Just b
+@
+
+It can be useful in combination with 'at':
+
+>>> Map.empty & at 3 ?~ x
+fromList [(3,x)]
+-}
+(?~) :: ASetter s t a (Maybe b) -> b -> s -> t
+l ?~ b = set l (Just b)
+{-# INLINE (?~) #-}
+
+infixr 4 ?~
 
 {- |
 'mapped' is a setter for everything contained in a functor. You can use it to map over lists, @Maybe@, or even @IO@ (which is something you can't do with 'traversed' or 'each').

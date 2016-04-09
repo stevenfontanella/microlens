@@ -280,11 +280,15 @@ Data.Map.insert k a m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Just a
 Data.Map.delete k m = m 'Lens.Micro.&' at k 'Lens.Micro..~' Nothing
 @
 
-'at' doesn't work for arrays, because you can't delete an arbitrary element from an array.
+Or you could use ('Lens.Micro.?~') instead of ('Lens.Micro..~'):
 
-If you want to modify an already existing value, you should use 'ix' instead because then you won't have to deal with 'Maybe' ('ix' is available for all types that have 'at').
+@
+Data.Map.insert k a m = m 'Lens.Micro.&' at k 'Lens.Micro.?~' a
+@
 
-'at' is often used with 'Lens.Micro.non'.
+Note that 'at' doesn't work for arrays or lists. You can't delete an arbitrary element from an array (what would be left in its place?), and you can't set an arbitrary element in a list because if the index is out of list's bounds, you'd have to somehow fill the stretch between the last element and the element you just inserted (i.e. @[1,2,3] & at 10 .~ 5@ is undefined). If you want to modify an already existing value in an array or list, you should use 'ix' instead.
+
+'at' is often used with 'Lens.Micro.non'. See the documentation of 'Lens.Micro.non' for examples.
 
 Note that 'at' isn't strict for @Map@, even if you're using @Data.Map.Strict@:
 
