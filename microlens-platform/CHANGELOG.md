@@ -1,3 +1,7 @@
+# 0.3.0.0
+
+* New major release (microlens-0.4.3, microlens-ghc-0.4.3, microlens-th-0.4).
+
 # 0.2.3.1
 
 * Added forgotten copyright/authorship information.

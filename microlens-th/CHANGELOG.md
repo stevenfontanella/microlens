@@ -1,3 +1,7 @@
+# 0.4.0.0
+
+* Added `makeClassy` (and `createClass`).
+
 # 0.3.0.2
 
 * Added forgotten copyright/authorship information.

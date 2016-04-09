@@ -1,3 +1,7 @@
+# 0.4.3.0
+
+* Added `?~`.
+
 # 0.4.2.1
 
 * Added forgotten copyright/authorship information.
