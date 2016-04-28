@@ -36,7 +36,7 @@ Other features:
 
   * If you use `ALens`, indexed traversals, prisms, isomorphisms, or `Wrapped`, you won't be able to migrate.
 
-  * If you have your own instances of `Each`, `At`, `Ix`, or `Zoomed`, and you don't export them, it's okay. Otherwise you should keep using lens, since those classes are incompatible with classes defined in lens. Similarly, if you export any functions with `At`/`Zoom`/etc constraints, don't migrate.
+  * If you have your own instances of `Each`, `At`, `Ix`, `Zoomed`, or `Field*`, and you don't export them, it's okay. Otherwise you should keep using lens, since those classes are incompatible with classes defined in lens. Similarly, if you export any functions with `At`/`Zoom`/etc constraints, don't migrate.
 
   * If you export `Getter`s or `Fold`s, you would have to use [microlens-contra][] for full compatibility, and it has more heavy dependencies (but still much less heavy than lens). “Full compatibility” here means that some lens functions (such as `takingWhile`) don't work with `SimpleGetter` and `SimpleFold` available from the main microlens package.
 
