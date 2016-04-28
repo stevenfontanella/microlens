@@ -32,6 +32,20 @@ Other features:
 [microlens-platform]: http://hackage.haskell.org/package/microlens-platform
 [microlens-contra]: http://hackage.haskell.org/package/microlens-contra
 
+## Migration guide
+
+  * If you use `ALens`, indexed traversals, prisms, isomorphisms, or `Wrapped`, you won't be able to migrate.
+
+  * If you have your own instances of `Each`, `At`, `Ix`, or `Zoomed`, and you don't export them, it's okay. Otherwise you should keep using lens, since those classes are incompatible with classes defined in lens. Similarly, if you export any functions with `At`/`Zoom`/etc constraints, don't migrate.
+
+  * If you export `Getter`s or `Fold`s, you would have to use [microlens-contra][] for full compatibility, and it has more heavy dependencies (but still much less heavy than lens). “Full compatibility” here means that some lens functions (such as `takingWhile`) don't work with `SimpleGetter` and `SimpleFold` available from the main microlens package.
+
+  * In the very rare case of using `makeLensesWith` and having `generateUpdateableOptics` disabled, you'd have to apply `fromSimpleFold` and `fromSimpleGetter` to folds/getters you export. Same with fields that have a `forall.` in them.
+
+This list might look big, but in reality it isn't and in the majority of cases you'll be able to migrate just fine. “If it compiles and you didn't have to change any type signatures, it works.”
+
+If you're unsure, just open an issue in your project, mention me (@neongreen), and I'll look at your code and tell you whether it'll work or not.
+
 ## All packages in the family
 
   * [microlens][] – all basic functionality, plus `each`/`at`/`ix`
