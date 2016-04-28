@@ -42,7 +42,7 @@ Other features:
 
   * In the very rare case of using `makeLensesWith` and having `generateUpdateableOptics` disabled, you'd have to apply `fromSimpleFold` and `fromSimpleGetter` to folds/getters you export. Same with fields that have a `forall.` in them.
 
-Otherwise, everything should work just fine without any code changes – the microlens API mirrors the lens API.
+Otherwise, everything should work just fine without any code changes – the microlens API mirrors the lens API. The license is the same, too.
 
 (The list might look big, but in reality it isn't and in the majority of cases you'll be able to migrate just fine. “If it compiles and you didn't have to change any type signatures, it works.”)
 
