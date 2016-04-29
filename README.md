@@ -31,6 +31,7 @@ Other features:
 [microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
 [microlens-platform]: http://hackage.haskell.org/package/microlens-platform
 [microlens-contra]: http://hackage.haskell.org/package/microlens-contra
+[microlens-aeson]: http://hackage.haskell.org/package/microlens-aeson
 
 ## Migration guide
 
@@ -58,6 +59,10 @@ If you're unsure, just open an issue in your project, mention me (@neongreen), a
   * [microlens-contra][] – `Fold` and `Getter` that are copies of types in lens (the reason they're in a separate library is that those types depend on [contravariant][])
 
 [contravariant]: http://hackage.haskell.org/package/contravariant
+
+Unofficial:
+
+  * [microlens-aeson][] – a port of [lens-aeson][]
 
 If you're writing a library, use [microlens][] and other packages as needed; if you're writing an application, perhaps use [microlens-platform][].
 
