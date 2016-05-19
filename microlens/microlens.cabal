@@ -12,7 +12,7 @@ description:
   .
   Don't use this library:
   .
-    * if you need @Iso@s, @Prism@s, indexed traversals, or actually anything else which isn't defined here
+    * if you need @Iso@s, @Prism@s, indexed traversals, or actually anything else which isn't defined here (tho some indexed functions are available elsewhere – containers and vector provide them for their types, and <http://hackage.haskell.org/package/ilist ilist> provides indexed functions for lists)
   .
     * if you want a library with a clean, understandable implementation (in which case you're looking for <http://hackage.haskell.org/package/lens-simple lens-simple>)
   .

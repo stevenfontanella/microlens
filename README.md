@@ -35,7 +35,9 @@ Other features:
 
 ## Migration guide
 
-  * If you use `ALens`, indexed traversals, prisms, isomorphisms, or `Wrapped`, you won't be able to migrate.
+[ilist]: https://github.com/aelve/ilist
+
+  * If you use `ALens`, indexed traversals, prisms, isomorphisms, or `Wrapped`, you won't be able to migrate. (Tho some indexed functions are available elsewhere – containers and vector provide them, and [ilist][] provides indexed functions for lists.)
 
   * If you have your own instances of `Each`, `At`, `Ix`, `Zoomed`, or `Field*`, and you don't export them, it's okay. Otherwise you should keep using lens, since those classes are incompatible with classes defined in lens. Similarly, if you export any functions with `At`/`Zoom`/etc constraints, don't migrate.
 
