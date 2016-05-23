@@ -68,6 +68,7 @@ module Lens.Micro
   each,
   ix,
   _head, _tail, _init, _last,
+  mapAccumLOf,
 
   -- * Prism: a traversal iterating over at most 1 element
   -- $prisms-note
@@ -88,6 +89,7 @@ import Control.Monad
 import Data.Functor.Identity
 import Data.Monoid
 import Data.Maybe
+import Data.Tuple
 import qualified Data.Foldable as F
 import Unsafe.Coerce
 
@@ -905,6 +907,20 @@ See documentation for '_head', as '_last' and '_head' are pretty similar.
 _last :: Snoc s s a a => Traversal' s a
 _last = _Snoc._2
 {-# INLINE _last #-}
+
+
+{- |
+This generalizes 'Data.Traversable.mapAccumL' to an arbitrary 'Traversal'. (Note that it doesn't work on folds, only traversals.)
+
+@
+'mapAccumL' ≡ 'mapAccumLOf' 'traverse'
+@
+-}
+mapAccumLOf :: LensLike (State acc) s t a b -> (acc -> a -> (acc, b)) -> acc -> s -> (acc, t)
+mapAccumLOf l f acc0 s = swap (runState (l g s) acc0)
+  where
+    g a = state $ \acc -> swap (f acc a)
+{-# INLINE mapAccumLOf #-}
 
 -- Prisms ------------------------------------------------------------------
 

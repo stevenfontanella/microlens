@@ -1,3 +1,7 @@
+# 0.4.4.0
+
+* Added `mapAccumLOf`.
+
 # 0.4.3.0
 
 * Added `?~`.
