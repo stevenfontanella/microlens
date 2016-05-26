@@ -66,6 +66,8 @@ Unofficial:
 
   * [microlens-aeson][] – a port of [lens-aeson][]
 
+[lens-aeson]: http://hackage.haskell.org/package/lens-aeson
+
 If you're writing a library, use [microlens][] and other packages as needed; if you're writing an application, perhaps use [microlens-platform][].
 
 Versions of microlens-ghc and microlens-platform are incremented whenever versions of their dependencies are incremented, so if you're using these packages it's always enough to specify just their versions and nothing else. In other words, there's no risk of the following happening:
