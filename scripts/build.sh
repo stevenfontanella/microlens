@@ -13,7 +13,7 @@ function buildlib {
   rm plan.txt
   cabal install --ghc-options "-Werror"
   # See https://github.com/aelve/microlens/issues/72
-  if ![ GHCVER == 8.0.1 ]
+  if [[ "$GHCVER" != 8.0.1 ]]
   then
     cabal haddock
   fi
