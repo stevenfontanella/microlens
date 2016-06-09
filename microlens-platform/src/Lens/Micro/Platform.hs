@@ -38,6 +38,7 @@ This module is an approximation for @<http://hackage.haskell.org/package/lens/do
 -}
 module Lens.Micro.Platform
 (
+  module Lens.Micro,
   module Lens.Micro.GHC,
   module Lens.Micro.Mtl,
   module Lens.Micro.TH,
@@ -47,6 +48,7 @@ where
 
 
 import Lens.Micro.Internal
+import Lens.Micro
 import Lens.Micro.GHC
 import Lens.Micro.Mtl
 import Lens.Micro.TH

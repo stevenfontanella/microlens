@@ -1,3 +1,7 @@
+# 0.3.1.1
+
+* Reexport `Lens.Micro` explicitly to make it clearer that it's exported.
+
 # 0.3.1.0
 
 * New minor release (microlens-0.4.4, microlens-ghc-0.4.4).
