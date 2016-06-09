@@ -1,3 +1,7 @@
+# 0.4.4.1
+
+* Pointed to microlens-platform in the synopsis.
+
 # 0.4.4.0
 
 * Added `mapAccumLOf`.
