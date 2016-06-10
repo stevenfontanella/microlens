@@ -15,7 +15,6 @@ microlens is a lens library, just like [lens][], but smaller. It provides essent
 
 | Package            | Build time with dependencies | Pure build time |
 | ------------------ | ----------------------------:| ---------------:|
-| **lens**           |                    **4m10s** |       **1m12s** |
 | microlens          |                           3s |              3s |
 | microlens-th       |                         7.2s |            4.5s |
 | microlens-ghc      |                         5.7s |            3.3s |
@@ -23,6 +22,7 @@ microlens is a lens library, just like [lens][], but smaller. It provides essent
 | microlens-platform |                        1m47s |            4.9s |
 | microlens-contra   |                        1m12s |            2.1s |
 | microlens-aeson    |                        3m47s |            9.2s |
+| **lens**           |                    **4m10s** |       **1m12s** |
 
 Other features:
 
