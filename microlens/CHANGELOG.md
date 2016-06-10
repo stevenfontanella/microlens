@@ -1,3 +1,7 @@
+# 0.4.4.2
+
+* More changes to make microlens-platform more prominent.
+
 # 0.4.4.1
 
 * Pointed to microlens-platform in the synopsis.

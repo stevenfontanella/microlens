@@ -13,6 +13,10 @@ Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Contr
 
 microlens is a lens library, just like [lens][], but smaller. It provides essential lenses and traversals (like `_1` and `_Just`), as well as ones which are simply nice to have (like `each`, `at`, and `ix`), and some combinators (like `failing` and `singular`), but everything else is stripped. As the result, microlens has no dependencies. However, there are also separate packages ([microlens-ghc][] and [microlens-platform][]) which provide additional instances and let you use `each` and friends with various container types.
 
+**If you're writing an app, you should probably use [microlens-platform][] and not microlens.** You'll get additional functions, instances, `makeLenses`, and other useful things. microlens is mostly for library writers and for toying with lenses.
+
+Here are the build times for all libraries in the family:
+
 | Package            | Build time with dependencies | Pure build time |
 | ------------------ | ----------------------------:| ---------------:|
 | microlens          |                           3s |              3s |
