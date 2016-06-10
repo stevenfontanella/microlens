@@ -11,7 +11,18 @@ Read [this tutorial](http://hackage.haskell.org/package/lens-tutorial/docs/Contr
 
 ## What is microlens?
 
-microlens is a lens library, just like [lens][], but smaller. It provides essential lenses and traversals (like `_1` and `_Just`), as well as ones which are simply nice to have (like `each`, `at`, and `ix`), and some combinators (like `failing` and `singular`), but everything else is stripped. As the result, microlens has *no* dependencies (and the whole package builds in ~4s on my laptop). However, there are also separate packages ([microlens-ghc][] and [microlens-platform][]) which provide additional instances and let you use `each` and friends with various container types.
+microlens is a lens library, just like [lens][], but smaller. It provides essential lenses and traversals (like `_1` and `_Just`), as well as ones which are simply nice to have (like `each`, `at`, and `ix`), and some combinators (like `failing` and `singular`), but everything else is stripped. As the result, microlens has no dependencies. However, there are also separate packages ([microlens-ghc][] and [microlens-platform][]) which provide additional instances and let you use `each` and friends with various container types.
+
+| Package            | Build time with dependencies | Pure build time |
+| ------------------ | ----------------------------:| ---------------:|
+| **lens**           |                    **4m10s** |       **1m12s** |
+| microlens          |                           3s |              3s |
+| microlens-th       |                         7.2s |            4.5s |
+| microlens-ghc      |                         5.7s |            3.3s |
+| microlens-mtl      |                         8.8s |            3.7s |
+| microlens-platform |                        1m47s |            4.9s |
+| microlens-contra   |                        1m12s |            2.1s |
+| microlens-aeson    |                        3m47s |            9.2s |
 
 Other features:
 
@@ -21,7 +32,7 @@ Other features:
 
   * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens. There are also no unique to microlens functions which you would have to rewrite when switching to lens (even tho I was tempted to add some).
 
-  * No Template Haskell dependency. There is a separate package for generating (lens-compatible) record lenses, which is called [microlens-th][]. It takes ~6s to build and it doesn't require any special dependencies either.
+  * No Template Haskell dependency. There is a separate package for generating (lens-compatible) record lenses, which is called [microlens-th][].
 
   * All `INLINE` pragmas sprinkled thru lens were preserved, as well as flags from the `.cabal` file. Performance shouldn't suffer; if it does, it's a bug.
 
