@@ -1,10 +1,10 @@
 name:                microlens
-version:             0.4.4.2
+version:             0.4.4.3
 synopsis:            A tiny lens library with no dependencies. If you're writing an app, you probably want microlens-platform, not this.
 description:
-  This is an extract from <http://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.
+  NOTE: If you're writing an app, you probably want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it has the most features. <http://hackage.haskell.org/package/microlens microlens> is intended more for library writers who want a tiny lens library (after all, lenses are pretty useful for everything, not just for updating records!).
   .
-  __If you're writing an app, you probably want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it has the most features.__ <http://hackage.haskell.org/package/microlens microlens> is intended more for library writers who want a tiny lens library (after all, lenses are pretty useful for everything, not just for updating records!).
+  This library is an extract from <http://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.
   .
   There's a longer readme <https://github.com/aelve/microlens#readme on Github>. It has a migration guide for lens users, a description of other packages in the family, a discussion of other lens libraries you could use instead, and so on.
   .
@@ -28,7 +28,7 @@ description:
   .
   If you haven't ever used lenses before, read <http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html this tutorial>. (It's for lens, but it applies to microlens just as well.)
   .
-  Note that microlens has /no/ dependencies starting from GHC 7.10 (base-4.8). Prior to that, it depends on transformers-0.2 or above.
+  Note that microlens has no dependencies starting from GHC 7.10 (base-4.8). Prior to that, it depends on transformers-0.2 or above.
 license:             BSD3
 license-file:        LICENSE
 author:              Edward Kmett, Artyom

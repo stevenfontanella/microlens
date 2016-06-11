@@ -14,6 +14,19 @@ Trustworthy
 Module      :  Lens.Micro
 Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
 License     :  BSD-style (see the file LICENSE)
+
+This module provides the essential functionality. There are other packages in the microlens family – mix and match them at will. If you're writing an app, you want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it provides the most functionality.
+
+* <http://hackage.haskell.org/package/microlens-mtl microlens-mtl> – (@+=@) and friends, @use@, @zoom@\/@magnify@
+* <http://hackage.haskell.org/package/microlens-th microlens-th> – @makeLenses@ and @makeFields@
+* <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> – everything in microlens + instances to make @each@\/@at@\/@ix@ usable with arrays, @ByteString@, and containers
+* <http://hackage.haskell.org/package/microlens-platform microlens-platform> – microlens-ghc + microlens-mtl + microlens-th + instances for @Text@, @Vector@, and @HashMap@
+* <http://hackage.haskell.org/package/microlens-contra microlens-contra> – @Fold@ and @Getter@ that are exact copies of types in lens
+
+Unofficial:
+
+* <http://hackage.haskell.org/package/microlens-aeson microlens-aeson> – a port of <http://hackage.haskell.org/package/lens-aeson lens-aeson>
+
 -}
 module Lens.Micro
 (

@@ -1,3 +1,8 @@
+# 0.4.4.3
+
+* Fixed markup in the .cabal file.
+* Added descriptions of other packages to `Lens.Micro`.
+
 # 0.4.4.2
 
 * More changes to make microlens-platform more prominent.
