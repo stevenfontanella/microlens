@@ -4,7 +4,9 @@
 
   * add it to [install-order.txt](install-order.txt)
   * add it to [README.md](README.md)
-  * possibly mention it in [microlens.cabal](microlens/microlens.cabal)
+  * add build times to [README.md](README.md)
+  * mention it in [microlens.cabal](microlens/microlens.cabal)
+  * mention it in `Lens.Micro`
   * [create a Stackage pull request](https://github.com/fpco/stackage/edit/master/build-constraints.yaml)
   * update this file
 
