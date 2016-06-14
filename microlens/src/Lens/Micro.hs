@@ -813,7 +813,7 @@ Unfortunately, in case of @evens@ this isn't a correct optimisation:
 
   * the right-side variant applies @f@ and @g@ to all even numbers
 
-Of course, when you are careful and know what you're doing, you won't try to make such an optimisation. However, if you export an illegal traversal created with 'filtered' and someone tries to use it, ne might mistakenly assume that it's legal, do the optimisation, and silently get an incorrect result.
+Of course, when you are careful and know what you're doing, you won't try to make such an optimisation. However, if you export an illegal traversal created with 'filtered' and someone tries to use it, they might mistakenly assume that it's legal, do the optimisation, and silently get an incorrect result.
 
 If you are using 'filtered' with some another traversal that doesn't overlap with -whatever the predicate checks-, the resulting traversal will be legal. For instance, here the predicate looks at the 1st element of a tuple, but the resulting traversal only gives you access to the 2nd:
 
