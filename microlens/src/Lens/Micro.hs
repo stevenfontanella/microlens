@@ -795,7 +795,9 @@ filtered :: (a -> Bool) -> 'Traversal'' a a
 filtered p s = if p s then f s else 'pure' s
 @
 
-By the way, note that 'filtered' can generate illegal traversals – sometimes this can bite you. For instance, take @evens@:
+By the way, note that 'filtered' can generate illegal traversals – sometimes this can bite you. In particular, an optimisation that should be safe becomes unsafe. (To the best of my knowledge, this optimisation never happens automatically. If you just use 'filtered' to modify/view something, you're safe. If you don't define any traversals that use 'filtered', you're safe too.)
+
+Let's use @evens@ as an example:
 
 @
 evens = 'filtered' 'even'
