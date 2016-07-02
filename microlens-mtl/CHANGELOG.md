@@ -1,3 +1,8 @@
+# 0.1.8.0
+
+* Added `assign` and `modifying` as synonyms for `.=` and `%=`.
+* Added `<%=`, `<<%=`, and `<<.=`.
+
 # 0.1.7.1
 
 * Added forgotten copyright/authorship information.

@@ -85,12 +85,6 @@ import Data.Traversable
 #endif
 
 
-(<&>) :: Functor f => f a -> (a -> b) -> f b
-as <&> f = f <$> as
-{-# INLINE (<&>) #-}
-
-infixl 1 <&>
-
 type instance Index   (Map k a) = k
 type instance IxValue (Map k a) = a
 type instance Index   (IntMap a) = Int

@@ -1,3 +1,7 @@
+# 0.4.5.0
+
+* Added `<&>` (which makes lens creation easier).
+
 # 0.4.4.3
 
 * Fixed markup in the .cabal file.

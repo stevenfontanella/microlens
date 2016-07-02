@@ -32,6 +32,7 @@ module Lens.Micro
 (
   (&),
   -- $ampersand-note
+  (<&>),
 
   -- * Setter: modifies something in a structure
   -- $setters-note
@@ -154,6 +155,35 @@ or this:
   '$' (1,2,3)
 @
 -}
+
+{- |
+('<&>') is flipped ('<$>'):
+
+@
+x '<&>' f = f '<$>' x
+@
+
+It's often useful when writing lenses. For instance, let's say you're writing 'ix' for @Map@; if the key is found in the map, you have to apply a function to it and then change the map based on the new value – which requires a lambda, like this:
+
+@
+'ix' key f map = case Map.lookup key map of
+     Just val -> (\\val' -> Map.insert key val' map) '<$>' f val
+     Nothing  -> 'pure' map
+@
+
+With ('<&>') you can get rid of parentheses and move the long lambda expression to the right of the value (like when you use '>>='):
+
+@
+'ix' key f map = case Map.lookup key map of
+     Just val -> f val '<&>' \\val' -> Map.insert key val' map
+     Nothing  -> 'pure' map
+@
+-}
+(<&>) :: Functor f => f a -> (a -> b) -> f b
+(<&>) x f = f <$> x
+{-# INLINE (<&>) #-}
+
+infixl 1 <&>
 
 -- Setting -----------------------------------------------------------------
 

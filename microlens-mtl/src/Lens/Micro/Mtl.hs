@@ -1,4 +1,5 @@
 {-# LANGUAGE
+CPP,
 MultiParamTypeClasses,
 FunctionalDependencies,
 FlexibleInstances,
@@ -18,12 +19,22 @@ License     :  BSD-style (see the file LICENSE)
 -}
 module Lens.Micro.Mtl
 (
+  -- * Getting
   view, preview,
   use, preuse,
+
+  -- * Zooming
   zoom,
   magnify,
-  (.=), (%=),
+
+  -- * Setting
+  (.=), assign,
+  (%=), modifying,
   (+=), (-=), (*=), (//=),
+
+  -- * Setting with passthrough
+  (<%=), (<<%=),
+  (<<.=),
 )
 where
 
@@ -104,6 +115,7 @@ preuse l = State.gets (preview l)
 
 
 infix  4 .=, %=
+infix  4 <<.=, <<%=, <%=
 infix  4 +=, -=, *=, //=
 
 {- |
@@ -114,10 +126,19 @@ This is merely ('.~') which works in 'MonadState':
 @
 l '.=' x = 'State.modify' (l '.~' x)
 @
+
+If you also want to know the value that was replaced by ('.='), use ('<<.=').
 -}
 (.=) :: MonadState s m => ASetter s s a b -> b -> m ()
 l .= x = State.modify (l .~ x)
 {-# INLINE (.=) #-}
+
+{- |
+A synonym for ('.=').
+-}
+assign :: MonadState s m => ASetter s s a b -> b -> m ()
+assign l x = l .= x
+{-# INLINE assign #-}
 
 {- |
 Modify state by applying a function to a part of the state. An example:
@@ -131,7 +152,9 @@ Implementation:
 l '%=' f = 'State.modify' (l '%~' f)
 @
 
-There are also a few specialised versions of ('%=') which mimic C operators:
+If you also want to get the value before\/after the modification, use ('<<%=')\/('<%=').
+
+There are a few specialised versions of ('%=') which mimic C operators:
 
 * ('+=') for addition
 * ('-=') for substraction
@@ -141,6 +164,13 @@ There are also a few specialised versions of ('%=') which mimic C operators:
 (%=) :: (MonadState s m) => ASetter s s a b -> (a -> b) -> m ()
 l %= f = State.modify (l %~ f)
 {-# INLINE (%=) #-}
+
+{- |
+A synonym for ('%=').
+-}
+modifying :: (MonadState s m) => ASetter s s a b -> (a -> b) -> m ()
+modifying l f = l %= f
+{-# INLINE modifying #-}
 
 {- |
 Add a number to the target.
@@ -185,3 +215,57 @@ l '//=' x = l '%=' (/x)
 (//=) :: (MonadState s m, Fractional a) => ASetter s s a a -> a -> m ()
 l //= x = l %= (/x)
 {-# INLINE (//=) #-}
+
+{- |
+Modify state and return the modified (new) value.
+
+@
+l '<%=' f = do
+  l '%=' f
+  'use' l
+@
+-}
+(<%=) :: MonadState s m => LensLike ((,) b) s s a b -> (a -> b) -> m b
+l <%= f = l %%= (\a -> (a, a)) . f
+{-# INLINE (<%=) #-}
+
+{- |
+Modify state and return the old value (i.e. as it was before the modificaton).
+
+@
+l '<<%=' f = do
+  old <- 'use' l
+  l '%=' f
+  return old
+@
+-}
+(<<%=) :: MonadState s m => LensLike ((,) a) s s a b -> (a -> b) -> m a
+l <<%= f = l %%= (\a -> (a, f a))
+{-# INLINE (<<%=) #-}
+
+{- |
+Set state and return the old value.
+
+@
+l '<<.=' b = do
+  old <- 'use' l
+  l '.=' f
+  return old
+@
+-}
+(<<.=) :: MonadState s m => LensLike ((,) a) s s a b -> b -> m a
+l <<.= b = l %%= (\a -> (a, b))
+{-# INLINE (<<.=) #-}
+
+(%%=) :: MonadState s m => LensLike ((,) r) s s a b -> (a -> (r, b)) -> m r
+#if MIN_VERSION_mtl(2,1,1)
+l %%= f = State.state (l f)
+#else
+l %%= f = do
+  (r, s) <- State.gets (l f)
+  State.put s
+  return r
+#endif
+{-# INLINE (%%=) #-}
+
+infix 4 %%=

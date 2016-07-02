@@ -73,13 +73,6 @@ import Control.Applicative
 #endif
 
 
-(<&>) :: Functor f => f a -> (a -> b) -> f b
-as <&> f = f <$> as
-{-# INLINE (<&>) #-}
-
-infixl 1 <&>
-
-
 type instance Index   (HashMap k a) = k
 type instance IxValue (HashMap k a) = a
 type instance Index   (Vector.Vector a) = Int
