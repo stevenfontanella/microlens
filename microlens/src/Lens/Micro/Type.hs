@@ -108,69 +108,12 @@ Lens users: you can convert a 'SimpleFold' to @Fold@ by applying @folded . toLis
 type SimpleFold s a = forall r. Monoid r => Getting r s a
 
 {- |
-Lenses in a nutshell: use ('Lens.Micro.^.') to get, ('Lens.Micro..~') to set, ('Lens.Micro.%~') to modify. ('.') composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of in @B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses with 'Lens.Micro.lens', or you can write them by hand (see below).
-
 @Lens s t a b@ is the lowest common denominator of a setter and a getter, something that has the power of both; it has a 'Functor' constraint, and since both 'Const' and 'Identity' are functors, it can be used whenever a getter or a setter is needed.
 
   * @a@ is the type of the value inside of structure
   * @b@ is the type of the replaced value
   * @s@ is the type of the whole structure
   * @t@ is the type of the structure after replacing @a@ in it with @b@
-
-A 'Lens' can only point at a single value inside a structure (unlike a 'Traversal').
-
-It is easy to write lenses manually. The generic template is:
-
-@
-somelens :: Lens s t a b
-
--- “f” is the “a -> f b” function, “s” is the structure.
-somelens f s =
-  let
-    a = ...                 -- Extract the value from “s”.
-    rebuildWith b = ...     -- Write a function which would
-                            -- combine “s” and modified value
-                            -- to produce new structure.
-  in
-    rebuildWith '<$>' f a     -- Apply the structure-producing
-                            -- function to the modified value.
-@
-
-Here's the 'Lens.Micro._1' lens:
-
-@
-'Lens.Micro._1' :: 'Lens' (a, x) (b, x) a b
-'Lens.Micro._1' f (a, x) = (\\b -> (b, x)) '<$>' f a
-@
-
-Here's a more complicated lens, which extracts /several/ values from a structure (in a tuple):
-
-@
-type Age     = Int
-type City    = String
-type Country = String
-
-data Person = Person Age City Country
-
--- This lens lets you access all location-related information about a person.
-location :: 'Lens'' Person (City, Country)
-location f (Person age city country) =
-  (\\(city', country') -> Person age city' country') '<$>' f (city, country)
-@
-
-You even can choose to use a lens to present /all/ information contained in the structure (in a different way). Such lenses are called @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Iso.html#t:Iso Iso>@ in lens's terminology. For instance (assuming you don't mind functions that can error out), here's a lens which lets you act on the string representation of a value:
-
-@
-string :: (Read a, Show a) => 'Lens'' a String
-string f s = read '<$>' f (show s)
-@
-
-Using it to reverse a number:
-
-@
->>> 123 'Lens.Micro.&' string 'Lens.Micro.%~' reverse
-321
-@
 -}
 type Lens s t a b = forall f. Functor f => (a -> f b) -> s -> f t
 

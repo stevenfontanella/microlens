@@ -62,6 +62,7 @@ module Lens.Micro
   folding,
 
   -- * Lens: a combined getter-and-setter
+  -- $lenses-note
   Lens, Lens',
   lens,
   at,
@@ -615,6 +616,87 @@ folding sfa agb = phantom . F.traverse_ agb . sfa
 {-# INLINE folding #-}
 
 -- Lenses ------------------------------------------------------------------
+
+{- $lenses-note
+
+Lenses are composable “pointers” at values inside some bigger structure (e.g. '_1' points at the first element of a tuple). You can use ('^.') to get, ('.~') to set, and ('%~') to modify:
+
+>>> (1,2) ^. _1
+1
+>>> (1,2) & _1 .~ 3
+(3,2)
+>>> (1,2) & _1 %~ negate
+(-1,2)
+
+A 'Lens' can only point at a single value inside a structure (unlike a 'Traversal').
+
+('.') composes lenses (i.e. if a @B@ is a part of @A@, and a @C@ is a part of @B@, then @b.c@ lets you operate on @C@ inside @A@). You can create lenses with 'lens', or you can write them by hand.
+
+There are several ways to get lenses for some datatype:
+
+* They can already be provided by the package, by @microlens@, or by some other package like <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+
+* They can be provided by some unofficial package (like <http://hackage.haskell.org/package/microlens-aeson microlens-aeson>).
+
+* You can get them by combining already existing lenses.
+
+* You can derive them with Template Haskell (with <http://hackage.haskell.org/package/microlens-th microlens-th>).
+
+* You can write them with 'lens' if you have a setter and a getter. It's a simple and good way.
+
+* You can write them manually (sometimes it looks a bit better than the variant with 'lens', sometimes worse). The generic template is as follows:
+
+@
+somelens :: Lens s t a b
+
+-- “f” is the “a -> f b” function, “s” is the structure.
+somelens f s =
+  let
+    a = ...                 -- Extract the value from “s”.
+    rebuildWith b = ...     -- Write a function which would
+                            -- combine “s” and modified value
+                            -- to produce new structure.
+  in
+    rebuildWith '<$>' f a     -- Apply the structure-producing
+                            -- function to the modified value.
+@
+
+Here's the '_1' lens, for instance:
+
+@
+'_1' :: 'Lens' (a, x) (b, x) a b
+'_1' f (a, x) = (\\b -> (b, x)) '<$>' f a
+@
+
+Here's a more complicated lens, which extracts /several/ values from a structure (in a tuple):
+
+@
+type Age     = Int
+type City    = String
+type Country = String
+
+data Person = Person Age City Country
+
+-- This lens lets you access all location-related information about a person.
+location :: 'Lens'' Person (City, Country)
+location f (Person age city country) =
+  (\\(city', country') -> Person age city' country') '<$>' f (city, country)
+@
+
+You even can choose to use a lens to present /all/ information contained in the structure (in a different way). Such lenses are called @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Iso.html#t:Iso Iso>@ in lens's terminology. For instance (assuming you don't mind functions that can error out), here's a lens which lets you act on the string representation of a value:
+
+@
+string :: (Read a, Show a) => 'Lens'' a String
+string f s = read '<$>' f (show s)
+@
+
+Using it to reverse a number:
+
+@
+>>> 123 '&' string '%~' reverse
+321
+@
+-}
 
 {- |
 'lens' creates a 'Lens' from a getter and a setter. The resulting lens isn't the most effective one (because of having to traverse the structure twice when modifying), but it shouldn't matter much.
