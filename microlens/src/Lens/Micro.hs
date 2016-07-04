@@ -74,6 +74,7 @@ module Lens.Micro
   non,
 
   -- * Traversal: a lens iterating over several elements
+  -- $traversals-note
   Traversal, Traversal',
   singular,
   failing,
@@ -815,6 +816,21 @@ non x afb s = f <$> afb (fromMaybe x s)
 {-# INLINE non #-}
 
 -- Traversals --------------------------------------------------------------
+
+{- $traversals-note
+
+Traversals are like lenses but they can point at multiple values. Use ('^..') to get all values, ('^?') to get the 1st value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals just as it composes lenses. ('^.') can be used with traversals as well, but don't confuse it with ('^..') – ('^..') gets all traversed values, ('^.') combines traversed values using the ('Data.Monoid.<>') operation (if the values are instances of 'Monoid'; if they aren't, it won't compile).
+
+Traversals don't differ from lenses when it comes to setting – you can use usual ('%~') and ('.~') to modify and set values. Getting is a bit different, because you have to decide what to do in the case of multiple values. In particular, you can use these combinators (as well as everything else in the “Folds” section):
+
+  * ('^..') gets a list of values
+  * ('^?') gets the 1st value (or 'Nothing' if there are no values)
+  * ('^?!') gets the 1st value and throws an exception if there are no values
+
+If you are sure that the traversal will traverse at least one value, you can convert it to a lens with 'singular'.
+
+'traversed' is a universal traversal for anything that belongs to the 'Traversable' typeclass. However, in many cases 'each' works as well and is shorter and nicer-looking.
+-}
 
 {- |
 'singular' turns a traversal into a lens that behaves like a single-element traversal:
