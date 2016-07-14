@@ -62,7 +62,7 @@ import Data.Monoid
 -- Zoomed
 ------------------------------------------------------------------------------
 
--- | This type family is used by 'Control.Lens.Zoom.Zoom' to describe the common effect type.
+-- | This type family is used by 'Zoom' to describe the common effect type.
 type family Zoomed (m :: * -> *) :: * -> * -> *
 type instance Zoomed (Strict.StateT s z) = Focusing z
 type instance Zoomed (Lazy.StateT s z) = Focusing z
@@ -81,7 +81,7 @@ type instance Zoomed (ExceptT e m) = FocusingErr e (Zoomed m)
 -- Focusing
 ------------------------------------------------------------------------------
 
--- | Used by 'Control.Lens.Zoom.Zoom' to 'Control.Lens.Zoom.zoom' into 'Control.Monad.State.StateT'.
+-- | Used by 'Zoom' to 'zoom' into 'Control.Monad.State.StateT'.
 newtype Focusing m s a = Focusing { unfocusing :: m (s, a) }
 
 instance Monad m => Functor (Focusing m s) where
@@ -103,7 +103,7 @@ instance (Monad m, Monoid s) => Applicative (Focusing m s) where
 -- FocusingWith
 ------------------------------------------------------------------------------
 
--- | Used by 'Control.Lens.Zoom.Zoom' to 'Control.Lens.Zoom.zoom' into 'Control.Monad.RWS.RWST'.
+-- | Used by 'Zoom' to 'zoom' into 'Control.Monad.RWS.RWST'.
 newtype FocusingWith w m s a = FocusingWith { unfocusingWith :: m (s, a, w) }
 
 instance Monad m => Functor (FocusingWith w m s) where
@@ -125,7 +125,7 @@ instance (Monad m, Monoid s, Monoid w) => Applicative (FocusingWith w m s) where
 -- FocusingPlus
 ------------------------------------------------------------------------------
 
--- | Used by 'Control.Lens.Zoom.Zoom' to 'Control.Lens.Zoom.zoom' into 'Control.Monad.Writer.WriterT'.
+-- | Used by 'Zoom' to 'zoom' into 'Control.Monad.Writer.WriterT'.
 newtype FocusingPlus w k s a = FocusingPlus { unfocusingPlus :: k (s, w) a }
 
 instance Functor (k (s, w)) => Functor (FocusingPlus w k s) where
@@ -142,7 +142,7 @@ instance Applicative (k (s, w)) => Applicative (FocusingPlus w k s) where
 -- FocusingOn
 ------------------------------------------------------------------------------
 
--- | Used by 'Control.Lens.Zoom.Zoom' to 'Control.Lens.Zoom.zoom' into 'Control.Monad.Trans.Maybe.MaybeT' or 'Control.Monad.Trans.List.ListT'.
+-- | Used by 'Zoom' to 'zoom' into 'Control.Monad.Trans.Maybe.MaybeT' or 'Control.Monad.Trans.List.ListT'.
 newtype FocusingOn f k s a = FocusingOn { unfocusingOn :: k (f s) a }
 
 instance Functor (k (f s)) => Functor (FocusingOn f k s) where
@@ -174,7 +174,7 @@ instance Monoid a => Monoid (May a) where
 -- FocusingMay
 ------------------------------------------------------------------------------
 
--- | Used by 'Control.Lens.Zoom.Zoom' to 'Control.Lens.Zoom.zoom' into 'Control.Monad.Error.ErrorT'.
+-- | Used by 'Zoom' to 'zoom' into 'Control.Monad.Error.ErrorT'.
 newtype FocusingMay k s a = FocusingMay { unfocusingMay :: k (May s) a }
 
 instance Functor (k (May s)) => Functor (FocusingMay k s) where
@@ -206,7 +206,7 @@ instance Monoid a => Monoid (Err e a) where
 -- FocusingErr
 ------------------------------------------------------------------------------
 
--- | Used by 'Control.Lens.Zoom.Zoom' to 'Control.Lens.Zoom.zoom' into 'Control.Monad.Error.ErrorT'.
+-- | Used by 'Zoom' to 'zoom' into 'Control.Monad.Error.ErrorT'.
 newtype FocusingErr e k s a = FocusingErr { unfocusingErr :: k (Err e s) a }
 
 instance Functor (k (Err e s)) => Functor (FocusingErr e k s) where
@@ -254,8 +254,8 @@ Now, here's an action that moves the player north-east:
 @
 moveNE :: 'Lazy.State' Game ()
 moveNE = do
-  player.position.x '+=' 1
-  player.position.y '+=' 1
+  player.position.x 'Lens.Micro.Mtl.+=' 1
+  player.position.y 'Lens.Micro.Mtl.+=' 1
 @
 
 With 'zoom', you can use @player.position@ to focus just on a part of the state:
@@ -264,23 +264,23 @@ With 'zoom', you can use @player.position@ to focus just on a part of the state:
 moveNE :: 'Lazy.State' Game ()
 moveNE = do
   'zoom' (player.position) $ do
-    x '+=' 1
-    y '+=' 1
+    x 'Lens.Micro.Mtl.+=' 1
+    y 'Lens.Micro.Mtl.+=' 1
 @
 
 You can just as well use it for retrieving things out of the state:
 
 @
 getCoords :: 'Lazy.State' Game (Int, Int)
-getCoords = 'zoom' (player.position) ((,) '<$>' 'use' x '<*>' 'use' y)
+getCoords = 'zoom' (player.position) ((,) '<$>' 'Lens.Micro.Mtl.use' x '<*>' 'Lens.Micro.Mtl.use' y)
 @
 
 Or more explicitly:
 
 @
 getCoords = 'zoom' (player.position) $ do
-  x' <- 'use' x
-  y' <- 'use' y
+  x' <- 'Lens.Micro.Mtl.use' x
+  y' <- 'Lens.Micro.Mtl.use' y
   return (x', y')
 @
 
@@ -289,22 +289,22 @@ When you pass a traversal to 'zoom', it'll work as a loop. For instance, here we
 @
 moveObstaclesNE :: 'Lazy.State' Game ()
 moveObstaclesNE = do
-  'zoom' (obstacles.each) $ do
-    x '+=' 1
-    y '+=' 1
+  'zoom' (obstacles.'each') $ do
+    x 'Lens.Micro.Mtl.+=' 1
+    y 'Lens.Micro.Mtl.+=' 1
 @
 
 If the action returns a result, all results would be combined with '<>' – the same way they're combined when '^.' is passed a traversal. In this example, @moveObstaclesNE@ returns a list of old coordinates of obstacles in addition to moving them:
 
 @
 moveObstaclesNE = do
-  xys <- 'zoom' (obstacles.each) $ do
+  xys <- 'zoom' (obstacles.'each') $ do
     -- Get old coordinates.
-    x' <- 'use' x
-    y' <- 'use' y
+    x' <- 'Lens.Micro.Mtl.use' x
+    y' <- 'Lens.Micro.Mtl.use' y
     -- Update them.
-    x '.=' x' + 1
-    y '.=' y' + 1
+    x 'Lens.Micro.Mtl..=' x' + 1
+    y 'Lens.Micro.Mtl..=' y' + 1
     -- Return a single-element list with old coordinates.
     return [(x', y')]
   ...
@@ -366,7 +366,7 @@ instance Zoom m n s t => Zoom (ExceptT e m) (ExceptT e n) s t where
 -- Magnified
 ------------------------------------------------------------------------------
 
--- | This type family is used by 'Control.Lens.Zoom.Magnify' to describe the common effect type.
+-- | This type family is used by 'Magnify' to describe the common effect type.
 type family Magnified (m :: * -> *) :: * -> * -> *
 type instance Magnified (ReaderT b m) = Effect m
 type instance Magnified ((->)b) = Const
@@ -411,8 +411,8 @@ Now, let's define a function which returns the base url:
 @
 getBase :: 'Reader.Reader' Config String
 getBase = do
-  protocol \<- 'Data.Maybe.fromMaybe' \"https\" '<$>' 'view' (base.protocol)
-  path     \<- 'view' (base.path)
+  protocol \<- 'Data.Maybe.fromMaybe' \"https\" '<$>' 'Lens.Micro.Mtl.view' (base.protocol)
+  path     \<- 'Lens.Micro.Mtl.view' (base.path)
   return (protocol ++ path)
 @
 
@@ -420,8 +420,8 @@ With 'magnify', we can factor out @base@:
 
 @
 getBase = 'magnify' base $ do
-  protocol \<- 'Data.Maybe.fromMaybe' \"https\" '<$>' 'view' protocol
-  path     \<- 'view' path
+  protocol \<- 'Data.Maybe.fromMaybe' \"https\" '<$>' 'Lens.Micro.Mtl.view' protocol
+  path     \<- 'Lens.Micro.Mtl.view' path
   return (protocol ++ path)
 @
   -}
@@ -487,4 +487,3 @@ instance (Monoid s, Monoid w, Monad m) => Applicative (EffectRWS w st m s) where
   {-# INLINE pure #-}
   EffectRWS m <*> EffectRWS n = EffectRWS $ \st -> m st >>= \ (s,t,w) -> n t >>= \ (s',u,w') -> return (mappend s s', u, mappend w w')
   {-# INLINE (<*>) #-}
-

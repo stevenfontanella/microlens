@@ -82,7 +82,7 @@ preview l = Reader.asks (getFirst #. foldMapOf l (First #. Just))
 {-# INLINE preview #-}
 
 {- |
-'use' is ('^.) (or 'view') which implicitly operates on the state; for instance, if your state is a record containing a field @foo@, you can write
+'use' is ('^.') (or 'view') which implicitly operates on the state; for instance, if your state is a record containing a field @foo@, you can write
 
 @
 x \<- 'use' foo
