@@ -1,3 +1,7 @@
+# 0.1.9.0
+
+* Added `?=` and `<~`.
+
 # 0.1.8.0
 
 * Added `assign` and `modifying` as synonyms for `.=` and `%=`.

@@ -23,18 +23,23 @@ module Lens.Micro.Mtl
   view, preview,
   use, preuse,
 
-  -- * Zooming
-  zoom,
-  magnify,
-
   -- * Setting
-  (.=), assign,
   (%=), modifying,
+  (.=), assign,
+  (?=),
+  (<~),
+
+  -- * Specialised modifying operators
+  -- $arith-note
   (+=), (-=), (*=), (//=),
 
   -- * Setting with passthrough
   (<%=), (<<%=),
   (<<.=),
+
+  -- * Zooming
+  zoom,
+  magnify,
 )
 where
 
@@ -114,9 +119,10 @@ preuse l = State.gets (preview l)
 {-# INLINE preuse #-}
 
 
-infix  4 .=, %=
+infix  4 .=, %=, ?=
 infix  4 <<.=, <<%=, <%=
 infix  4 +=, -=, *=, //=
+infixr 2 <~
 
 {- |
 Modify state by “assigning” a value to a part of the state.
@@ -141,6 +147,32 @@ assign l x = l .= x
 {-# INLINE assign #-}
 
 {- |
+('?=') is a version of ('.=') that wraps the value into 'Just' before setting.
+
+@
+l '?=' b = l '.=' Just b
+@
+
+It can be useful in combination with 'at'.
+-}
+(?=) :: MonadState s m => ASetter s s a (Maybe b) -> b -> m ()
+l ?= b = l .= Just b
+{-# INLINE (?=) #-}
+
+{- |
+('<~') is a version of ('.=') that takes a monadic value (and then executes it and assigns the result to the lens).
+
+@
+l '<~' mb = do
+  b <- mb
+  l '.=' b
+@
+-}
+(<~) :: MonadState s m => ASetter s s a b -> m b -> m ()
+l <~ mb = mb >>= (l .=)
+{-# INLINE (<~) #-}
+
+{- |
 Modify state by applying a function to a part of the state. An example:
 
 >>> execState (do _1 %= (+1); _2 %= reverse) (1,"hello")
@@ -159,7 +191,7 @@ There are a few specialised versions of ('%=') which mimic C operators:
 * ('+=') for addition
 * ('-=') for substraction
 * ('*=') for multiplication
-* ('//=') for division (since ('/=') is already taken)
+* ('//=') for division
 -}
 (%=) :: (MonadState s m) => ASetter s s a b -> (a -> b) -> m ()
 l %= f = State.modify (l %~ f)
@@ -172,46 +204,31 @@ modifying :: (MonadState s m) => ASetter s s a b -> (a -> b) -> m ()
 modifying l f = l %= f
 {-# INLINE modifying #-}
 
-{- |
-Add a number to the target.
+{- $arith-note
+
+The following operators mimic well-known C operators ('+=', '-=', etc). ('//=') stands for division.
+
+They're implemented like this:
 
 @
 l '+=' x = l '%=' (+x)
+l '-=' x = l '%=' ('subtract' x)
+...
 @
 -}
+
 (+=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
 l += x = l %= (+x)
 {-# INLINE (+=) #-}
 
-{- |
-Subtract a number from the target.
-
-@
-l '-=' x = l '%=' ('subtract' x)
-@
--}
 (-=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
 l -= x = l %= (subtract x)
 {-# INLINE (-=) #-}
 
-{- |
-Multiply the target by a number.
-
-@
-l '*=' x = l '%=' (*x)
-@
--}
 (*=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
 l *= x = l %= (*x)
 {-# INLINE (*=) #-}
 
-{- |
-Divide the target by a number.
-
-@
-l '//=' x = l '%=' (/x)
-@
--}
 (//=) :: (MonadState s m, Fractional a) => ASetter s s a a -> a -> m ()
 l //= x = l %= (/x)
 {-# INLINE (//=) #-}
