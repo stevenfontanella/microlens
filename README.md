@@ -48,6 +48,8 @@ Other features:
 [microlens-contra]: http://hackage.haskell.org/package/microlens-contra
 [microlens-aeson]: http://hackage.haskell.org/package/microlens-aeson
 
+The reason microlens exists is that lens is a huge library with lots of dependencies, but lenses are very useful and it's not nice to limit them to applications and bigger packages. (I'm not talking about exporting lenses, I'm talking about using lenses to write code.) microlens attempts to be a library that would be a nearly *unquestionable* win for some people.
+
 ## Migration guide
 
 [ilist]: https://github.com/aelve/ilist
@@ -123,7 +125,7 @@ I hate it when people advertise things without also describing their disadvantag
 
   * No prisms, no isomorphisms, no indexed traversals, and probably never will be.
 
-  * This package doesn't actually let you write everything full lens-style (for instance, there are few operators, no myriads of functions generalised for lenses by adding the `Of` suffix aren't included, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you probably can afford depending on the full package.
+  * This package doesn't actually let you write everything full lens-style (for instance, there are few operators, myriads of functions generalised for lenses by adding the `Of` suffix aren't included, etc). On the other hand, I guess some would actually consider it an advantage. Anyway, if you want to use lens as a *language* instead of as a tool, you probably can afford depending on the full package.
 
   * There are orphan instances, e.g. in the [microlens-ghc][] package. (However, the only way someone can actually break things is by using `Lens.Micro.Internal` and ignoring the warnings there, so I think it's not a huge danger.)
 
@@ -137,9 +139,15 @@ I hate it when people advertise things without also describing their disadvantag
 
 microlens doesn't include anything lens doesn't include, even tho sometimes I'm very tempted to improve something in microlens just because I have control over it.
 
+I [don't mind](https://github.com/aelve/microlens/issues/79#issuecomment-231720804) adding new functions from lens to the package, even when done in an inconsistent way (e.g. I added `mapAccumLOf` just because someone needed it, but I haven't added `mapAccumROf` even tho that would've been more consistent). However, I am only able to add functions as long as microlens stays small, so if you plan to adopt microlens first and make dozens of requests for function additions later, this package is not for you.
+
 -----------------------------------------------------------------------------
 
-All the `*Of` functions aren't included. If you don't know, those are `sumOf`, `lengthOf`, `setOf`, etc., and they are roughly equivalent to following:
+All those `<>~` and `+~` operators aren't included, since they are trivial to write with `%~` and there's way too many of them. Operators like `+=` or `.=` are available from [microlens-mtl][] (yes, `+=` is trivial to write too, but it's one of more widely known lens operators and I thought it'd be nice to have it).
+
+-----------------------------------------------------------------------------
+
+Most `*Of` functions aren't included. If you don't know, those are `sumOf`, `lengthOf`, `setOf`, etc., and they are roughly equivalent to following:
 
 ~~~ haskell
 sumOf    l s = sum          (s ^.. l)
@@ -164,10 +172,6 @@ There are lots of functions which work on lists; lists are something like “the
   * With lenses: one function traverses something and takes another function as a parameter (to know what to do with results). Note that here `each._1` is the traversing function; it seems like `sumOf` takes it as a parameter, but in reality `sumOf` merely gives “summation” as the parameter to the traversing function.
 
 The latter way is theoretically nicer, but *not* when you've got the rest of huge ecosystem using lists as the preferred way of information flow, otherwise you're bound to keep rewriting all functions and adding `Of` to them. `lens` is good for creating functions which extract data, and for creating functions which update structures (nested records, etc.), but it's probably not good enough to make the whole world want to switch to writing lens-compatible *consumers* of data.
-
------------------------------------------------------------------------------
-
-All those `<>~` and `+~` operators aren't included. Operators like `+=` or `.=` are available from [microlens-mtl][]. The only operators available from `Lens.Micro` are `&`, `%~`, `.~`, and their `<<` variants (`<%~`, `<<%~`, `<<.~`) which I thought could be useful sometimes and yet they aren't trivial to write by yourself.
 
 -----------------------------------------------------------------------------
 
@@ -212,36 +216,6 @@ Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages,
 
 [array]: http://hackage.haskell.org/package/array
 
-## Motivation
-
-[lens][] is awesome. It's also huge, and requires lots of dependencies; not only [vector][] and [text][] (which you probably have anyway), but:
-
-  * bifunctors
-  * comonad
-  * contravariant
-  * distributive
-  * exceptions
-  * free
-  * hashable
-  * primitive
-  * profunctors
-  * reflection
-  * semigroupoids
-  * semigroups
-  * split
-  * tagged
-  * transformers-compat
-  * unordered-containers
-  * void
-
-[lens]: http://hackage.haskell.org/package/lens
-[vector]: http://hackage.haskell.org/package/vector
-[text]: http://hackage.haskell.org/package/text
-
-Some packages – like small libraries – can't afford having a huge list of dependencies, and this means that their authors don't get to enjoy the benefits of lenses (I'm not talking about exporting lenses, I'm talking about using lenses to write code). Of course, a lot of people don't care about build times, or might even argue that people who *do* care about them are “wrong”, but it doesn't change the fact that having a miniature lenses library would lead to more people being able to use lenses in their code.
-
-So, microlens attempts to be a library that would be a nearly *unquestionable* win for some people. When there are no tradeoffs, the choice becomes much easier.
-
 ## What about lens-family?
 
 [lens-family][] is another small lenses library which is mostly compatible with lens (unless I decide to nitpick and say that its `makeLensesBy` and `intAt` aren't present in lens at all), which has few dependencies, and which provides Template Haskell in a separate package as well.
@@ -249,5 +223,3 @@ So, microlens attempts to be a library that would be a nearly *unquestionable* w
 [lens-family]: http://hackage.haskell.org/package/lens-family
 
 It looks like lens-family values cleanness and simplicity, which unfortunately means that it might've been hard for me (if possible at all) to convince its maintainer to make changes which would bring it closer to lens (`INLINE` pragmas, using unsafe `#.` operator, adding `each`, etc). I actually like cleanness and dislike excessive optimisation (especially of the kind that is used in lens) too, but making a library *I* would like wasn't my goal. The goal was to push people who aren't using a lens library towards using one.
-
-Yep, in a way it's [NIH](https://en.wikipedia.org/wiki/Not_invented_here). However, I think that in this case in this case NIH is justified, if only because most reasons NIH is bad (time spent rewriting the library could've been spent improving another library, different libraries are incompatible with each other and so the community is fractured, etc) don't really apply here.
