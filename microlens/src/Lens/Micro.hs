@@ -57,6 +57,7 @@ module Lens.Micro
   (^..), toListOf,
   (^?),
   (^?!),
+  traverseOf_,
   has,
   folded,
   folding,
@@ -76,6 +77,7 @@ module Lens.Micro
   -- * Traversal: a lens iterating over several elements
   -- $traversals-note
   Traversal, Traversal',
+  traverseOf,
   singular,
   failing,
   filtered,
@@ -590,6 +592,21 @@ s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
 infixl 8 ^?!
 
 {- |
+Apply an action to all targets and discard the result (like 'Control.Monad.mapM_' or 'Data.Foldable.traverse_'):
+
+>>> traverseOf_ both putStrLn ("hello", "world")
+hello
+world
+
+Works with anything that allows getting, including lenses and getters (so, anything except for 'ASetter'). Should be faster than 'traverseOf' when you don't need the result.
+-}
+traverseOf_
+  :: Functor f
+  => Getting (Traversed r f) s a -> (a -> f r) -> s -> f ()
+traverseOf_ l f = void . getTraversed #. foldMapOf l (Traversed #. f)
+{-# INLINE traverseOf_ #-}
+
+{- |
 'has' checks whether a getter (any getter, including lenses, traversals, and folds) returns at least 1 value.
 
 Checking whether a list is non-empty:
@@ -628,6 +645,16 @@ Lenses are composable “pointers” at values inside some bigger structure (e.g
 (3,2)
 >>> (1,2) & _1 %~ negate
 (-1,2)
+
+To apply a monadic action (or an 'Applicative' action, or even a 'Functor' action) to the pointed value, just apply the lens directly or use 'traverseOf' (or 'traverseOf_' if you don't need the result):
+
+>>> traverseOf_ _1 print (1,2)
+1
+
+>>> _1 id (Just 1, 2)
+Just (1, 2)
+>>> _1 id (Nothing, 2)
+Nothing
 
 A 'Lens' can only point at a single value inside a structure (unlike a 'Traversal').
 
@@ -819,7 +846,7 @@ non x afb s = f <$> afb (fromMaybe x s)
 
 {- $traversals-note
 
-Traversals are like lenses but they can point at multiple values. Use ('^..') to get all values, ('^?') to get the 1st value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals just as it composes lenses. ('^.') can be used with traversals as well, but don't confuse it with ('^..') – ('^..') gets all traversed values, ('^.') combines traversed values using the ('Data.Monoid.<>') operation (if the values are instances of 'Monoid'; if they aren't, it won't compile).
+Traversals are like lenses but they can point at multiple values. Use ('^..') to get all values, ('^?') to get the 1st value, ('.~') to set values, ('%~') to modify them. ('.') composes traversals just as it composes lenses. ('^.') can be used with traversals as well, but don't confuse it with ('^..') – ('^..') gets all traversed values, ('^.') combines traversed values using the ('Data.Monoid.<>') operation (if the values are instances of 'Monoid'; if they aren't, it won't compile). 'traverseOf' and 'traverseOf_' apply an action to all pointed values of a traversal.
 
 Traversals don't differ from lenses when it comes to setting – you can use usual ('%~') and ('.~') to modify and set values. Getting is a bit different, because you have to decide what to do in the case of multiple values. In particular, you can use these combinators (as well as everything else in the “Folds” section):
 
@@ -831,6 +858,28 @@ If you are sure that the traversal will traverse at least one value, you can con
 
 'traversed' is a universal traversal for anything that belongs to the 'Traversable' typeclass. However, in many cases 'each' works as well and is shorter and nicer-looking.
 -}
+
+{- |
+Apply an action to all targets (like 'Control.Monad.mapM' or 'Data.Traversable.traverse'):
+
+>>> traverseOf both readFile ("file1", "file2")
+(<contents of file1>, <contents of file2>)
+
+>>> traverseOf _1 id (Just 1, 2)
+Just (1, 2)
+>>> traverseOf _1 id (Nothing, 2)
+Nothing
+
+You can also just apply the lens\/traversal directly (but 'traverseOf' might be more readable):
+
+>>> both readFile ("file1", "file2")
+(<contents of file1>, <contents of file2>)
+
+If you don't need the result, use 'traverseOf_'.
+-}
+traverseOf :: LensLike f s t a b -> (a -> f b) -> s -> f t
+traverseOf = id
+{-# INLINE traverseOf #-}
 
 {- |
 'singular' turns a traversal into a lens that behaves like a single-element traversal:
@@ -1188,6 +1237,14 @@ _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
 
 -- Some of the guts of lens
+
+newtype Traversed a f = Traversed { getTraversed :: f a }
+
+instance Applicative f => Monoid (Traversed a f) where
+  mempty = Traversed (pure (error "Lens.Micro.Traversed: value used"))
+  {-# INLINE mempty #-}
+  Traversed ma `mappend` Traversed mb = Traversed (ma *> mb)
+  {-# INLINE mappend #-}
 
 newtype Bazaar a b t = Bazaar (forall f. Applicative f => (a -> f b) -> f t)
 
