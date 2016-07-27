@@ -1,3 +1,8 @@
+# 0.4.6.0
+
+* Added `traverseOf` and `traverseOf_`.
+* Changed fixities of `#.` and `.#` to the ones in the profunctors package. Those operators are only available from `Lens.Micro.Internal`, so this shouldn't affect most users.
+
 # 0.4.5.0
 
 * Added `<&>` (which makes lens creation easier).
