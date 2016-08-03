@@ -34,8 +34,8 @@ module Lens.Micro.Mtl
   (+=), (-=), (*=), (//=),
 
   -- * Setting with passthrough
-  (<%=), (<<%=),
-  (<<.=),
+  (<%=), (<.=), (<?=),
+  (<<%=), (<<.=),
 
   -- * Zooming
   zoom,
@@ -120,7 +120,7 @@ preuse l = State.gets (preview l)
 
 
 infix  4 .=, %=, ?=
-infix  4 <<.=, <<%=, <%=
+infix  4 <<.=, <<%=, <%=, <.=, <?=
 infix  4 +=, -=, *=, //=
 infixr 2 <~
 
@@ -266,13 +266,41 @@ Set state and return the old value.
 @
 l '<<.=' b = do
   old <- 'use' l
-  l '.=' f
+  l '.=' b
   return old
 @
 -}
 (<<.=) :: MonadState s m => LensLike ((,) a) s s a b -> b -> m a
 l <<.= b = l %%= (\a -> (a, b))
 {-# INLINE (<<.=) #-}
+
+{- |
+Set state and return new value.
+
+@
+l '<.=' b = do
+  l '.=' b
+  return b
+@
+-}
+(<.=) :: MonadState s m => LensLike ((,) b) s s a b -> b -> m b
+l <.= b = l <%= const b
+{-# INLINE (<.=) #-}
+
+{- |
+('<?=') is a version of ('<.=') that wraps the value into 'Just' before setting.
+
+@
+l '<?=' b = do
+  l '.=' Just b
+  'return' b
+@
+
+It can be useful in combination with 'at'.
+-}
+(<?=) :: MonadState s m => LensLike ((,) b) s s a (Maybe b) -> b -> m b
+l <?= b = l %%= const (b, Just b)
+{-# INLINE (<?=) #-}
 
 (%%=) :: MonadState s m => LensLike ((,) r) s s a b -> (a -> (r, b)) -> m r
 #if MIN_VERSION_mtl(2,1,1)
