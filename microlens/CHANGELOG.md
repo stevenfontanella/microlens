@@ -1,3 +1,7 @@
+# 0.4.6.1
+
+* Fixed the Haddock crash on GHC 8!
+
 # 0.4.6.0
 
 * Added `traverseOf` and `traverseOf_`.
