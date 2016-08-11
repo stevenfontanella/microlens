@@ -5,7 +5,6 @@ FlexibleInstances,
 UndecidableInstances,
 RankNTypes,
 ScopedTypeVariables,
-DefaultSignatures,
 KindSignatures,
 TypeFamilies,
 MultiParamTypeClasses,
@@ -44,6 +43,7 @@ module Lens.Micro.Internal
   IxValue,
   Ixed(..),
   At(..),
+  ixAt,
   Field1(..),
   Field2(..),
   Field3(..),
@@ -189,12 +189,6 @@ You can use 'each' with these things:
 You can also use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   each :: Traversal s t a b
--- See https://github.com/aelve/microlens/issues/72
-#if defined(__GLASGOW_HASKELL__) || defined(__GHCJS__) || defined(__HASTE__)
-  default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
-  each = traverse
-  {-# INLINE each #-}
-#endif
 
 instance (a~b, q~r) => Each (a,b) (q,r) a q where
   each f ~(a,b) = (,) <$> f a <*> f b
@@ -220,7 +214,9 @@ instance Each [a] [b] a b where
   each = traversed
   {-# INLINE each #-}
 
-instance Each (Maybe a) (Maybe b) a b
+instance Each (Maybe a) (Maybe b) a b where
+  each = traverse
+  {-# INLINE each #-}
 
 type family Index (s :: *) :: *
 
@@ -267,12 +263,6 @@ The following instances are provided in this package:
 You can also use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   ix :: Index m -> Traversal' m (IxValue m)
--- See https://github.com/aelve/microlens/issues/72
-#if defined(__GLASGOW_HASKELL__) || defined(__GHCJS__) || defined(__HASTE__)
-  default ix :: (At m) => Index m -> Traversal' m (IxValue m)
-  ix = ixAt
-  {-# INLINE ix #-}
-#endif
 
 class Ixed m => At m where
   {- |

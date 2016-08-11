@@ -181,7 +181,9 @@ instance Each (Seq a) (Seq b) a b where
   each = traversed
   {-# INLINE each #-}
 
-instance Each (Tree a) (Tree b) a b
+instance Each (Tree a) (Tree b) a b where
+  each = traversed
+  {-# INLINE each #-}
 
 instance (Ix i, i ~ j) => Each (Array i a) (Array j b) a b where
   each f arr = array (bounds arr) <$> traverse (\(i,a) -> (,) i <$> f a) (Array.assocs arr)

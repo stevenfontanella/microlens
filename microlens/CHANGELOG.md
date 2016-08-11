@@ -1,6 +1,6 @@
-# 0.4.6.1
+# 0.4.7.0
 
-* Fixed the Haddock crash on GHC 8!
+* Fixed the Haddock crash on GHC 8 by removing default method implementations (`each = traverse` and `ix = ixAt`). If you had custom instances of `Ixed` or `Each` which relied on default methods, they'd stop working.
 
 # 0.4.6.0
 
