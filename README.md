@@ -21,7 +21,7 @@ Here are the build times for all libraries in the family:
 
 | Package            | Build time with dependencies | Pure build time |
 | ------------------ | ----------------------------:| ---------------:|
-| microlens          |                           3s |              3s |
+| microlens          |                         3.5s |            3.5s |
 | microlens-th       |                         7.2s |            4.5s |
 | microlens-ghc      |                         5.7s |            3.3s |
 | microlens-mtl      |                         8.8s |            3.7s |
