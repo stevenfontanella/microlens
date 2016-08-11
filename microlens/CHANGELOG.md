@@ -1,6 +1,6 @@
 # 0.4.7.0
 
-* Fixed the Haddock crash on GHC 8 by removing default method implementations (`each = traverse` and `ix = ixAt`). If you had custom instances of `Ixed` or `Each` which relied on default methods, they'd stop working.
+* Fixed the [Haddock crash on GHC 8](https://github.com/aelve/microlens/issues/72) by removing default method implementations (`each = traverse` and `ix = ixAt`). If you had custom instances of `Ixed` or `Each` which relied on default methods, they'd stop working.
 
 # 0.4.6.0
 

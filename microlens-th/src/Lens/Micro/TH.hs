@@ -61,7 +61,6 @@ import           Control.Monad
 import           Data.Char
 import           Data.Data
 import           Data.Either
-import           Data.Foldable (toList)
 import qualified Data.Map as Map
 import           Data.Map (Map)
 import           Data.Monoid
@@ -1295,16 +1294,17 @@ data DefName
 -- Template Haskell wants type variables declared in a forall, so
 -- we find all free type variables in a given type and declare them.
 quantifyType :: Cxt -> Type -> Type
-quantifyType c t = ForallT vs c t
-  where
-  vs = map PlainTV (toList (setOf typeVars t))
+quantifyType c t = quantifyType' Set.empty
 
 -- This function works like 'quantifyType' except that it takes
 -- a list of variables to exclude from quantification.
 quantifyType' :: Set Name -> Cxt -> Type -> Type
 quantifyType' exclude c t = ForallT vs c t
   where
-  vs = map PlainTV (toList (setOf typeVars t Set.\\ exclude))
+    vs = map PlainTV
+       $ filter (`Set.notMember` exclude)
+       $ nub -- stable order
+       $ toListOf typeVars t
 
 
 ------------------------------------------------------------------------

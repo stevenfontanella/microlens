@@ -1,3 +1,7 @@
+# 0.4.0.1
+
+* Ported a lens commit that (probably) makes lens generation deterministic. See [this issue](https://github.com/aelve/microlens/issues/83).
+
 # 0.4.0.0
 
 * Added `makeClassy` (and `createClass`).
