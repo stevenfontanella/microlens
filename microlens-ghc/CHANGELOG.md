@@ -1,3 +1,7 @@
+# 0.4.7.0
+
+* New minor release (microlens-0.4.7).
+
 # 0.4.6.0
 
 * New minor release (microlens-0.4.6).
