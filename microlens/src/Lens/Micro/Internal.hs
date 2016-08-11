@@ -190,7 +190,7 @@ You can also use 'each' with types from <http://hackage.haskell.org/package/arra
   -}
   each :: Traversal s t a b
 -- See https://github.com/aelve/microlens/issues/72
-#if defined(__GHC__) || defined(__GHCJS__) || defined(__HASTE__)
+#if defined(__GLASGOW_HASKELL__) || defined(__GHCJS__) || defined(__HASTE__)
   default each :: (Traversable g, s ~ g a, t ~ g b) => Traversal s t a b
   each = traverse
   {-# INLINE each #-}
@@ -268,7 +268,7 @@ You can also use 'ix' with types from <http://hackage.haskell.org/package/array 
   -}
   ix :: Index m -> Traversal' m (IxValue m)
 -- See https://github.com/aelve/microlens/issues/72
-#if defined(__GHC__) || defined(__GHCJS__) || defined(__HASTE__)
+#if defined(__GLASGOW_HASKELL__) || defined(__GHCJS__) || defined(__HASTE__)
   default ix :: (At m) => Index m -> Traversal' m (IxValue m)
   ix = ixAt
   {-# INLINE ix #-}
