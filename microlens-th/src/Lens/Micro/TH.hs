@@ -1294,7 +1294,7 @@ data DefName
 -- Template Haskell wants type variables declared in a forall, so
 -- we find all free type variables in a given type and declare them.
 quantifyType :: Cxt -> Type -> Type
-quantifyType c t = quantifyType' Set.empty
+quantifyType = quantifyType' Set.empty
 
 -- This function works like 'quantifyType' except that it takes
 -- a list of variables to exclude from quantification.
