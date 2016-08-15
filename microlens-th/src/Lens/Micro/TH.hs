@@ -44,6 +44,7 @@ module Lens.Micro.TH
   lensRulesFor,
   classyRules,
   camelCaseFields,
+  abbreviatedFields,
 
   -- * Configuring lens rules
   lensField,
@@ -375,7 +376,7 @@ instance HasY (Foo a) a where
 
 If you only want to make lenses for some fields, you can prefix them with underscores – the rest would be untouched. If no fields are prefixed with underscores, lenses would be created for all fields.
 
-The prefix must be the same as the name of the name of the data type (/not/ the constructor).
+The prefix must be the same as the name of the name of the data type (/not/ the constructor). If you don't like this behavior, use @'makeLensesWith' 'abbreviatedFields'@ – it allows any prefix (and even different prefixes).
 
 If you want to use 'makeFields' on types declared in different modules, you can do it, but then you would have to export the @Has*@ classes from one of the modules – 'makeFields' creates a class if it's not in scope yet, so the class must be in scope or else there would be duplicate classes and you would get an “Ambiguous occurrence” error.
 
@@ -632,6 +633,36 @@ camelCaseNamer tyName fields field = maybeToList $ do
   where
   expectedPrefix = optUnderscore ++ over _head toLower (nameBase tyName)
 
+  optUnderscore  = ['_' | any (isPrefixOf "_" . nameBase) fields ]
+
+  computeMethod (x:xs) | isUpper x = Just (toLower x : xs)
+  computeMethod _                  = Nothing
+
+{- |
+Like standard rules used by 'makeFields', but doesn't put any restrictions on the prefix. I.e. if you have fields called
+
+* @_fooBarBaz@
+* @_someX@
+* @someY@
+
+then the generated lenses would be called @barBaz@ and @x@.
+-}
+abbreviatedFields :: LensRules
+abbreviatedFields = defaultFieldRules { _fieldToDef = abbreviatedNamer }
+
+abbreviatedNamer :: Name -> [Name] -> Name -> [DefName]
+abbreviatedNamer _ fields field = maybeToList $ do
+
+  fieldPart <- stripMaxLc (nameBase field)
+  method    <- computeMethod fieldPart
+  let cls = "Has" ++ fieldPart
+  return (MethodName (mkName cls) (mkName method))
+
+  where
+  stripMaxLc f = do x <- stripPrefix optUnderscore f
+                    case break isUpper x of
+                      (p,s) | null p || null s -> Nothing
+                            | otherwise        -> Just s
   optUnderscore  = ['_' | any (isPrefixOf "_" . nameBase) fields ]
 
   computeMethod (x:xs) | isUpper x = Just (toLower x : xs)
