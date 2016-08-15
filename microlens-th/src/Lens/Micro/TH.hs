@@ -1261,9 +1261,7 @@ applyTypeSubst sub = rewrite aux
 ------------------------------------------------------------------------
 
 {- |
-Rules used to generate lenses. You can't create them from scratch, but you can customise already existing ones with lenses in the “Configuring lens rules” section.
-
-For an example, see 'makeLensesWith'.
+Rules used to generate lenses. The fields are intentionally not exported; to create your own rules, see lenses in the “Configuring lens rules” section. You'd have to customise one of the existing rulesets; for an example of doing that, see 'makeLensesWith'.
 -}
 data LensRules = LensRules
   { _simpleLenses    :: Bool
