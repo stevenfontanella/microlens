@@ -1,3 +1,7 @@
+# 0.3.7.0
+
+* New minor release (microlens-th-0.4.1).
+
 # 0.3.6.0
 
 * New minor release (microlens-0.4.7, microlens-ghc-0.4.7).
