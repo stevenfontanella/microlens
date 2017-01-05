@@ -1,3 +1,7 @@
+# 0.4.1.1
+
+* Bumped the upper bound of template-haskell, as requested by @ocharles.
+
 # 0.4.1.0
 
 * Added `abbreviatedFields`.
