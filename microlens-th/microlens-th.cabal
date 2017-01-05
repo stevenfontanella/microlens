@@ -34,7 +34,7 @@ library
                      , microlens >=0.4.0 && <0.5
                      , containers >=0.4.0 && <0.6
                      -- lens has >=2.4, but GHC 7.4 shipped with 2.7
-                     , template-haskell >=2.7 && <2.12
+                     , template-haskell >=2.7 && <2.13
 
   if flag(inlining)
     cpp-options: -DINLINING
