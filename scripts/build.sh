@@ -11,9 +11,7 @@ function buildlib {
     exit 1
   fi
   rm plan.txt
-  if [ "$GHCVER" == "head" ]
   $CABALINSTALL --ghc-options "-Werror"
-  fi
   cabal haddock
   # cabal check
   cabal sdist
