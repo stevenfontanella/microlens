@@ -3,10 +3,7 @@ set -ev
 
 function buildlib {
   cd $1
-  if [ "$GHCVER" == "head" ]
-  then cabal install --allow-newer --only-dependencies --dry-run > plan.txt
-  else cabal install --only-dependencies --dry-run > plan.txt
-  fi
+  $CABALINSTALL --only-dependencies --dry-run > plan.txt
   if grep -Fq microlens plan.txt
   then
     cat plan.txt
@@ -15,8 +12,7 @@ function buildlib {
   fi
   rm plan.txt
   if [ "$GHCVER" == "head" ]
-  then cabal install --allow-newer --ghc-options "-Werror"
-  else cabal install --ghc-options "-Werror"
+  $CABALINSTALL --ghc-options "-Werror"
   fi
   cabal haddock
   # cabal check
