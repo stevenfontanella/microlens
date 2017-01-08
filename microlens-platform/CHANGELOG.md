@@ -1,3 +1,7 @@
+# 0.3.7.1
+
+* Bumped `vector` upper bound.
+
 # 0.3.7.0
 
 * New minor release (microlens-th-0.4.1).
