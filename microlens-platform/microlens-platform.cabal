@@ -36,7 +36,7 @@ library
                      , microlens-th ==0.4.1.*
                      , text >=0.11 && <1.3
                      , unordered-containers >=0.2.4 && <0.3
-                     , vector >=0.9 && <0.12
+                     , vector >=0.9 && <0.13
 
   ghc-options:
     -Wall -fwarn-tabs
