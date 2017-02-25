@@ -36,7 +36,7 @@ Other features:
 
   * Compatibility with lens. If you want to define a `Lens` or a `Traversal` in your package, you can depend on this package without fear.
 
-  * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens. There are also no unique to microlens functions which you would have to rewrite when switching to lens (even tho I was tempted to add some).
+  * No awkward renamed functions or any of such nonsense. You can at any moment replace `Lens.Micro` with `Control.Lens` and get the full power of lens. There are also no unique to microlens functions which you would have to rewrite when switching to lens (even though I was tempted to add some).
 
   * No Template Haskell dependency. There is a separate package for generating (lens-compatible) record lenses, which is called [microlens-th][].
 
@@ -56,7 +56,7 @@ The reason microlens exists is that lens is a huge library with lots of dependen
 
 [ilist]: https://github.com/aelve/ilist
 
-  * If you use `ALens`, indexed traversals, prisms, isomorphisms, or `Wrapped`, you won't be able to migrate. (Tho some indexed functions are available elsewhere – containers and vector provide them, and [ilist][] provides indexed functions for lists.)
+  * If you use `ALens`, indexed traversals, prisms, isomorphisms, or `Wrapped`, you won't be able to migrate (although some indexed functions are available elsewhere – containers and vector provide them, and [ilist][] provides indexed functions for lists).
 
   * If you have your own instances of `Each`, `At`, `Ix`, `Zoomed`, or `Field*`, and you don't export them, it's okay. Otherwise you should keep using lens, since those classes are incompatible with classes defined in lens. Similarly, if you export any functions with `At`/`Zoom`/etc constraints, don't migrate.
 
@@ -139,9 +139,9 @@ I hate it when people advertise things without also describing their disadvantag
 
 ## Design decisions
 
-microlens doesn't include anything lens doesn't include, even tho sometimes I'm very tempted to improve something in microlens just because I have control over it.
+microlens doesn't include anything lens doesn't include, even though sometimes I'm very tempted to improve something in microlens just because I have control over it.
 
-I [don't mind](https://github.com/aelve/microlens/issues/79#issuecomment-231720804) adding new functions from lens to the package, even when done in an inconsistent way (e.g. I added `mapAccumLOf` just because someone needed it, but I haven't added `mapAccumROf` even tho that would've been more consistent). However, I am only able to add functions as long as microlens stays small, so if you plan to adopt microlens first and make dozens of requests for function additions later, this package is not for you.
+I [don't mind](https://github.com/aelve/microlens/issues/79#issuecomment-231720804) adding new functions from lens to the package, even when done in an inconsistent way (e.g. I added `mapAccumLOf` just because someone needed it, but I haven't added `mapAccumROf` even though that would've been more consistent). However, I am only able to add functions as long as microlens stays small, so if you plan to adopt microlens first and make dozens of requests for function additions later, this package is not for you.
 
 -----------------------------------------------------------------------------
 
