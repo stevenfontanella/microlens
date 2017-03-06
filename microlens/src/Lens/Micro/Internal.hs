@@ -64,6 +64,10 @@ import Data.Foldable as F
 import Data.Functor.Identity
 import Data.Complex
 
+#if __GLASGOW_HASKELL__ >= 800
+import Data.List.NonEmpty (NonEmpty)
+#endif
+
 #if __GLASGOW_HASKELL__ < 710
 import Data.Traversable
 #endif
@@ -73,7 +77,7 @@ import Data.Coerce
 #else
 import Unsafe.Coerce
 #endif
-  
+
 
 {- |
 'traversed' traverses any 'Traversable' container (list, vector, @Map@, 'Maybe', you name it):
@@ -217,6 +221,12 @@ instance Each [a] [b] a b where
 instance Each (Maybe a) (Maybe b) a b where
   each = traverse
   {-# INLINE each #-}
+
+#if __GLASGOW_HASKELL__ >= 800
+instance Each (NonEmpty a) (NonEmpty b) a b where
+  each = traversed
+  {-# INLINE each #-}
+#endif
 
 type family Index (s :: *) :: *
 
