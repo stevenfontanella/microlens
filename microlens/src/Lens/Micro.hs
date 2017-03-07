@@ -58,6 +58,7 @@ module Lens.Micro
   (^?),
   (^?!),
   traverseOf_,
+  forOf_,
   has,
   folded,
   folding,
@@ -78,6 +79,7 @@ module Lens.Micro
   -- $traversals-note
   Traversal, Traversal',
   traverseOf,
+  forOf,
   singular,
   failing,
   filtered,
@@ -607,6 +609,27 @@ traverseOf_ l f = void . getTraversed #. foldMapOf l (Traversed #. f)
 {-# INLINE traverseOf_ #-}
 
 {- |
+'traverseOf_' with flipped arguments. Useful if the “loop body” is a lambda
+or a @do@ block, or in some other cases – for instance, you can avoid
+accidentally using 'Data.Foldable.for_' on a tuple or 'Either' by switching
+to @'forOf_' 'each'@. Or you can write custom loops like these:
+
+@
+'forOf_' 'both' (a, b) $ \\x -\>
+  ...
+'forOf_' 'each' [1..10] $ \\x -\>
+  ...
+'forOf_' ('each' . '_Right') $ \\x -\>
+  ...
+@
+-}
+forOf_
+  :: Functor f
+  => Getting (Traversed r f) s a -> s -> (a -> f r) -> f ()
+forOf_ = flip . traverseOf_
+{-# INLINE forOf_ #-}
+
+{- |
 'has' checks whether a getter (any getter, including lenses, traversals, and folds) returns at least 1 value.
 
 Checking whether a list is non-empty:
@@ -880,6 +903,14 @@ If you don't need the result, use 'traverseOf_'.
 traverseOf :: LensLike f s t a b -> (a -> f b) -> s -> f t
 traverseOf = id
 {-# INLINE traverseOf #-}
+
+{- |
+'traverseOf' with flipped arguments. Useful if the “loop body” is a lambda or
+a @do@ block.
+-}
+forOf :: LensLike f s t a b -> s -> (a -> f b) -> f t
+forOf = flip
+{-# INLINE forOf #-}
 
 {- |
 'singular' turns a traversal into a lens that behaves like a single-element traversal:
