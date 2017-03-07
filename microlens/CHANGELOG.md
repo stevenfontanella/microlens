@@ -1,3 +1,8 @@
+# 0.4.8.0
+
+* Added `forOf_` and `forOf`.
+* Added an instance for `Each (NonEmpty a)` (available starting from GHC 8).
+
 # 0.4.7.0
 
 * Fixed the [Haddock crash on GHC 8](https://github.com/aelve/microlens/issues/72) by removing default method implementations (`each = traverse` and `ix = ixAt`). If you had custom instances of `Ixed` or `Each` which relied on default methods, they'd stop working.
