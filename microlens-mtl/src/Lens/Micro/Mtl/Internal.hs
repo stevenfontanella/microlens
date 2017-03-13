@@ -27,10 +27,27 @@ The warning from "Lens.Micro.Internal" applies to this module as well. Don't exp
 -}
 module Lens.Micro.Mtl.Internal
 (
+  -- * Classes
   Zoomed,
   Zoom(..),
   Magnified,
   Magnify(..),
+
+  -- * Focusing (used for 'Zoom')
+  Focusing(..),
+  FocusingWith(..),
+  FocusingPlus(..),
+  FocusingOn(..),
+  FocusingMay(..),
+  FocusingErr(..),
+
+  -- * Effect (used for 'Magnify')
+  Effect(..),
+  EffectRWS(..),
+
+  -- * Utilities
+  May(..),
+  Err(..),
 )
 where
 
@@ -309,6 +326,17 @@ moveObstaclesNE = do
     return [(x', y')]
   ...
 @
+
+Finally, you might need to write your own instances of 'Zoom' if you use @newtype@d transformers in your monad stack. This can be done as follows:
+
+@
+import "Lens.Micro.Mtl.Internal"
+
+type instance 'Zoomed' (MyStateT s m) = 'Zoomed' (StateT s m)
+
+instance Monad m =\> 'Zoom' (MyStateT s m) (MyStateT t m) s t where
+    'zoom' l (MyStateT m) = MyStateT ('zoom' l m)
+@
   -}
   zoom :: LensLike' (Zoomed m c) t s -> m c -> n c
 
@@ -423,6 +451,19 @@ getBase = 'magnify' base $ do
   protocol \<- 'Data.Maybe.fromMaybe' \"https\" '<$>' 'Lens.Micro.Mtl.view' protocol
   path     \<- 'Lens.Micro.Mtl.view' path
   return (protocol ++ path)
+@
+
+This concludes the example.
+
+Finally, you should know writing instances of 'Magnify' for your own types can be done as follows:
+
+@
+import "Lens.Micro.Mtl.Internal"
+
+type instance 'Magnified' (MyReaderT r m) = 'Magnified' (ReaderT r m)
+
+instance Monad m =\> 'Magnify' (MyReaderT r m) (MyReaderT t m) r t where
+    'magnify' l (MyReaderT m) = MyReaderT ('magnify' l m)
 @
   -}
   magnify :: LensLike' (Magnified m c) a b -> m c -> n c
