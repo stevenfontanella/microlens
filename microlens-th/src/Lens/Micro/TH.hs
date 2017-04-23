@@ -601,7 +601,7 @@ lensRules = LensRules
 A modification of 'lensRules' used by 'makeLensesFor' (the only difference is that a simple lookup function is used for 'lensField').
 -}
 lensRulesFor
-  :: [(String, String)] -- ^ \[(fieldName, lensName)\]
+  :: [(String, String)] -- ^ @[(fieldName, lensName)]@
   -> LensRules
 lensRulesFor fields = lensRules & lensField .~ mkNameLookup fields
 
