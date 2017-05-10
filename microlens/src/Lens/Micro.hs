@@ -969,7 +969,7 @@ failing left right afb s = case pins b of
 infixl 5 `failing`
 
 {- |
-'filtered' is a traversal that filters elements “passing” thru it:
+'filtered' is a traversal that filters elements “passing” through it:
 
 >>> (1,2,3,4) ^.. each
 [1,2,3,4]
@@ -1032,7 +1032,7 @@ pairedWithEvens :: 'Traversal' [(Int, a)] [(Int, b)] a b
 pairedWithEvens = 'each' '.' 'filtered' ('even' '.' 'fst') '.' '_2'
 @
 
-Since you can't do anything with the 1st components thru this traversal, the following holds for any @f@ and @g@:
+Since you can't do anything with the 1st components through this traversal, the following holds for any @f@ and @g@:
 
 @
 'over' pairedWithEvens f '.' 'over' pairedWithEvens g = 'over' pairedWithEvens (f '.' g)

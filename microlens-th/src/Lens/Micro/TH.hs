@@ -372,7 +372,7 @@ instance HasY (Foo a) a where
   y = ...
 @
 
-(There's a minor drawback, tho: you can't perform type-changing updates with these lenses.)
+(There's a minor drawback, though: you can't perform type-changing updates with these lenses.)
 
 If you only want to make lenses for some fields, you can prefix them with underscores – the rest would be untouched. If no fields are prefixed with underscores, lenses would be created for all fields.
 
