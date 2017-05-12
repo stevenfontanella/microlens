@@ -24,6 +24,7 @@ module Lens.Micro.Mtl
   use, preuse,
 
   -- * Setting
+  (&~),
   (%=), modifying,
   (.=), assign,
   (?=),
@@ -123,6 +124,25 @@ infix  4 .=, %=, ?=
 infix  4 <<.=, <<%=, <%=, <.=, <?=
 infix  4 +=, -=, *=, //=
 infixr 2 <~
+infixl 1 &~
+
+{- |
+This can be used to chain lens operations using @op=@ syntax
+rather than @op~@ syntax for simple non-type-changing cases.
+>>> (10,20) & _1 .~ 30 & _2 .~ 40
+(30,40)
+
+>>> (10,20) &~ do _1 .= 30; _2 .= 40
+(30,40)
+
+This does not support type-changing assignment, /e.g./
+
+>>> (10,20) & _1 .~ "hello"
+("hello",20)
+-}
+(&~) :: s -> State s a -> s
+s &~ l = execState l s
+{-# INLINE (&~) #-}
 
 {- |
 Modify state by “assigning” a value to a part of the state.
