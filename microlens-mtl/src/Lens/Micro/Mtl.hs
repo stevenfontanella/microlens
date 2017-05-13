@@ -24,11 +24,13 @@ module Lens.Micro.Mtl
   use, preuse,
 
   -- * Setting
-  (&~),
   (%=), modifying,
   (.=), assign,
   (?=),
   (<~),
+
+  -- * Convenience
+  (&~),
 
   -- * Specialised modifying operators
   -- $arith-note
