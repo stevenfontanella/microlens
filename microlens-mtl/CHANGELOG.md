@@ -1,4 +1,4 @@
-# next
+# 0.1.11.0
 
 * Exported `Focusing`, etc. from `Lens.Micro.Mtl.Internal`.
 * Added `&~`.
