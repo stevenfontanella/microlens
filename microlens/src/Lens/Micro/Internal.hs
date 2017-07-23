@@ -1,16 +1,14 @@
-{-# LANGUAGE
-CPP,
-FlexibleContexts,
-FlexibleInstances,
-UndecidableInstances,
-RankNTypes,
-ScopedTypeVariables,
-KindSignatures,
-TypeFamilies,
-MultiParamTypeClasses,
-FunctionalDependencies,
-Unsafe
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE Unsafe #-}
 
 
 {- |

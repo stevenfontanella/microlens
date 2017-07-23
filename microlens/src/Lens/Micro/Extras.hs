@@ -1,6 +1,4 @@
-{-# LANGUAGE
-Trustworthy
-  #-}
+{-# LANGUAGE Trustworthy #-}
 
 
 {- |

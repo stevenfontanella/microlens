@@ -1,11 +1,9 @@
-{-# LANGUAGE
-CPP,
-TypeFamilies,
-MultiParamTypeClasses,
-FlexibleInstances,
-UndecidableInstances,
-Trustworthy
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE Trustworthy #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 

@@ -1,8 +1,6 @@
-{-# LANGUAGE
-CPP,
-RankNTypes,
-Safe
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE Safe #-}
 
 
 {- |

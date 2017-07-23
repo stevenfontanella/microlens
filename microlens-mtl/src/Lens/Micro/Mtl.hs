@@ -1,12 +1,5 @@
-{-# LANGUAGE
-CPP,
-MultiParamTypeClasses,
-FunctionalDependencies,
-FlexibleInstances,
-UndecidableInstances,
-TypeFamilies,
-Trustworthy
-  #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards #-}
 
 -- This is needed because ErrorT is deprecated.
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}

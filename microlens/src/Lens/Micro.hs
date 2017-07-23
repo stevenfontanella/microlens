@@ -1,13 +1,11 @@
-{-# LANGUAGE
-CPP,
-FlexibleInstances,
-FlexibleContexts,
-UndecidableInstances,
-RankNTypes,
-ScopedTypeVariables,
-MonoLocalBinds,
-Trustworthy
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE Trustworthy #-}
 
 
 {- |

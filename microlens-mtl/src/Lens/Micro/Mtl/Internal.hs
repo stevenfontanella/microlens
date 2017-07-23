@@ -1,16 +1,14 @@
-{-# LANGUAGE
-CPP,
-MultiParamTypeClasses,
-FunctionalDependencies,
-FlexibleContexts,
-FlexibleInstances,
-UndecidableInstances,
-ScopedTypeVariables,
-RankNTypes,
-TypeFamilies,
-KindSignatures,
-Trustworthy
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE Trustworthy #-}
 
 -- This is needed because ErrorT is deprecated.
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}

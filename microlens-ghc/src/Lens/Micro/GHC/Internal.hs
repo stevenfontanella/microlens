@@ -1,8 +1,6 @@
-{-# LANGUAGE
-CPP,
-BangPatterns,
-Unsafe
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE Unsafe #-}
 
 
 {- |

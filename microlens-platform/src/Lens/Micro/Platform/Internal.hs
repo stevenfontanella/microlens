@@ -1,8 +1,6 @@
-{-# LANGUAGE
-CPP,
-FlexibleInstances,
-Safe
-  #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE Safe #-}
 
 
 {- |
