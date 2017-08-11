@@ -5,6 +5,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE Trustworthy #-}
 
 
