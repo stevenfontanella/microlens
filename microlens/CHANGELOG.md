@@ -1,3 +1,7 @@
+# 0.4.8.1
+
+* Added `HasCallStack` for some partial functions.
+
 # 0.4.8.0
 
 * Added `forOf_` and `forOf`.

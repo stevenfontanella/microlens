@@ -585,7 +585,7 @@ infixl 8 ^?
 {- |
 ('^?!') is an unsafe variant of ('^?') – instead of using 'Nothing' to indicate that there were no elements returned, it throws an exception.
 -}
-(^?!) :: s -> Getting (Endo a) s a -> a
+(^?!) :: HasCallStack => s -> Getting (Endo a) s a -> a
 s ^?! l = foldrOf l const (error "(^?!): empty Fold") s
 {-# INLINE (^?!) #-}
 
@@ -928,7 +928,7 @@ However, it won't fail if you are merely setting the value:
 
 >>> [] & singular each %~ negate
 -}
-singular :: Traversal s t a a -> Lens s t a a
+singular :: HasCallStack => Traversal s t a a -> Lens s t a a
 singular l afb s = case ins b of
   (w:ws) -> unsafeOuts b . (:ws) <$> afb w
   []     -> unsafeOuts b . return <$>

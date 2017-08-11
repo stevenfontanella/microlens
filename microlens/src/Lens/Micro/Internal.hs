@@ -8,6 +8,8 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE ImplicitParams #-}
 {-# LANGUAGE Unsafe #-}
 
 
@@ -50,6 +52,9 @@ module Lens.Micro.Internal
   Cons(..),
   Snoc(..),
   Strict(..),
+
+  -- * CallStack
+  HasCallStack,
 )
 where
 
@@ -76,6 +81,17 @@ import Data.Coerce
 import Unsafe.Coerce
 #endif
 
+-- We don't depend on the call-stack package because building an extra
+-- package is likely slower than adding several lines of code here.
+#if MIN_VERSION_base(4,9,0)
+import GHC.Stack (HasCallStack)
+#elif MIN_VERSION_base(4,8,1)
+import qualified GHC.Stack as GHC
+type HasCallStack = (?callStack :: GHC.CallStack)
+#else
+import GHC.Exts (Constraint)
+type HasCallStack = (() :: Constraint)
+#endif
 
 {- |
 'traversed' traverses any 'Traversable' container (list, vector, @Map@, 'Maybe', you name it):
