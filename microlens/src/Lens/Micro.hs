@@ -914,7 +914,7 @@ forOf = flip
 {- |
 'singular' turns a traversal into a lens that behaves like a single-element traversal:
 
->>> [1,2,3] ^. signular each
+>>> [1,2,3] ^. singular each
 1
 
 >>> [1,2,3] & singular each %~ negate
