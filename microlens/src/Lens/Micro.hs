@@ -815,7 +815,7 @@ Same happens if you try to modify a value:
 >>> Just 1 & non 0 %~ subtract 1
 Nothing
 
->>> Just 1 & non 0 .~ (+ 1)
+>>> Just 1 & non 0 %~ (+ 1)
 Just 2
 
 'non' is often useful when combined with 'at'. For instance, if you have a map of songs and their playcounts, it makes sense not to store songs with 0 plays in the map; 'non' can act as a filter that wouldn't pass such entries.
@@ -1166,7 +1166,7 @@ However, it's not possible for microlens to export prisms, because their type de
 
 Gathering all @Left@s in a structure (like the 'Data.Either.lefts' function, but not necessarily just for lists):
 
->>> [Left 1, Right 'c', Left 3] ^.. each._Just
+>>> [Left 1, Right 'c', Left 3] ^.. each._Left
 [1,3]
 
 Checking whether an 'Either' is a 'Left' (like 'Data.Either.isLeft'):
