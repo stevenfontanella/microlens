@@ -1,3 +1,7 @@
+# NEXT
+
+* Added `<>~`.
+
 # 0.4.8.1
 
 * Added `HasCallStack` for some partial functions.
