@@ -1273,8 +1273,14 @@ newtype Traversed a f = Traversed { getTraversed :: f a }
 instance Applicative f => Monoid (Traversed a f) where
   mempty = Traversed (pure (error "Lens.Micro.Traversed: value used"))
   {-# INLINE mempty #-}
+#if !MIN_VERSION_base(4,11,0)
   Traversed ma `mappend` Traversed mb = Traversed (ma *> mb)
   {-# INLINE mappend #-}
+#else
+instance Applicative f => Semigroup (Traversed a f) where
+  Traversed ma <> Traversed mb = Traversed (ma *> mb)
+  {-# INLINE (<>) #-}
+#endif
 
 newtype Bazaar a b t = Bazaar (forall f. Applicative f => (a -> f b) -> f t)
 
