@@ -1,6 +1,10 @@
-# 0.4.8.2
+# 0.4.8.3
 
 * Fixed compilation on GHC 8.4.
+
+# 0.4.8.2
+
+Skipped (the tarball got corrupted).
 
 # 0.4.8.1
 

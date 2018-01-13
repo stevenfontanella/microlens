@@ -1,6 +1,10 @@
-# 0.4.1.2
+# 0.4.1.3
 
 * Bumped the upper bound of template-haskell again.
+
+# 0.4.1.2
+
+Skipped (the tarball got corrupted).
 
 # 0.4.1.1
 
