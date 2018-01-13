@@ -1,3 +1,7 @@
+# 0.1.11.1
+
+* Fixed compilation on GHC 8.4.
+
 # 0.1.11.0
 
 * Exported `Focusing`, etc. from `Lens.Micro.Mtl.Internal`.

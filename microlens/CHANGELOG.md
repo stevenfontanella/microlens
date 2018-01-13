@@ -1,3 +1,7 @@
+# 0.4.8.2
+
+* Fixed compilation on GHC 8.4.
+
 # 0.4.8.1
 
 * Added `HasCallStack` for some partial functions.
