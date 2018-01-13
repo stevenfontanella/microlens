@@ -1,3 +1,7 @@
+# 0.4.1.2
+
+* Bumped the upper bound of template-haskell again.
+
 # 0.4.1.1
 
 * Bumped the upper bound of template-haskell, as requested by @ocharles.
