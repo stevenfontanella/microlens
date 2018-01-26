@@ -1,0 +1,37 @@
+version: 2
+jobs:
+  build:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            # See if this exact revision was already built
+            - dependency-cache-{{ .Branch }}-{{arch}}-{{ .Revision }}
+            # Else look for a previous build of this branch
+            - dependency-cache-{{ .Branch }}-{{arch}}
+            # Else look for a previous build of master
+            - dependency-cache-master-{{arch}}
+      - run:
+          name: install_stack
+          command: |
+            set -o xtrace
+            curl -sSL https://get.haskellstack.org/ | sh
+            stack --version
+      - run:
+          name: stack_build
+          command: |
+            set -o xtrace
+            stack build --install-ghc -j8
+      - save_cache:
+          key: dependency-cache-{{ .Branch }}-{{arch}}-{{ .Revision }}
+          paths:
+            - ~/.stack
+            - .stack-work
+            - microlens/.stack-work
+            - microlens-contra/.stack-work
+            - microlens-ghc/.stack-work
+            - microlens-mtl/.stack-work
+            - microlens-platform/.stack-work
+            - microlens-th/.stack-work
