@@ -38,6 +38,7 @@ module Lens.Micro
   ASetter, ASetter',
   sets,
   (%~), over,
+  (<>~),
   (.~), set,
   (?~),
   (<%~), (<<%~), (<<.~),
@@ -289,6 +290,18 @@ Using @'over' '_2'@ as a replacement for 'Control.Arrow.second':
 over :: ASetter s t a b -> (a -> b) -> s -> t
 over l f = runIdentity #. l (Identity #. f)
 {-# INLINE over #-}
+
+{- |
+('<>~') appends a value monoidally to the target.
+
+>>> ("hello", "goodbye") & both <>~ " world!"
+("hello world!", "goodbye world!")
+-}
+(<>~) :: (Monoid a) => ASetter s t a a -> a -> s -> t
+(<>~) l a = over l (`mappend` a)
+{-# INLINE (<>~) #-}
+
+infixr 4 <>~
 
 {- |
 ('.~') assigns a value to the target. It's the same thing as using ('%~') with 'const':

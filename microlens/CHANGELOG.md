@@ -1,3 +1,7 @@
+# 0.4.9
+
+* Added `<>~`.
+
 # 0.4.8.3
 
 * Fixed compilation on GHC 8.4.
