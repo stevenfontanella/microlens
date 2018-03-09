@@ -399,6 +399,8 @@ Since it does getting in addition to setting, you can't use it with 'ASetter' (b
 (<%~) l f = l (join (,) . f)
 {-# INLINE (<%~) #-}
 
+infixr 4 <%~
+
 {- |
 This is a version of ('%~') which modifies the structure and returns it along with the old value:
 
@@ -416,6 +418,8 @@ Simpler type signatures:
 (<<%~) l f = l (\a -> (a, f a))
 {-# INLINE (<<%~) #-}
 
+infixr 4 <<%~
+
 {- |
 This is a version of ('.~') which modifies the structure and returns it along with the old value:
 
@@ -432,6 +436,8 @@ Simpler type signatures:
 (<<.~) :: LensLike ((,) a) s t a b -> b -> s -> (a, t)
 (<<.~) l x = l (\a -> (a, x))
 {-# INLINE (<<.~) #-}
+
+infixr 4 <<.~
 
 -- Getting -----------------------------------------------------------------
 
