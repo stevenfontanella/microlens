@@ -1,0 +1,9 @@
+resolver: lts-10.3
+
+packages:
+- microlens
+- microlens-contra
+- microlens-ghc
+- microlens-mtl
+- microlens-th
+- microlens-platform

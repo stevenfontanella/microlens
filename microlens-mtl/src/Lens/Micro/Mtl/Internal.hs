@@ -180,10 +180,18 @@ newtype May a = May { getMay :: Maybe a }
 instance Monoid a => Monoid (May a) where
   mempty = May (Just mempty)
   {-# INLINE mempty #-}
+#if !MIN_VERSION_base(4,11,0)
   May Nothing `mappend` _ = May Nothing
   _ `mappend` May Nothing = May Nothing
   May (Just a) `mappend` May (Just b) = May (Just (mappend a b))
   {-# INLINE mappend #-}
+#else
+instance Semigroup a => Semigroup (May a) where
+  May Nothing <> _ = May Nothing
+  _ <> May Nothing = May Nothing
+  May (Just a) <> May (Just b) = May (Just (a <> b))
+  {-# INLINE (<>) #-}
+#endif
 
 ------------------------------------------------------------------------------
 -- FocusingMay
@@ -212,10 +220,18 @@ newtype Err e a = Err { getErr :: Either e a }
 instance Monoid a => Monoid (Err e a) where
   mempty = Err (Right mempty)
   {-# INLINE mempty #-}
+#if !MIN_VERSION_base(4,11,0)
   Err (Left e) `mappend` _ = Err (Left e)
   _ `mappend` Err (Left e) = Err (Left e)
   Err (Right a) `mappend` Err (Right b) = Err (Right (mappend a b))
   {-# INLINE mappend #-}
+#else
+instance Semigroup a => Semigroup (Err e a) where
+  Err (Left e) <> _ = Err (Left e)
+  _ <> Err (Left e) = Err (Left e)
+  Err (Right a) <> Err (Right b) = Err (Right (a <> b))
+  {-# INLINE (<>) #-}
+#endif
 
 ------------------------------------------------------------------------------
 -- FocusingErr
@@ -501,8 +517,14 @@ instance Functor (Effect m r) where
 instance (Monad m, Monoid r) => Monoid (Effect m r a) where
   mempty = Effect (return mempty)
   {-# INLINE mempty #-}
+#if !MIN_VERSION_base(4,11,0)
   Effect ma `mappend` Effect mb = Effect (liftM2 mappend ma mb)
   {-# INLINE mappend #-}
+#else
+instance (Monad m, Semigroup r) => Semigroup (Effect m r a) where
+  Effect ma <> Effect mb = Effect (liftM2 (<>) ma mb)
+  {-# INLINE (<>) #-}
+#endif
 
 instance (Monad m, Monoid r) => Applicative (Effect m r) where
   pure _ = Effect (return mempty)

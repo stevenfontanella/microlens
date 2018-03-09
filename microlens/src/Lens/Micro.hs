@@ -828,7 +828,7 @@ Same happens if you try to modify a value:
 >>> Just 1 & non 0 %~ subtract 1
 Nothing
 
->>> Just 1 & non 0 .~ (+ 1)
+>>> Just 1 & non 0 %~ (+ 1)
 Just 2
 
 'non' is often useful when combined with 'at'. For instance, if you have a map of songs and their playcounts, it makes sense not to store songs with 0 plays in the map; 'non' can act as a filter that wouldn't pass such entries.
@@ -1012,7 +1012,7 @@ And now combine them into a traversal that conditionally traverses the value it'
 
 @
 filtered :: (a -> Bool) -> 'Traversal'' a a
-filtered p s = if p s then f s else 'pure' s
+filtered p f s = if p s then f s else 'pure' s
 @
 
 By the way, note that 'filtered' can generate illegal traversals – sometimes this can bite you. In particular, an optimisation that should be safe becomes unsafe. (To the best of my knowledge, this optimisation never happens automatically. If you just use 'filtered' to modify/view something, you're safe. If you don't define any traversals that use 'filtered', you're safe too.)
@@ -1179,7 +1179,7 @@ However, it's not possible for microlens to export prisms, because their type de
 
 Gathering all @Left@s in a structure (like the 'Data.Either.lefts' function, but not necessarily just for lists):
 
->>> [Left 1, Right 'c', Left 3] ^.. each._Just
+>>> [Left 1, Right 'c', Left 3] ^.. each._Left
 [1,3]
 
 Checking whether an 'Either' is a 'Left' (like 'Data.Either.isLeft'):
@@ -1286,8 +1286,14 @@ newtype Traversed a f = Traversed { getTraversed :: f a }
 instance Applicative f => Monoid (Traversed a f) where
   mempty = Traversed (pure (error "Lens.Micro.Traversed: value used"))
   {-# INLINE mempty #-}
+#if !MIN_VERSION_base(4,11,0)
   Traversed ma `mappend` Traversed mb = Traversed (ma *> mb)
   {-# INLINE mappend #-}
+#else
+instance Applicative f => Semigroup (Traversed a f) where
+  Traversed ma <> Traversed mb = Traversed (ma *> mb)
+  {-# INLINE (<>) #-}
+#endif
 
 newtype Bazaar a b t = Bazaar (forall f. Applicative f => (a -> f b) -> f t)
 

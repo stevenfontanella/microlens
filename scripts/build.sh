@@ -12,6 +12,7 @@ function buildlib {
   fi
   rm plan.txt
   $CABALINSTALL --ghc-options "-Werror"
+  cabal test
   cabal haddock
   # cabal check
   cabal sdist
