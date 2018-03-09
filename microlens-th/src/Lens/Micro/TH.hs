@@ -75,13 +75,17 @@ import           Data.Map (Map)
 import           Data.Monoid
 import qualified Data.Set as Set
 import           Data.Set (Set)
-import qualified Data.Traversable as T
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
 import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
 import qualified Language.Haskell.TH.Datatype as D
+
+#if __GLASGOW_HASKELL__ < 710
+import           Control.Applicative
+import           Data.Traversable (traverse, sequenceA)
+#endif
 
 
 {- $errors-note
@@ -839,7 +843,7 @@ makeFieldOpticsForDatatype rules info =
        let allFields  = toListOf (folded . _2 . folded . _1 . folded) fieldCons
        let defCons    = over normFieldLabels (expandName allFields) fieldCons
            allDefs    = setOf (normFieldLabels . folded) defCons
-       T.sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
+       sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
 
      let defs = Map.toList perDef
      case _classyLenses rules tyName of
@@ -892,7 +896,7 @@ makeClassyDriver ::
   Type {- ^ Outer 's' type -} ->
   [(DefName, (OpticType, OpticStab, [(Name, Int, [Int])]))] ->
   HasFieldClasses [Dec]
-makeClassyDriver rules className methodName s defs = T.sequenceA (cls ++ inst)
+makeClassyDriver rules className methodName s defs = sequenceA (cls ++ inst)
 
   where
   cls | _generateClasses rules = [liftState $ makeClassyClass className methodName s defs]
@@ -1060,7 +1064,7 @@ buildStab s categorizedFields =
      let s' = applyTypeSubst subA s
 
      -- compute possible type changes
-     sub <- T.sequenceA (fromSet (newName . nameBase) unfixedTypeVars)
+     sub <- sequenceA (fromSet (newName . nameBase) unfixedTypeVars)
      let (t,b) = over both (substTypeVars sub) (s',a)
 
      return (s',t,a,b)
@@ -1082,7 +1086,7 @@ makeFieldOptic rules (defName, (opticType, defType, cons)) = do
   addName
   liftState $ do
     cls <- mkCls locals
-    T.sequenceA (cls ++ sig ++ def)
+    sequenceA (cls ++ sig ++ def)
   where
   mkCls locals = case defName of
                  MethodName c n | _generateClasses rules ->
