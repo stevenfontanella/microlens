@@ -456,5 +456,28 @@ checkAbbreviatedNamer = fieldAbbreviatedNamer
 
 -}
 
+-- test for associated types (#93)
+
+data UserTable = UserTable
+data OtherTable = OtherTable
+
+class CRUDTable a where
+  data TableRow a :: *
+
+instance CRUDTable UserTable where
+  data TableRow UserTable =
+    UserRow {_username :: String, _email :: String} |
+    UserRow2 {_username :: String, _email :: String}
+  -- Other things here
+
+instance CRUDTable OtherTable where
+  data TableRow OtherTable =
+    OtherRow {_foo :: Maybe Int, _bar :: Maybe Int}
+
+makeLenses 'UserRow
+
+checkUserName :: Lens' (TableRow UserTable) String
+checkUserName = username
+
 main :: IO ()
 main = putStrLn "\ntest/templates.hs: ok"
