@@ -48,8 +48,8 @@ before_install:
  - unset CC
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
  - if [ "$GHCVER" == "head" ];
-   then export CABALINSTALL="cabal install --allow-newer";
-   else export CABALINSTALL="cabal install";
+   then export CABALINSTALL="cabal install --enable-tests --allow-newer";
+   else export CABALINSTALL="cabal install --enable-tests";
    fi
 
 # check whether install-order.txt lists all packages in the dir
@@ -73,7 +73,7 @@ install:
    fi
  - travis_retry cabal update -v
  - sed -i 's/^jobs:/-- jobs:/' ${HOME}/.cabal/config
- - $CABALINSTALL --only-dependencies --enable-tests --enable-benchmarks --dry -v microlens*/ > installplan.txt
+ - $CABALINSTALL --only-dependencies --dry -v microlens*/ > installplan.txt
  - sed -i -e '1,/^Resolving /d' installplan.txt; cat installplan.txt
 
 # check whether current requested install-plan matches cached package-db snapshot
@@ -87,7 +87,7 @@ install:
      echo "cabal build-cache MISS";
      rm -rf $HOME/.cabsnap;
      mkdir -p $HOME/.ghc $HOME/.cabal/lib $HOME/.cabal/share $HOME/.cabal/bin;
-     $CABALINSTALL --only-dependencies --enable-tests --enable-benchmarks microlens*/;
+     $CABALINSTALL --only-dependencies microlens*/;
    fi
 
 # snapshot package-db on cache miss
