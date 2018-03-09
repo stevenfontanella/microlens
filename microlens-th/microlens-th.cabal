@@ -56,3 +56,5 @@ test-suite templates
   hs-source-dirs: test
 
   build-depends: base, microlens, microlens-th
+
+  default-language: Haskell2010
