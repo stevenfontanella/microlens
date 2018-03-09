@@ -2,6 +2,15 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
+#ifdef TRUSTWORTHY
+# if MIN_VERSION_template_haskell(2,12,0)
+{-# LANGUAGE Safe #-}
+# else
+{-# LANGUAGE Trustworthy #-}
+# endif
+#endif
 
 #ifndef MIN_VERSION_template_haskell
 #define MIN_VERSION_template_haskell(x,y,z) (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 706)
@@ -57,6 +66,7 @@ where
 
 
 import           Control.Monad
+import           Control.Monad.Trans.State
 import           Data.Char
 import           Data.Data
 import           Data.Either
@@ -65,16 +75,13 @@ import           Data.Map (Map)
 import           Data.Monoid
 import qualified Data.Set as Set
 import           Data.Set (Set)
+import qualified Data.Traversable as T
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
 import           Lens.Micro.Internal (phantom)
 import           Language.Haskell.TH
-
-#if __GLASGOW_HASKELL__ < 710
-import           Control.Applicative
-import           Data.Traversable (traverse, sequenceA)
-#endif
+import qualified Language.Haskell.TH.Datatype as D
 
 
 {- $errors-note
@@ -162,13 +169,6 @@ _ForallT _ other = pure other
 
 -- Utilities
 
--- This is like @rewrite@ from uniplate.
-rewrite :: (Data a, Data b) => (a -> Maybe a) -> b -> b
-rewrite f mbA = case cast mbA of
-  Nothing -> gmapT (rewrite f) mbA
-  Just a  -> let a' = gmapT (rewrite f) a
-             in  fromJust . cast $ fromMaybe a' (f a')
-
 -- @fromSet@ wasn't always there, and we need compatibility with
 -- containers-0.4 to compile on GHC 7.4.
 fromSet :: (k -> v) -> Set.Set k -> Map.Map k v
@@ -177,6 +177,17 @@ fromSet = Map.fromSet
 #else
 fromSet f x = Map.fromDistinctAscList [ (k,f k) | k <- Set.toAscList x ]
 #endif
+
+-- like 'rewrite' from uniplate
+rewrite :: (Data a, Data b) => (a -> Maybe a) -> b -> b
+rewrite f mbA = case cast mbA of
+  Nothing -> gmapT (rewrite f) mbA
+  Just a  -> let a' = gmapT (rewrite f) a
+             in  fromJust . cast $ fromMaybe a' (f a')
+
+-- like 'children' from uniplate
+children :: Data a => a -> [a]
+children = catMaybes . gmapQ cast
 
 -- Control.Lens.TH
 
@@ -812,57 +823,35 @@ substTypeVars m = over typeVars $ \n -> fromMaybe n (Map.lookup n m)
 -- Compute the field optics for the type identified by the given type name.
 -- Lenses will be computed when possible, Traversals otherwise.
 makeFieldOptics :: LensRules -> Name -> DecsQ
-makeFieldOptics rules tyName =
-  do info <- reify tyName
-     case info of
-       TyConI dec -> makeFieldOpticsForDec rules dec
-       _          -> fail "makeFieldOptics: Expected type constructor name"
+makeFieldOptics rules = (`evalStateT` Set.empty) . makeFieldOpticsForDatatype rules <=< D.reifyDatatype
 
+type HasFieldClasses = StateT (Set Name) Q
 
-makeFieldOpticsForDec :: LensRules -> Dec -> DecsQ
-makeFieldOpticsForDec rules dec = case dec of
-#if MIN_VERSION_template_haskell(2,11,0)
-  DataD    _ tyName vars _ cons _ ->
-    makeFieldOpticsForDec' rules tyName (mkS tyName vars) cons
-  NewtypeD _ tyName vars _ con  _ ->
-    makeFieldOpticsForDec' rules tyName (mkS tyName vars) [con]
-  DataInstD _ tyName args _ cons _ ->
-    makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) cons
-  NewtypeInstD _ tyName args _ con _ ->
-    makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) [con]
-#else
-  DataD    _ tyName vars cons _ ->
-    makeFieldOpticsForDec' rules tyName (mkS tyName vars) cons
-  NewtypeD _ tyName vars con  _ ->
-    makeFieldOpticsForDec' rules tyName (mkS tyName vars) [con]
-  DataInstD _ tyName args cons _ ->
-    makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) cons
-  NewtypeInstD _ tyName args con _ ->
-    makeFieldOpticsForDec' rules tyName (tyName `conAppsT` args) [con]
-#endif
-  _ -> fail "makeFieldOptics: Expected data or newtype type-constructor"
-  where
-  mkS tyName vars = tyName `conAppsT` map VarT (vars ^.. typeVars)
+addFieldClassName :: Name -> HasFieldClasses ()
+addFieldClassName n = modify $ Set.insert n
 
-
--- Compute the field optics for a deconstructed Dec
+-- | Compute the field optics for a deconstructed datatype Dec
 -- When possible build an Iso otherwise build one optic per field.
-makeFieldOpticsForDec' :: LensRules -> Name -> Type -> [Con] -> DecsQ
-makeFieldOpticsForDec' rules tyName s cons =
-  do fieldCons <- traverse normalizeConstructor cons
-     let allFields  = fieldCons ^.. folded._2.folded._1.folded
-     let defCons    = over normFieldLabels (expandName allFields) fieldCons
-         allDefs    = setOf (normFieldLabels . folded) defCons
-     perDef <- sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
+makeFieldOpticsForDatatype :: LensRules -> D.DatatypeInfo -> HasFieldClasses [Dec]
+makeFieldOpticsForDatatype rules info =
+  do perDef <- liftState $ do
+       fieldCons <- traverse normalizeConstructor cons
+       let allFields  = toListOf (folded . _2 . folded . _1 . folded) fieldCons
+       let defCons    = over normFieldLabels (expandName allFields) fieldCons
+           allDefs    = setOf (normFieldLabels . folded) defCons
+       T.sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
 
      let defs = Map.toList perDef
      case _classyLenses rules tyName of
        Just (className, methodName) ->
          makeClassyDriver rules className methodName s defs
-       Nothing -> do decss  <- traverse (makeFieldOptic rules) defs
+       Nothing -> do decss <- traverse (makeFieldOptic rules) defs
                      return (concat decss)
 
   where
+  tyName = D.datatypeName info
+  s      = D.datatypeType info
+  cons   = D.datatypeCons info
 
   -- Traverse the field labels of a normalized constructor
   normFieldLabels :: Traversal [(Name,[(a,Type)])] [(Name,[(b,Type)])] a b
@@ -870,8 +859,31 @@ makeFieldOpticsForDec' rules tyName s cons =
 
   -- Map a (possibly missing) field's name to zero-to-many optic definitions
   expandName :: [Name] -> Maybe Name -> [DefName]
-  expandName allFields (Just n) = _fieldToDef rules tyName allFields n
-  expandName _ _ = []
+  expandName allFields = concatMap (_fieldToDef rules tyName allFields) . maybeToList
+
+normalizeConstructor ::
+  D.ConstructorInfo ->
+  Q (Name, [(Maybe Name, Type)]) -- ^ constructor name, field name, field type
+
+normalizeConstructor con =
+  return (D.constructorName con,
+          zipWith checkForExistentials fieldNames (D.constructorFields con))
+  where
+    fieldNames =
+      case D.constructorVariant con of
+        D.RecordConstructor xs -> fmap Just xs
+        D.NormalConstructor    -> repeat Nothing
+        D.InfixConstructor     -> repeat Nothing
+
+    -- Fields mentioning existentially quantified types are not
+    -- elligible for TH generated optics.
+    checkForExistentials _ fieldtype
+      | any (\tv -> D.tvName tv `Set.member` used) unallowable
+      = (Nothing, fieldtype)
+      where
+        used        = setOf typeVars fieldtype
+        unallowable = D.constructorVars con
+    checkForExistentials fieldname fieldtype = (fieldname, fieldtype)
 
 makeClassyDriver ::
   LensRules ->
@@ -879,11 +891,11 @@ makeClassyDriver ::
   Name ->
   Type {- ^ Outer 's' type -} ->
   [(DefName, (OpticType, OpticStab, [(Name, Int, [Int])]))] ->
-  DecsQ
-makeClassyDriver rules className methodName s defs = sequenceA (cls ++ inst)
+  HasFieldClasses [Dec]
+makeClassyDriver rules className methodName s defs = T.sequenceA (cls ++ inst)
 
   where
-  cls | _generateClasses rules = [makeClassyClass className methodName s defs]
+  cls | _generateClasses rules = [liftState $ makeClassyClass className methodName s defs]
       | otherwise = []
 
   inst = [makeClassyInstance rules className methodName s defs]
@@ -924,11 +936,11 @@ makeClassyInstance ::
   Name ->
   Type {- ^ Outer 's' type -} ->
   [(DefName, (OpticType, OpticStab, [(Name, Int, [Int])]))] ->
-  DecQ
+  HasFieldClasses Dec
 makeClassyInstance rules className methodName s defs = do
   methodss <- traverse (makeFieldOptic rules') defs
 
-  instanceD (cxt[]) (return instanceHead)
+  liftState $ instanceD (cxt[]) (return instanceHead)
     $ valD (varP methodName) (normalB (varE 'id)) []
     : map return (concat methodss)
 
@@ -939,37 +951,8 @@ makeClassyInstance rules className methodName s defs = do
                        , _generateClasses = False
                        }
 
--- Normalized the Con type into a uniform positional representation,
--- eliminating the variance between records, infix constructors, and normal
--- constructors.
--- 
--- For 'GadtC' and 'RecGadtC', the leftmost name is chosen.
-normalizeConstructor ::
-  Con ->
-  Q (Name, [(Maybe Name, Type)]) -- constructor name, field name, field type
-
-normalizeConstructor (RecC n xs) =
-  return (n, [ (Just fieldName, ty) | (fieldName,_,ty) <- xs])
-
-normalizeConstructor (NormalC n xs) =
-  return (n, [ (Nothing, ty) | (_,ty) <- xs])
-
-normalizeConstructor (InfixC (_,ty1) n (_,ty2)) =
-  return (n, [ (Nothing, ty1), (Nothing, ty2) ])
-
-normalizeConstructor (ForallC _ _ con) =
-  do con' <- normalizeConstructor con
-     return (set (_2 . mapped . _1) Nothing con')
-
-#if MIN_VERSION_template_haskell(2,11,0)
-normalizeConstructor (GadtC ns xs _) =
-  return (head ns, [ (Nothing, ty) | (_,ty) <- xs])
- 
-normalizeConstructor (RecGadtC ns xs _) =
-  return (head ns, [ (Just fieldName, ty) | (fieldName,_,ty) <- xs])
-#endif
-
 data OpticType = GetterType | LensType -- or IsoType
+
 
 -- Compute the positional location of the fields involved in
 -- each constructor for a given optic definition as well as the
@@ -1043,9 +1026,9 @@ buildScaffold rules s cons defName =
   --             [(_,1,[0])] -> True
   --             _           -> False
 
-
 data OpticStab = OpticStab     Name Type Type Type Type
                | OpticSa   Cxt Name Type Type
+
 
 stabToType :: OpticStab -> Type
 stabToType (OpticStab  c s t a b) = quantifyType [] (c `conAppsT` [s,t,a,b])
@@ -1077,7 +1060,7 @@ buildStab s categorizedFields =
      let s' = applyTypeSubst subA s
 
      -- compute possible type changes
-     sub <- sequenceA (fromSet (newName . nameBase) unfixedTypeVars)
+     sub <- T.sequenceA (fromSet (newName . nameBase) unfixedTypeVars)
      let (t,b) = over both (substTypeVars sub) (s',a)
 
      return (s',t,a,b)
@@ -1087,23 +1070,29 @@ buildStab s categorizedFields =
   fixedTypeVars               = setOf typeVars fixedFields
   unfixedTypeVars             = setOf typeVars s Set.\\ fixedTypeVars
 
-
 -- Build the signature and definition for a single field optic.
 -- In the case of a singleton constructor irrefutable matches are
 -- used to enable the resulting lenses to be used on a bottom value.
 makeFieldOptic ::
   LensRules ->
   (DefName, (OpticType, OpticStab, [(Name, Int, [Int])])) ->
-  DecsQ
-makeFieldOptic rules (defName, (opticType, defType, cons)) =
-  do cls <- mkCls
-     sequenceA (cls ++ sig ++ def)
+  HasFieldClasses [Dec]
+makeFieldOptic rules (defName, (opticType, defType, cons)) = do
+  locals <- get
+  addName
+  liftState $ do
+    cls <- mkCls locals
+    T.sequenceA (cls ++ sig ++ def)
   where
-  mkCls = case defName of
-          MethodName c n | _generateClasses rules ->
-            do classExists <- isJust <$> lookupTypeName (show c)
-               return (if classExists then [] else [makeFieldClass defType c n])
-          _ -> return []
+  mkCls locals = case defName of
+                 MethodName c n | _generateClasses rules ->
+                  do classExists <- isJust <$> lookupTypeName (show c)
+                     return (if classExists || Set.member c locals then [] else [makeFieldClass defType c n])
+                 _ -> return []
+
+  addName = case defName of
+            MethodName c _ -> addFieldClassName c
+            _              -> return ()
 
   sig = case defName of
           _ | not (_generateSigs rules) -> []
@@ -1133,10 +1122,32 @@ makeFieldClass defType className methodName =
   s = mkName "s"
   a = mkName "a"
 
+-- | Build an instance for a field. If the field’s type contains any type
+-- families, will produce an equality constraint to avoid a type family
+-- application in the instance head.
 makeFieldInstance :: OpticStab -> Name -> [DecQ] -> DecQ
-makeFieldInstance defType className =
-  instanceD (cxt [])
-    (return (className `conAppsT` [stabToS defType, stabToA defType]))
+makeFieldInstance defType className decs =
+  containsTypeFamilies a >>= pickInstanceDec
+  where
+  s = stabToS defType
+  a = stabToA defType
+
+  containsTypeFamilies = go <=< D.resolveTypeSynonyms
+    where
+    go (ConT nm) = (\i -> case i of FamilyI{} -> True; _ -> False)
+                   <$> reify nm
+    go ty = or <$> traverse go (children ty)
+
+  pickInstanceDec hasFamilies
+    | hasFamilies = do
+        placeholder <- VarT <$> newName "a"
+        mkInstanceDec
+          [return (D.equalPred placeholder a)]
+          [s, placeholder]
+    | otherwise = mkInstanceDec [] [s, a]
+
+  mkInstanceDec context headTys =
+    instanceD (cxt context) (return (className `conAppsT` headTys)) decs
 
 ------------------------------------------------------------------------
 -- Optic clause generators
@@ -1302,7 +1313,7 @@ data LensRules = LensRules
   -- Type Name -> Field Names -> Target Field Name -> Definition Names
   , _fieldToDef      :: Name -> [Name] -> Name -> [DefName]
   -- Type Name -> (Class Name, Top Method)
-  , _classyLenses    :: Name -> Maybe (Name,Name)
+  , _classyLenses    :: Name -> Maybe (Name, Name)
   }
 
 {- |
@@ -1313,10 +1324,17 @@ data DefName
   | MethodName Name Name  -- ^ 'makeFields'-style class name and method name
   deriving (Show, Eq, Ord)
 
+
 ------------------------------------------------------------------------
 -- Miscellaneous utility functions
 ------------------------------------------------------------------------
 
+liftState :: Monad m => m a -> StateT s m a
+liftState act = StateT (\s -> liftM (flip (,) s) act)
+
+-- Apply arguments to a type constructor.
+conAppsT :: Name -> [Type] -> Type
+conAppsT conName = foldl AppT (ConT conName)
 
 -- Template Haskell wants type variables declared in a forall, so
 -- we find all free type variables in a given type and declare them.
@@ -1332,7 +1350,6 @@ quantifyType' exclude c t = ForallT vs c t
        $ filter (`Set.notMember` exclude)
        $ nub -- stable order
        $ toListOf typeVars t
-
 
 ------------------------------------------------------------------------
 -- Support for generating inline pragmas
@@ -1362,9 +1379,3 @@ inlinePragma methodName = [pragInlD methodName (inlineSpecNoPhase True False)]
 inlinePragma _ = []
 
 #endif
-
--- Control.Lens.Internal.TH
-
--- Apply arguments to a type constructor.
-conAppsT :: Name -> [Type] -> Type
-conAppsT conName = foldl AppT (ConT conName)

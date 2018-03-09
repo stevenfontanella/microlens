@@ -1,3 +1,8 @@
+# 0.4.2
+
+* We now depend on `th-abstraction` (like `lens` itself).
+* Associated types are now supported.
+
 # 0.4.1.3
 
 * Bumped the upper bound of template-haskell again.
