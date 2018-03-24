@@ -32,6 +32,7 @@ module Lens.Micro
   (&),
   -- $ampersand-note
   (<&>),
+  -- $reverse-fmap-note
 
   -- * Setter: modifies something in a structure
   -- $setters-note
@@ -113,8 +114,12 @@ import Data.Tuple
 import qualified Data.Foldable as F
 import Unsafe.Coerce
 
-#if __GLASGOW_HASKELL__ >= 710
+#if MIN_VERSION_base(4,8,0)
 import Data.Function ((&))
+#endif
+
+#if MIN_VERSION_base(4,11,0)
+import Data.Functor ((<&>))
 #endif
 
 -- This is for the reimplementation of State
@@ -128,7 +133,7 @@ import qualified Control.Monad.Fail as Fail
 -}
 
 
-#if __GLASGOW_HASKELL__ < 710
+#if !(MIN_VERSION_base(4,8,0))
 {- |
 '&' is a reverse application operator. This provides notational convenience. Its precedence is one higher than that of the forward application operator '$', which allows '&' to be nested in '$'.
 -}
@@ -162,7 +167,19 @@ or this:
 @
 -}
 
+#if !(MIN_VERSION_base(4,11,0))
 {- |
+Flipped version of '<$>'.
+-}
+(<&>) :: Functor f => f a -> (a -> b) -> f b
+(<&>) x f = f <$> x
+{-# INLINE (<&>) #-}
+
+infixl 1 <&>
+#endif
+
+{- $reverse-fmap-note
+
 ('<&>') is flipped ('<$>'):
 
 @
@@ -185,11 +202,6 @@ With ('<&>') you can get rid of parentheses and move the long lambda expression 
      Nothing  -> 'pure' map
 @
 -}
-(<&>) :: Functor f => f a -> (a -> b) -> f b
-(<&>) x f = f <$> x
-{-# INLINE (<&>) #-}
-
-infixl 1 <&>
 
 -- Setting -----------------------------------------------------------------
 
