@@ -1138,9 +1138,20 @@ makeFieldInstance defType className decs =
 
   containsTypeFamilies = go <=< D.resolveTypeSynonyms
     where
-    go (ConT nm) = (\i -> case i of FamilyI{} -> True; _ -> False)
+    go (ConT nm) = (\i -> case i of FamilyI d _ -> isTypeFamily d; _ -> False)
                    <$> reify nm
     go ty = or <$> traverse go (children ty)
+
+#if MIN_VERSION_template_haskell(2,11,0)
+  isTypeFamily OpenTypeFamilyD{}       = True
+  isTypeFamily ClosedTypeFamilyD{}     = True
+#elif MIN_VERSION_template_haskell(2,9,0)
+  isTypeFamily (FamilyD TypeFam _ _ _) = True
+  isTypeFamily ClosedTypeFamilyD{}     = True
+#else
+  isTypeFamily (FamilyD TypeFam _ _ _) = True
+#endif
+  isTypeFamily _ = False
 
   pickInstanceDec hasFamilies
     | hasFamilies = do

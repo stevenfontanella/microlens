@@ -1,3 +1,7 @@
+# 0.4.2.1
+
+* Fixed [lens bug #799](https://github.com/ekmett/lens/issues/799) (`makeFields` instances violate coverage condition).
+
 # 0.4.2
 
 * We now depend on `th-abstraction` (like `lens` itself).
@@ -21,7 +25,7 @@ Skipped (the tarball got corrupted).
 
 # 0.4.0.1
 
-* Ported a lens commit that (probably) makes lens generation deterministic. See [this issue](https://github.com/aelve/microlens/issues/83).
+* Ported a lens commit that (probably) makes lens generation deterministic. See [issue #83](https://github.com/aelve/microlens/issues/83).
 
 # 0.4.0.0
 
