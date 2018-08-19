@@ -1,4 +1,4 @@
-resolver: lts-10.3
+resolver: lts-12.4
 
 packages:
 - microlens
@@ -7,3 +7,6 @@ packages:
 - microlens-mtl
 - microlens-th
 - microlens-platform
+
+extra-deps:
+- containers-0.6.0.1

@@ -1,3 +1,7 @@
+# 0.4.2.2
+
+* Bumped containers version.
+
 # 0.4.2.1
 
 * Fixed [lens bug #799](https://github.com/ekmett/lens/issues/799) (`makeFields` instances violate coverage condition).
