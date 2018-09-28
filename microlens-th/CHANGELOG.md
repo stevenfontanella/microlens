@@ -1,3 +1,7 @@
+# 0.4.2.3
+
+* Bumped template-haskell version.
+
 # 0.4.2.2
 
 * Bumped containers version.
