@@ -35,7 +35,7 @@ library
                      , containers >=0.4.0 && <0.7
                      , transformers
                      -- lens has >=2.4, but GHC 7.4 shipped with 2.7
-                     , template-haskell >=2.7 && <2.14
+                     , template-haskell >=2.7 && <2.15
                      , th-abstraction >=0.2.1 && <0.3
 
   if flag(inlining)
