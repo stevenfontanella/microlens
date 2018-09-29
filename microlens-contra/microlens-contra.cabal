@@ -6,13 +6,13 @@ description:
   .
   The difference between @Fold@ and @SimpleFold@ is that you can use e.g. @takingWhile@\/@droppingWhile@ and @backwards@ on the former but not on the latter. Most functions from lens that work with @Fold@ would work with @SimpleFold@ as well, tho.
   .
-  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
+  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/monadfix/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
-author:              Edward Kmett, Artyom
-maintainer:          Artyom <yom@artyom.me>
-homepage:            http://github.com/aelve/microlens
-bug-reports:         http://github.com/aelve/microlens/issues
+author:              Edward Kmett, Artyom Kazak
+maintainer:          Monadfix <hi@monadfix.io>
+homepage:            http://github.com/monadfix/microlens
+bug-reports:         http://github.com/monadfix/microlens/issues
 category:            Data, Lenses
 build-type:          Simple
 extra-source-files:
@@ -21,7 +21,7 @@ cabal-version:       >=1.10
 
 source-repository head
   type:                git
-  location:            git://github.com/aelve/microlens.git
+  location:            git://github.com/monadfix/microlens.git
 
 library
   exposed-modules:     Lens.Micro.Contra

@@ -11,7 +11,7 @@
 
 {- |
 Module      :  Lens.Micro
-Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
 This module provides the essential functionality. There are other packages in the microlens family – mix and match them at will. If you're writing an app, you want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it provides the most functionality.

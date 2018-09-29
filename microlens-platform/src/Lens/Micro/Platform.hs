@@ -14,7 +14,7 @@
 
 {- |
 Module      :  Lens.Micro.Platform
-Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
 This module is an approximation for @<http://hackage.haskell.org/package/lens/docs/Control-Lens.html Control.Lens>@ from <http://hackage.haskell.org/package/lens lens>; by importing it you get all functions and instances from <http://hackage.haskell.org/package/microlens microlens>, <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, as well as the following instances:
@@ -227,7 +227,7 @@ instance (Unbox a, Unbox b) => Each (Unboxed.Vector a) (Unboxed.Vector b) a b wh
 
 instance (c ~ d) => Each (HashMap c a) (HashMap d b) a b where
   each = traversed
-  {-# INLINE each #-}  
+  {-# INLINE each #-}
 
 instance (a ~ Char, b ~ Char) => Each T.Text T.Text a b where
   each = strictText

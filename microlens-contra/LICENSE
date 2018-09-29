@@ -1,5 +1,6 @@
 Copyright (c) 2013-2016 Edward Kmett,
-              2015-2016 Artyom
+              2015-2016 Artyom Kazak,
+              2018 Monadfix
 
 All rights reserved.
 
@@ -14,7 +15,7 @@ modification, are permitted provided that the following conditions are met:
       disclaimer in the documentation and/or other materials provided
       with the distribution.
 
-    * Neither the name of Artyom nor the names of other
+    * Neither the name of Monadfix nor the names of other
       contributors may be used to endorse or promote products derived
       from this software without specific prior written permission.
 

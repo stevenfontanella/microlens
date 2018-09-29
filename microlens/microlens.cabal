@@ -6,7 +6,7 @@ description:
   .
   This library is an extract from <http://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.
   .
-  There's a longer readme <https://github.com/aelve/microlens#readme on Github>. It has a migration guide for lens users, a description of other packages in the family, a discussion of other lens libraries you could use instead, and so on.
+  There's a longer readme <https://github.com/monadfix/microlens#readme on Github>. It has a migration guide for lens users, a description of other packages in the family, a discussion of other lens libraries you could use instead, and so on.
   .
   Here are some usecases for this library:
   .
@@ -31,11 +31,11 @@ description:
   Note that microlens has no dependencies starting from GHC 7.10 (base-4.8). Prior to that, it depends on transformers-0.2 or above.
 license:             BSD3
 license-file:        LICENSE
-author:              Edward Kmett, Artyom
-maintainer:          Artyom <yom@artyom.me>
-homepage:            http://github.com/aelve/microlens
-bug-reports:         http://github.com/aelve/microlens/issues
--- copyright:           
+author:              Edward Kmett, Artyom Kazak
+maintainer:          Monadfix <hi@monadfix.io>
+homepage:            http://github.com/monadfix/microlens
+bug-reports:         http://github.com/monadfix/microlens/issues
+-- copyright:
 category:            Data, Lenses
 build-type:          Simple
 extra-source-files:
@@ -44,15 +44,15 @@ cabal-version:       >=1.10
 
 source-repository head
   type:                git
-  location:            git://github.com/aelve/microlens.git
+  location:            git://github.com/monadfix/microlens.git
 
 library
   exposed-modules:     Lens.Micro
                        Lens.Micro.Extras
                        Lens.Micro.Internal
                        Lens.Micro.Type
-  -- other-modules:       
-  -- other-extensions:    
+  -- other-modules:
+  -- other-extensions:
 
   -- Since base-4.8 we get the Identity functor in base, so we can avoid a
   -- transformers dependency.

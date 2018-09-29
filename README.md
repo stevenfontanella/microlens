@@ -1,6 +1,6 @@
 # microlens
 
-[![Build status](https://secure.travis-ci.org/aelve/microlens.svg)](http://travis-ci.org/aelve/microlens)
+[![Build status](https://secure.travis-ci.org/monadfix/microlens.svg)](http://travis-ci.org/monadfix/microlens)
 ![BSD3 license](https://img.shields.io/badge/license-BSD3-blue.svg)
 
 *A tiny part of the lens library with no dependencies.*
@@ -141,7 +141,7 @@ I hate it when people advertise things without also describing their disadvantag
 
 microlens doesn't include anything lens doesn't include, even though sometimes I'm very tempted to improve something in microlens just because I have control over it.
 
-I [don't mind](https://github.com/aelve/microlens/issues/79#issuecomment-231720804) adding new functions from lens to the package, even when done in an inconsistent way (e.g. I added `mapAccumLOf` just because someone needed it, but I haven't added `mapAccumROf` even though that would've been more consistent). However, I am only able to add functions as long as microlens stays small, so if you plan to adopt microlens first and make dozens of requests for function additions later, this package is not for you.
+I [don't mind](https://github.com/monadfix/microlens/issues/79#issuecomment-231720804) adding new functions from lens to the package, even when done in an inconsistent way (e.g. I added `mapAccumLOf` just because someone needed it, but I haven't added `mapAccumROf` even though that would've been more consistent). However, I am only able to add functions as long as microlens stays small, so if you plan to adopt microlens first and make dozens of requests for function additions later, this package is not for you.
 
 -----------------------------------------------------------------------------
 
@@ -190,7 +190,7 @@ class ( Choice p, Corepresentable p
       , Monad (Rep p), MonadFix (Rep p)
       , Distributive (Rep p)
       , ArrowLoop p, ArrowApply p, ArrowChoice p
-      ) 
+      )
       => Conjoined p
 
 class Conjoined p => Indexable i p

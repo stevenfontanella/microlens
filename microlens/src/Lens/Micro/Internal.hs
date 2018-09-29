@@ -15,7 +15,7 @@
 
 {- |
 Module      :  Lens.Micro.Internal
-Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
 This module is needed to give other packages from the microlens family (like <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>) access to functions and classes that don't need to be exported from "Lens.Micro" (because they just clutter the namespace). Also:

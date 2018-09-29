@@ -3,7 +3,7 @@
 
 {- |
 Module      :  Lens.Micro.Extras
-Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom
+Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 -}
 module Lens.Micro.Extras

@@ -6,13 +6,13 @@ description:
   .
   The minor and major versions of microlens-ghc are incremented whenever the minor and major versions of microlens are incremented, so you can depend on the exact version of microlens-ghc without specifying the version of microlens you need.
   .
-  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/aelve/microlens#readme on Github>.
+  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/monadfix/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
-author:              Edward Kmett, Artyom
-maintainer:          Artyom <yom@artyom.me>
-homepage:            http://github.com/aelve/microlens
-bug-reports:         http://github.com/aelve/microlens/issues
+author:              Edward Kmett, Artyom Kazak
+maintainer:          Monadfix <hi@monadfix.io>
+homepage:            http://github.com/monadfix/microlens
+bug-reports:         http://github.com/monadfix/microlens/issues
 category:            Data, Lenses
 build-type:          Simple
 extra-source-files:
@@ -21,13 +21,13 @@ cabal-version:       >=1.10
 
 source-repository head
   type:                git
-  location:            git://github.com/aelve/microlens.git
+  location:            git://github.com/monadfix/microlens.git
 
 library
   exposed-modules:     Lens.Micro.GHC
                        Lens.Micro.GHC.Internal
-  -- other-modules:       
-  -- other-extensions:    
+  -- other-modules:
+  -- other-extensions:
   build-depends:       array >=0.3.0.2 && <0.6
                      , base >=4.5 && <5
                      , bytestring >=0.9.1.10 && <0.11

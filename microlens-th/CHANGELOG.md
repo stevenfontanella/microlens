@@ -33,7 +33,7 @@ Skipped (the tarball got corrupted).
 
 # 0.4.0.1
 
-* Ported a lens commit that (probably) makes lens generation deterministic. See [issue #83](https://github.com/aelve/microlens/issues/83).
+* Ported a lens commit that (probably) makes lens generation deterministic. See [issue #83](https://github.com/monadfix/microlens/issues/83).
 
 # 0.4.0.0
 

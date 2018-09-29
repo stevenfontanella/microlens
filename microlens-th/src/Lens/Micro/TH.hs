@@ -23,7 +23,7 @@
 
 {- |
 Module      :  Lens.Micro.TH
-Copyright   :  (C) 2013-2016 Eric Mertens, Edward Kmett, Artyom
+Copyright   :  (C) 2013-2016 Eric Mertens, Edward Kmett, Artyom Kazak; 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 -}
 module Lens.Micro.TH
