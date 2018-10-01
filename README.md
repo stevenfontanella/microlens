@@ -216,6 +216,7 @@ Instances of `Ixed`, `Each`, `At`, etc are all split off into separate packages,
 * I *really* want to be able to say “this library has no dependencies”.
 * All those instances actually take quite some time to build (for the same reason not all instances for tuples are included in the main package).
 
+[vector]: http://hackage.haskell.org/package/vector
 [array]: http://hackage.haskell.org/package/array
 
 ## What about lens-family?
