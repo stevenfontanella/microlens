@@ -38,7 +38,7 @@ module Lens.Micro
   -- $setters-note
   ASetter, ASetter',
   sets,
-  (%~), over,
+  (%~), over, (+~), (-~),
   (<>~),
   (.~), set,
   (?~),
@@ -302,6 +302,53 @@ Using @'over' '_2'@ as a replacement for 'Control.Arrow.second':
 over :: ASetter s t a b -> (a -> b) -> s -> t
 over l f = runIdentity #. l (Identity #. f)
 {-# INLINE over #-}
+
+
+-- | Increment the target(s) of a numerically valued 'Lens' or 'Traversal'.
+--
+-- >>> (a,b) & _1 +~ c
+-- (a + c,b)
+--
+-- >>> (a,b) & both +~ c
+-- (a + c,b + c)
+--
+-- >>> (1,2) & _2 +~ 1
+-- (1,3)
+--
+-- >>> [(a,b),(c,d)] & traverse.both +~ e
+-- [(a + e,b + e),(c + e,d + e)]
+--
+-- @
+-- ('+~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
+-- ('+~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
+-- @
+(+~) :: Num a => ASetter s t a a -> a -> s -> t
+l +~ n = over l (+ n)
+{-# INLINE (+~) #-}
+
+-- | Decrement the target(s) of a numerically valued 'Lens', or 'Traversal'.
+--
+-- >>> (a,b) & _1 -~ c
+-- (a - c,b)
+--
+-- >>> (a,b) & both -~ c
+-- (a - c,b - c)
+--
+-- >>> _1 -~ 2 $ (1,2)
+-- (-1,2)
+--
+-- >>> mapped.mapped -~ 1 $ [[4,5],[6,7]]
+-- [[3,4],[5,6]]
+--
+-- @
+-- ('-~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
+-- ('-~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
+-- @
+(-~) :: Num a => ASetter s t a a -> a -> s -> t
+l -~ n = over l (subtract n)
+{-# INLINE (-~) #-}
+
+
 
 {- |
 ('<>~') appends a value monoidally to the target.
