@@ -38,7 +38,7 @@ module Lens.Micro
   -- $setters-note
   ASetter, ASetter',
   sets,
-  (%~), over,
+  (%~), over, (+~), (-~)
   (<>~),
   (.~), set,
   (?~),
