@@ -304,7 +304,7 @@ over l f = runIdentity #. l (Identity #. f)
 {-# INLINE over #-}
 
 
--- | Increment the target(s) of a numerically valued 'Lens', 'Setter' or 'Traversal'.
+-- | Increment the target(s) of a numerically valued 'Lens' or 'Traversal'.
 --
 -- >>> (a,b) & _1 +~ c
 -- (a + c,b)
@@ -326,7 +326,7 @@ over l f = runIdentity #. l (Identity #. f)
 l +~ n = over l (+ n)
 {-# INLINE (+~) #-}
 
--- | Decrement the target(s) of a numerically valued 'Lens', 'Iso', 'Setter' or 'Traversal'.
+-- | Decrement the target(s) of a numerically valued 'Lens', or 'Traversal'.
 --
 -- >>> (a,b) & _1 -~ c
 -- (a - c,b)
