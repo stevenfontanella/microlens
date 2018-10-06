@@ -38,7 +38,7 @@ module Lens.Micro
   -- $setters-note
   ASetter, ASetter',
   sets,
-  (%~), over, (+~), (-~)
+  (%~), over, (+~), (-~),
   (<>~),
   (.~), set,
   (?~),
@@ -319,8 +319,6 @@ over l f = runIdentity #. l (Identity #. f)
 -- [(a + e,b + e),(c + e,d + e)]
 --
 -- @
--- ('+~') :: 'Num' a => 'Setter'' s a    -> a -> s -> s
--- ('+~') :: 'Num' a => 'Iso'' s a       -> a -> s -> s
 -- ('+~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
 -- ('+~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
 -- @
@@ -343,8 +341,6 @@ l +~ n = over l (+ n)
 -- [[3,4],[5,6]]
 --
 -- @
--- ('-~') :: 'Num' a => 'Setter'' s a    -> a -> s -> s
--- ('-~') :: 'Num' a => 'Iso'' s a       -> a -> s -> s
 -- ('-~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
 -- ('-~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
 -- @
