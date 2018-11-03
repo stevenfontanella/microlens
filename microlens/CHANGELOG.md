@@ -1,3 +1,8 @@
+# 0.4.10
+
+* Added `+~` and `-~`.
+* Marked `#.` and `.#` with `INLINE`.
+
 # 0.4.9.1
 
 * Reexported `<&>` from `Data.Functor` (on recent versions of `base`).

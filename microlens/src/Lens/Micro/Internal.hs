@@ -170,6 +170,9 @@ noEffect = phantom (pure ())
 ( .# ) pbc _ = unsafeCoerce pbc
 #endif
 
+{-# INLINE ( #. ) #-}
+{-# INLINE ( .# ) #-}
+
 infixr 9 #.
 infixl 8 .#
 
