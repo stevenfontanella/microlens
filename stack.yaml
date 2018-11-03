@@ -2,11 +2,9 @@ resolver: lts-13.18
 
 packages:
 - microlens
-- microlens-contra
 - microlens-ghc
 - microlens-mtl
 - microlens-th
 - microlens-platform
-
-extra-deps:
-- containers-0.6.0.1
+- microlens-contra
+- microlens-pro
