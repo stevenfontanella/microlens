@@ -35,7 +35,7 @@ module Lens.Micro.TH
   -- * 'SimpleGetter' and 'SimpleFold'
   -- $getter-fold-note
 
-  -- * Making lenses
+  -- * Generating lenses
   makeLenses,
   makeLensesFor,
   makeLensesWith,
