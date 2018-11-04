@@ -77,6 +77,7 @@ import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
 import           Data.Maybe
 import           Lens.Micro
 import           Lens.Micro.Internal (phantom)
+import           Lens.Micro.TH.Internal
 import           Language.Haskell.TH
 import qualified Language.Haskell.TH.Datatype as D
 
@@ -722,99 +723,6 @@ classyRules = LensRules
   , _fieldToDef      = underscoreNoPrefixNamer
   }
 
--- Language.Haskell.TH.Lens
-
--- Has a 'Name'
-class HasName t where
-  -- Extract (or modify) the 'Name' of something
-  name :: Lens' t Name
-
-instance HasName TyVarBndr where
-  name f (PlainTV n) = PlainTV <$> f n
-  name f (KindedTV n k) = (`KindedTV` k) <$> f n
-
-instance HasName Name where
-  name = id
-
--- | On @template-haskell-2.11.0.0@ or later, if a 'GadtC' or 'RecGadtC' has
--- multiple 'Name's, the leftmost 'Name' will be chosen.
-instance HasName Con where
-  name f (NormalC n tys)       = (`NormalC` tys) <$> f n
-  name f (RecC n tys)          = (`RecC` tys) <$> f n
-  name f (InfixC l n r)        = (\n' -> InfixC l n' r) <$> f n
-  name f (ForallC bds ctx con) = ForallC bds ctx <$> name f con
-#if MIN_VERSION_template_haskell(2,11,0)
-  name f (GadtC ns argTys retTy) =
-    (\n -> GadtC [n] argTys retTy) <$> f (head ns)
-  name f (RecGadtC ns argTys retTy) =
-    (\n -> RecGadtC [n] argTys retTy) <$> f (head ns)
-#endif
-
--- Provides for the extraction of free type variables, and alpha renaming.
-class HasTypeVars t where
-  -- When performing substitution into this traversal you're not allowed
-  -- to substitute in a name that is bound internally or you'll violate
-  -- the 'Traversal' laws, when in doubt generate your names with 'newName'.
-  typeVarsEx :: Set Name -> Traversal' t Name
-
-instance HasTypeVars TyVarBndr where
-  typeVarsEx s f b
-    | Set.member (b^.name) s = pure b
-    | otherwise              = name f b
-
-instance HasTypeVars Name where
-  typeVarsEx s f n
-    | Set.member n s = pure n
-    | otherwise      = f n
-
-instance HasTypeVars Type where
-  typeVarsEx s f (VarT n)            = VarT <$> typeVarsEx s f n
-  typeVarsEx s f (AppT l r)          = AppT <$> typeVarsEx s f l <*> typeVarsEx s f r
-  typeVarsEx s f (SigT t k)          = (`SigT` k) <$> typeVarsEx s f t
-  typeVarsEx s f (ForallT bs ctx ty) = ForallT bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f ty
-       where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
-  typeVarsEx _ _ t                   = pure t
-
-#if !MIN_VERSION_template_haskell(2,10,0)
-instance HasTypeVars Pred where
-  typeVarsEx s f (ClassP n ts) = ClassP n <$> typeVarsEx s f ts
-  typeVarsEx s f (EqualP l r)  = EqualP <$> typeVarsEx s f l <*> typeVarsEx s f r
-#endif
-
-instance HasTypeVars Con where
-  typeVarsEx s f (NormalC n ts)     =
-    NormalC n <$> (traverse . _2) (typeVarsEx s f) ts
-  typeVarsEx s f (RecC n ts)        =
-    RecC n <$> (traverse . _3) (typeVarsEx s f) ts
-  typeVarsEx s f (InfixC l n r)     =
-    InfixC <$> g l <*> pure n <*> g r
-      where g (i, t) = (,) i <$> typeVarsEx s f t
-  typeVarsEx s f (ForallC bs ctx c) =
-    ForallC bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f c
-      where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
-#if MIN_VERSION_template_haskell(2,11,0)
-  typeVarsEx s f (GadtC ns argTys retTy) =
-    GadtC ns <$> (traverse . _2) (typeVarsEx s f) argTys
-             <*> typeVarsEx s f retTy
-  typeVarsEx s f (RecGadtC ns argTys retTy) =
-    RecGadtC ns <$> (traverse . _3) (typeVarsEx s f) argTys
-                <*> typeVarsEx s f retTy
-#endif
-
-instance HasTypeVars t => HasTypeVars [t] where
-  typeVarsEx s = traverse . typeVarsEx s
-
-instance HasTypeVars t => HasTypeVars (Maybe t) where
-  typeVarsEx s = traverse . typeVarsEx s
-
--- Traverse /free/ type variables
-typeVars :: HasTypeVars t => Traversal' t Name
-typeVars = typeVarsEx mempty
-
--- Substitute using a map of names in for /free/ type variables
-substTypeVars :: HasTypeVars t => Map Name Name -> t -> t
-substTypeVars m = over typeVars $ \n -> fromMaybe n (Map.lookup n m)
-
 -- FieldTH.hs
 
 ------------------------------------------------------------------------
@@ -1344,33 +1252,3 @@ data DefName
 
 liftState :: Monad m => m a -> StateT s m a
 liftState act = StateT (\s -> liftM (flip (,) s) act)
-
--- Apply arguments to a type constructor.
-conAppsT :: Name -> [Type] -> Type
-conAppsT conName = foldl AppT (ConT conName)
-
--- Template Haskell wants type variables declared in a forall, so
--- we find all free type variables in a given type and declare them.
-quantifyType :: Cxt -> Type -> Type
-quantifyType = quantifyType' Set.empty
-
--- This function works like 'quantifyType' except that it takes
--- a list of variables to exclude from quantification.
-quantifyType' :: Set Name -> Cxt -> Type -> Type
-quantifyType' exclude c t = ForallT vs c t
-  where
-    vs = map PlainTV
-       $ filter (`Set.notMember` exclude)
-       $ nub -- stable order
-       $ toListOf typeVars t
-
-------------------------------------------------------------------------
--- Support for generating inline pragmas
-------------------------------------------------------------------------
-
-inlinePragma :: Name -> [DecQ]
-#if MIN_VERSION_template_haskell(2,8,0)
-inlinePragma methodName = [pragInlD methodName Inline FunLike AllPhases]
-#else
-inlinePragma methodName = [pragInlD methodName (inlineSpecNoPhase True False)]
-#endif
