@@ -15,6 +15,10 @@ This module provides types and functions that require 'Profunctor'; they aren't 
 -}
 module Lens.Micro.Pro
 (
+  -- * Reexports
+  -- $reexports-note
+  module Lens.Micro,
+
   -- * Isomorphism: losslessly converts between types
   Iso, Iso',
   iso,
@@ -62,6 +66,12 @@ import Lens.Micro.Internal (coerce, coerce')
 #if __GLASGOW_HASKELL__ >= 708
 import Data.Coerce (Coercible)
 #endif
+
+{- $reexports-note
+
+We reexport stuff. But if you want to combine microlens-platform and microlens-pro, well, that's a bit trickier.
+
+-}
 
 ----------------------------------------------------------------------------
 -- Isomorphisms
