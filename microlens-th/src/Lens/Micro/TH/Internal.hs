@@ -24,6 +24,7 @@ module Lens.Micro.TH.Internal
 (
   -- * Name utilities
   HasName(..),
+  newNames,
 
   -- * Type variable utilities
   HasTypeVars(..),
@@ -77,6 +78,10 @@ instance HasName Con where
   name f (RecGadtC ns argTys retTy) =
     (\n -> RecGadtC [n] argTys retTy) <$> f (head ns)
 #endif
+
+-- | Generate many new names from a given base name.
+newNames :: String {- ^ base name -} -> Int {- ^ count -} -> Q [Name]
+newNames base n = sequence [ newName (base++show i) | i <- [1..n] ]
 
 -- | Provides for the extraction of free type variables, and alpha renaming.
 class HasTypeVars t where
