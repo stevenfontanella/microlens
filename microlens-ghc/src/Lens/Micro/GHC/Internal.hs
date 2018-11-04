@@ -29,7 +29,7 @@ where
 
 
 import Lens.Micro
-import Lens.Micro.Internal
+import Lens.Micro.Internal (foldring)
 
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Lazy       as BL

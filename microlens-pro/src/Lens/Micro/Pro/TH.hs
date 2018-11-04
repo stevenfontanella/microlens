@@ -27,6 +27,12 @@ module Lens.Micro.Pro.TH
 )
 where
 
+import Lens.Micro
+import Lens.Micro.Extras
+import Lens.Micro.Pro.Internal
+import Lens.Micro.TH.Internal
+  (HasTypeVars(..), typeVars, substTypeVars, newNames, conAppsT)
+
 import Data.Char (isUpper)
 import Data.List
 import Data.Monoid
@@ -36,10 +42,6 @@ import Data.Traversable
 import Language.Haskell.TH
 import qualified Language.Haskell.TH.Datatype as D
 import qualified Data.Map as Map
-import Lens.Micro
-import Lens.Micro.Extras
-import Lens.Micro.TH.Internal
-import Lens.Micro.Pro.Internal
 
 -- | Generate a 'Prism' for each constructor of a data type.
 -- Isos generated when possible.

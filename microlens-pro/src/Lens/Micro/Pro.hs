@@ -31,6 +31,9 @@ module Lens.Micro.Pro
   -- * Prism: inspects sum types (half-traversal, half-isomorphism)
   Prism, Prism',
   prism, prism',
+  -- ** Common prisms
+  _Left, _Right,
+  _Just, _Nothing,
   only,
 
   -- * Review: constructs a branch of a sum type
@@ -51,7 +54,7 @@ import Data.Profunctor.Unsafe
 import Data.Tagged
 import Data.Functor.Identity
 import Data.Maybe
-import Lens.Micro hiding (non)
+import Lens.Micro hiding (non, _Left, _Right, _Just, _Nothing)
 import Lens.Micro.Pro.TH
 import Lens.Micro.Pro.Internal
 import Lens.Micro.Internal (coerce, coerce')
@@ -111,6 +114,22 @@ coerced l = case sym Coercion :: Coercion a s of
 prism' :: (b -> s) -> (s -> Maybe a) -> Prism s s a b
 prism' bs sma = prism bs (\s -> maybe (Left s) Right (sma s))
 {-# INLINE prism' #-}
+
+_Left :: Prism (Either a c) (Either b c) a b
+_Left = prism Left $ either Right (Left . Right)
+{-# INLINE _Left #-}
+
+_Right :: Prism (Either c a) (Either c b) a b
+_Right = prism Right $ either (Left . Left) Right
+{-# INLINE _Right #-}
+
+_Just :: Prism (Maybe a) (Maybe b) a b
+_Just = prism Just $ maybe (Left Nothing) Right
+{-# INLINE _Just #-}
+
+_Nothing :: Prism' (Maybe a) ()
+_Nothing = prism' (const Nothing) $ maybe (Just ()) (const Nothing)
+{-# INLINE _Nothing #-}
 
 only :: Eq a => a -> Prism' a ()
 only a = prism' (\() -> a) $ guard . (a ==)

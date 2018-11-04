@@ -45,12 +45,14 @@ module Lens.Micro.Platform
 where
 
 
-import Lens.Micro.Internal
 import Lens.Micro
 import Lens.Micro.GHC
 import Lens.Micro.Mtl
 import Lens.Micro.TH
 import Lens.Micro.Platform.Internal
+import Lens.Micro.Internal
+  (At, Cons(..), Snoc(..), Each(..), Strict, Ixed, Index, IxValue,
+   foldring)
 
 import Data.Hashable
 import Data.Int

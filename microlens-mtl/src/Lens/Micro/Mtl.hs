@@ -44,17 +44,15 @@ module Lens.Micro.Mtl
 )
 where
 
+import Lens.Micro
+import Lens.Micro.Internal (( #. ), foldMapOf)
+import Lens.Micro.Mtl.Internal
 
 import Control.Applicative
 import Data.Monoid
 
 import Control.Monad.Reader as Reader
 import Control.Monad.State as State
--- microlens
-import Lens.Micro
-import Lens.Micro.Internal
--- Internal modules
-import Lens.Micro.Mtl.Internal
 
 
 {- |

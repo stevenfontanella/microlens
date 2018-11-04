@@ -1274,7 +1274,7 @@ Left 3
 Left 5
 @
 
-However, it's not possible for microlens to export prisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@ from <http://hackage.haskell.org/package/profunctors profunctors>. So, all prisms included here are traversals instead (and you can't reverse them).
+However, it's not possible for microlens to export prisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@ from <http://hackage.haskell.org/package/profunctors profunctors>. So, all prisms included here are traversals instead (and you can't reverse them). Use <http://hackage.hackell.org/package/microlens-pro microlens-pro> or <http://hackage.hackell.org/package/lens lens> if you need proper prisms.
 -}
 
 {- |

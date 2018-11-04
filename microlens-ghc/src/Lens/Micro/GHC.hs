@@ -50,8 +50,9 @@ where
 
 
 import Lens.Micro
-import Lens.Micro.Internal
 import Lens.Micro.GHC.Internal
+import Lens.Micro.Internal
+  (Ixed, At, Each, Cons(..), Snoc(..), Strict, Index, IxValue)
 
 import qualified Data.Map as Map
 import           Data.Map (Map)
