@@ -31,7 +31,6 @@ library
                      , containers >=0.4.0 && <0.7
                      , microlens >=0.4.11.3 && <0.5
                      , microlens-th >=0.4.3.3 && <0.5
-                     , mtl >=2.0.1 && <2.3
                      , profunctors >=5.2.1 && <6
                      , tagged >=0.4.4 && <1
                      , template-haskell >=2.7 && <2.15

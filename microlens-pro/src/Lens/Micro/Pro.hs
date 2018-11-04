@@ -51,17 +51,17 @@ module Lens.Micro.Pro
 )
 where
 
+import Lens.Micro hiding (non, _Left, _Right, _Just, _Nothing)
+import Lens.Micro.Pro.TH
+import Lens.Micro.Pro.Internal
+import Lens.Micro.Internal (coerce, coerce')
 
-import Control.Monad.Reader
+import Control.Monad
 import Data.Profunctor
 import Data.Profunctor.Unsafe
 import Data.Tagged
 import Data.Functor.Identity
 import Data.Maybe
-import Lens.Micro hiding (non, _Left, _Right, _Just, _Nothing)
-import Lens.Micro.Pro.TH
-import Lens.Micro.Pro.Internal
-import Lens.Micro.Internal (coerce, coerce')
 
 #if __GLASGOW_HASKELL__ >= 708
 import Data.Coerce (Coercible)
@@ -149,6 +149,6 @@ only a = prism' (\() -> a) $ guard . (a ==)
 -- Review
 ----------------------------------------------------------------------------
 
-review :: MonadReader b m => AReview t b -> m t
-review p = asks (runIdentity #. unTagged #. p .# Tagged .# Identity)
+review :: AReview t b -> b -> t
+review p = runIdentity #. unTagged #. p .# Tagged .# Identity
 {-# INLINE review #-}
