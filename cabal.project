@@ -1,0 +1,6 @@
+packages: microlens/
+          microlens-contra/
+          microlens-ghc/
+          microlens-mtl/
+          microlens-platform/
+          microlens-th/
