@@ -2,7 +2,6 @@
 
 ## Adding a new package
 
-  * add it to [install-order.txt](install-order.txt)
   * add it to [README.md](README.md)
   * add build times to [README.md](README.md)
   * mention it in [microlens.cabal](microlens/microlens.cabal)

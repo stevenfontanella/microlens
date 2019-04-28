@@ -1,6 +1,0 @@
-microlens
-microlens-th
-microlens-ghc
-microlens-mtl
-microlens-platform
-microlens-contra
