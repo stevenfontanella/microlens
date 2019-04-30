@@ -429,7 +429,7 @@ Here 'mapped' is used to turn a value to all non-'Nothing' values in a list:
 >>> [Just 3,Nothing,Just 5] & mapped.mapped .~ 0
 [Just 0,Nothing,Just 0]
 
-Keep in mind that while 'mapped' is a more powerful setter than 'each', it can't be used as a getter! This won't work (and will fail with a type error):
+Keep in mind that while 'mapped' is a more powerful setter than 'each', it can't be used as a getter! This won't work (and will #if !MIN_VERSION_base(4,13,0) with a type error):
 
 @
 [(1,2),(3,4),(5,6)] '^..' 'mapped' . 'both'
@@ -1413,8 +1413,10 @@ instance (Monad m) => Monad (StateT s m) where
         ~(a, s') <- runStateT m s
         runStateT (k a) s'
     {-# INLINE (>>=) #-}
+#if !MIN_VERSION_base(4,13,0)
     fail str = StateT $ \ _ -> fail str
     {-# INLINE fail #-}
+#endif
 
 #if MIN_VERSION_base(4,9,0)
 instance (Fail.MonadFail m) => Fail.MonadFail (StateT s m) where
