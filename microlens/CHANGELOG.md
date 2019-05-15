@@ -1,3 +1,7 @@
+# Next
+
+* Added `rewriteOf` and `transformOf`.
+
 # 0.4.10
 
 * Added `+~` and `-~`.
