@@ -326,6 +326,8 @@ over l f = runIdentity #. l (Identity #. f)
 l +~ n = over l (+ n)
 {-# INLINE (+~) #-}
 
+infixr 4 +~
+
 -- | Decrement the target(s) of a numerically valued 'Lens', or 'Traversal'.
 --
 -- >>> (a,b) & _1 -~ c
@@ -348,7 +350,7 @@ l +~ n = over l (+ n)
 l -~ n = over l (subtract n)
 {-# INLINE (-~) #-}
 
-
+infixr 4 -~
 
 {- |
 ('<>~') appends a value monoidally to the target.
