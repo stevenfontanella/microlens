@@ -119,13 +119,6 @@ preuse :: MonadState s m => Getting (First a) s a -> m (Maybe a)
 preuse l = State.gets (preview l)
 {-# INLINE preuse #-}
 
-
-infix  4 .=, %=, ?=
-infix  4 <<.=, <<%=, <%=, <.=, <?=
-infix  4 +=, -=, *=, //=
-infixr 2 <~
-infixl 1 &~
-
 {- |
 This can be used to chain lens operations using @op=@ syntax
 rather than @op~@ syntax for simple non-type-changing cases.
@@ -144,6 +137,8 @@ This does not support type-changing assignment, /e.g./
 s &~ l = execState l s
 {-# INLINE (&~) #-}
 
+infixl 1 &~
+
 {- |
 Modify state by “assigning” a value to a part of the state.
 
@@ -158,6 +153,8 @@ If you also want to know the value that was replaced by ('.='), use ('<<.=').
 (.=) :: MonadState s m => ASetter s s a b -> b -> m ()
 l .= x = State.modify (l .~ x)
 {-# INLINE (.=) #-}
+
+infix 4 .=
 
 {- |
 A synonym for ('.=').
@@ -179,6 +176,8 @@ It can be useful in combination with 'at'.
 l ?= b = l .= Just b
 {-# INLINE (?=) #-}
 
+infix 4 .=
+
 {- |
 ('<~') is a version of ('.=') that takes a monadic value (and then executes it and assigns the result to the lens).
 
@@ -191,6 +190,8 @@ l '<~' mb = do
 (<~) :: MonadState s m => ASetter s s a b -> m b -> m ()
 l <~ mb = mb >>= (l .=)
 {-# INLINE (<~) #-}
+
+infixr 2 <~
 
 {- |
 Modify state by applying a function to a part of the state. An example:
@@ -217,6 +218,8 @@ There are a few specialised versions of ('%=') which mimic C operators:
 l %= f = State.modify (l %~ f)
 {-# INLINE (%=) #-}
 
+infix 4 %=
+
 {- |
 A synonym for ('%=').
 -}
@@ -241,17 +244,25 @@ l '-=' x = l '%=' ('subtract' x)
 l += x = l %= (+x)
 {-# INLINE (+=) #-}
 
+infix 4 +=
+
 (-=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
 l -= x = l %= (subtract x)
 {-# INLINE (-=) #-}
+
+infix 4 -=
 
 (*=) :: (MonadState s m, Num a) => ASetter s s a a -> a -> m ()
 l *= x = l %= (*x)
 {-# INLINE (*=) #-}
 
+infix 4 *=
+
 (//=) :: (MonadState s m, Fractional a) => ASetter s s a a -> a -> m ()
 l //= x = l %= (/x)
 {-# INLINE (//=) #-}
+
+infix 4 //=
 
 {- |
 Modify state and return the modified (new) value.
@@ -265,6 +276,8 @@ l '<%=' f = do
 (<%=) :: MonadState s m => LensLike ((,) b) s s a b -> (a -> b) -> m b
 l <%= f = l %%= (\a -> (a, a)) . f
 {-# INLINE (<%=) #-}
+
+infix 4 <%=
 
 {- |
 Modify state and return the old value (i.e. as it was before the modificaton).
@@ -280,6 +293,8 @@ l '<<%=' f = do
 l <<%= f = l %%= (\a -> (a, f a))
 {-# INLINE (<<%=) #-}
 
+infix 4 <<%=
+
 {- |
 Set state and return the old value.
 
@@ -294,6 +309,8 @@ l '<<.=' b = do
 l <<.= b = l %%= (\a -> (a, b))
 {-# INLINE (<<.=) #-}
 
+infix 4 <<.=
+
 {- |
 Set state and return new value.
 
@@ -306,6 +323,8 @@ l '<.=' b = do
 (<.=) :: MonadState s m => LensLike ((,) b) s s a b -> b -> m b
 l <.= b = l <%= const b
 {-# INLINE (<.=) #-}
+
+infix 4 <.=
 
 {- |
 ('<?=') is a version of ('<.=') that wraps the value into 'Just' before setting.
@@ -321,6 +340,8 @@ It can be useful in combination with 'at'.
 (<?=) :: MonadState s m => LensLike ((,) b) s s a (Maybe b) -> b -> m b
 l <?= b = l %%= const (b, Just b)
 {-# INLINE (<?=) #-}
+
+infix 4 <?=
 
 (%%=) :: MonadState s m => LensLike ((,) r) s s a b -> (a -> (r, b)) -> m r
 #if MIN_VERSION_mtl(2,1,1)
