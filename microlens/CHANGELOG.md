@@ -1,3 +1,7 @@
+# 0.4.11
+
+* Added fixity declarations for `+~` and `-~` (thanks to Francesco Ariis).
+
 # 0.4.10
 
 * Added `+~` and `-~`.

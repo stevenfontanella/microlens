@@ -1,5 +1,5 @@
 name:                microlens-platform
-version:             0.3.11
+version:             0.3.12
 synopsis:            microlens + all batteries included (best for apps)
 description:
   This package exports a module which is the recommended starting point for using <http://hackage.haskell.org/package/microlens microlens> if you aren't trying to keep your dependencies minimal. By importing @Lens.Micro.Platform@ you get all functions and instances from <http://hackage.haskell.org/package/microlens microlens>, <http://hackage.haskell.org/package/microlens-th microlens-th>, <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, as well as instances for @Vector@, @Text@, and @HashMap@.
@@ -38,8 +38,8 @@ library
   -- other-extensions:
   build-depends:       base >=4.5 && <5
                      , hashable >=1.1.2.3 && <1.4
-                     , microlens ==0.4.10.*
-                     , microlens-ghc ==0.4.10.*
+                     , microlens ==0.4.11.*
+                     , microlens-ghc ==0.4.11.*
                      , microlens-mtl ==0.1.11.*
                      , microlens-th ==0.4.2.*
                      , text >=0.11 && <1.3
