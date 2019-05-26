@@ -1,6 +1,7 @@
 # 0.4.11
 
 * Added fixity declarations for `+~` and `-~` (thanks to Francesco Ariis).
+* Added `rewriteOf` and `transformOf` (thanks to @quasicomputational).
 
 # 0.4.10
 
