@@ -176,7 +176,7 @@ It can be useful in combination with 'at'.
 l ?= b = l .= Just b
 {-# INLINE (?=) #-}
 
-infix 4 .=
+infix 4 ?=
 
 {- |
 ('<~') is a version of ('.=') that takes a monadic value (and then executes it and assigns the result to the lens).
