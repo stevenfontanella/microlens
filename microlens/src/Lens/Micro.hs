@@ -502,34 +502,33 @@ Simpler type signatures:
 
 infixr 4 <<.~
 
--- | Rewrite by applying a rule everywhere you can. Ensures that the rule cannot
--- be applied anywhere in the result:
---
--- @
--- propRewriteOf l r x = 'all' ('Data.Just.isNothing' '.' r) ('universeOf' l ('rewriteOf' l r x))
--- @
---
--- Usually 'transformOf' is more appropriate, but 'rewriteOf' can give better
--- compositionality. Given two single transformations @f@ and @g@, you can
--- construct @\\a -> f a '<|>' g a@ which performs both rewrites until a fixed point.
---
--- @
--- 'rewriteOf' :: 'Control.Lens.Iso.Iso'' a a       -> (a -> 'Maybe' a) -> a -> a
--- 'rewriteOf' :: 'Lens'' a a      -> (a -> 'Maybe' a) -> a -> a
--- 'rewriteOf' :: 'Traversal'' a a -> (a -> 'Maybe' a) -> a -> a
--- 'rewriteOf' :: 'Setter'' a a    -> (a -> 'Maybe' a) -> a -> a
--- @
+{- | Rewrite by applying a rule everywhere you can. Ensures that the rule cannot be applied anywhere in the result:
+
+@
+propRewriteOf l r x = 'all' ('Data.Just.isNothing' '.' r) ('universeOf' l ('rewriteOf' l r x))
+@
+
+Usually 'transformOf' is more appropriate, but 'rewriteOf' can give better compositionality. Given two single transformations @f@ and @g@, you can construct @\\a -> f a '<|>' g a@ which performs both rewrites until a fixed point.
+
+@
+'rewriteOf' :: 'Control.Lens.Iso.Iso'' a a       -> (a -> 'Maybe' a) -> a -> a
+'rewriteOf' :: 'Lens'' a a      -> (a -> 'Maybe' a) -> a -> a
+'rewriteOf' :: 'Traversal'' a a -> (a -> 'Maybe' a) -> a -> a
+'rewriteOf' :: 'Setter'' a a    -> (a -> 'Maybe' a) -> a -> a
+@
+-}
 rewriteOf :: ASetter a b a b -> (b -> Maybe a) -> a -> b
 rewriteOf l f = go where
   go = transformOf l (\x -> maybe x go (f x))
 {-# INLINE rewriteOf #-}
 
--- | Transform every element by recursively applying a given 'Setter' in a bottom-up manner.
---
--- @
--- 'transformOf' :: 'Traversal'' a a -> (a -> a) -> a -> a
--- 'transformOf' :: 'Setter'' a a    -> (a -> a) -> a -> a
--- @
+{- | Transform every element by recursively applying a given 'Setter' in a bottom-up manner.
+
+@
+'transformOf' :: 'Traversal'' a a -> (a -> a) -> a -> a
+'transformOf' :: 'Setter'' a a    -> (a -> a) -> a -> a
+@
+-}
 transformOf :: ASetter a b a b -> (b -> b) -> a -> b
 transformOf l f = go where
   go = f . over l go
