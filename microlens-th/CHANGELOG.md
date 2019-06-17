@@ -1,6 +1,7 @@
 # 0.4.2.4
 
 * Bumped th-abstraction version.
+* `Lens.Micro.TH` is now properly marked as `Safe` or `Trustworthy`.
 
 # 0.4.2.3
 
