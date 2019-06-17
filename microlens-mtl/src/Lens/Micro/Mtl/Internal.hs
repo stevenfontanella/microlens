@@ -256,7 +256,7 @@ instance Applicative (k (Err e s)) => Applicative (FocusingErr e k s) where
 
 infixr 2 `zoom`
 
-class (Zoomed m ~ Zoomed n, MonadState s m, MonadState t n) => Zoom m n s t | m -> s, n -> t, m t -> n, n s -> m where
+class (MonadState s m, MonadState t n) => Zoom m n s t | m -> s, n -> t, m t -> n, n s -> m where
   {- |
 When you're in a state monad, this function lets you operate on a part of your state. For instance, if your state was a record containing a @position@ field, after zooming @position@ would become your whole state (and when you modify it, the bigger structure would be modified as well).
 
@@ -422,7 +422,7 @@ type instance Magnified (IdentityT m) = Magnified m
 
 infixr 2 `magnify`
 
-class (Magnified m ~ Magnified n, MonadReader b m, MonadReader a n) => Magnify m n b a | m -> b, n -> a, m a -> n, n b -> m where
+class (MonadReader b m, MonadReader a n) => Magnify m n b a | m -> b, n -> a, m a -> n, n b -> m where
   {- |
 This is an equivalent of 'Reader.local' which lets you apply a getter to your environment instead of merely applying a function (and it also lets you change the type of the environment).
 

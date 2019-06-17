@@ -1,3 +1,7 @@
+# 0.1.12
+
+* Removed of equality constraints on `Zoom` and `Magnify`, as was done in `lens` earlier. This allows instances of `Zoom` and `Magnify` for `FreeT`. (Thanks to @treeowl.)
+
 # 0.1.11.1
 
 * Fixed compilation on GHC 8.4.
