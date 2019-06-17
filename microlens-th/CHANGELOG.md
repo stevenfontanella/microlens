@@ -1,7 +1,8 @@
-# 0.4.2.4
+# 0.4.3
 
 * Bumped th-abstraction version.
 * `Lens.Micro.TH` is now properly marked as `Safe` or `Trustworthy`.
+* The `-f-inlining` flag is not supported anymore.
 
 # 0.4.2.3
 

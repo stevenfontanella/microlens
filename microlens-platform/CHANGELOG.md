@@ -1,6 +1,6 @@
 # 0.4.0
 
-* New major release (microlens-0.4.11, microlens-ghc-0.4.11, microlens-mtl-0.2.0).
+* New major release (microlens-0.4.11, microlens-ghc-0.4.11, microlens-th-0.4.3, microlens-mtl-0.2.0).
 
 # 0.3.11
 
