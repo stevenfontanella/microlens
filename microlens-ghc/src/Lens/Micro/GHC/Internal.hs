@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE Unsafe #-}
+{-# LANGUAGE Trustworthy #-}
 
 
 {- |

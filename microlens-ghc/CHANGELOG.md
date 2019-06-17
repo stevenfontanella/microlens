@@ -1,3 +1,7 @@
+# unreleased
+
+* Marked `Lens.Micro.GHC.Internal` as `Trustworthy`.
+
 # 0.4.11
 
 * New minor release (microlens-0.4.11).

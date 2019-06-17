@@ -10,8 +10,12 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE ImplicitParams #-}
-{-# LANGUAGE Unsafe #-}
 
+#if __GLASGOW_HASKELL__ >= 708
+{-# LANGUAGE Trustworthy #-}
+#else
+{-# LANGUAGE Unsafe #-}
+#endif
 
 {- |
 Module      :  Lens.Micro.Internal
@@ -155,6 +159,10 @@ noEffect = phantom (pure ())
 ------------------------------------------------------------------------------
 -- Data.Profunctor.Unsafe
 ------------------------------------------------------------------------------
+
+-- Note: 'lens' defines a type-restricted version of (#.) to work around a
+-- bug, but our version is restricted enough that we don't need it. See
+-- <https://github.com/ekmett/lens/commit/cde2fc39c0dba413d1a6f814b47bd14431a5e339>
 
 #if __GLASGOW_HASKELL__ >= 708
 ( #. ) :: Coercible c b => (b -> c) -> (a -> b) -> (a -> c)

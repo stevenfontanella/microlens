@@ -114,7 +114,12 @@ import Data.Monoid
 import Data.Maybe
 import Data.Tuple
 import qualified Data.Foldable as F
+
+#if __GLASGOW_HASKELL__ >= 708
+import Data.Coerce
+#else
 import Unsafe.Coerce
+#endif
 
 #if MIN_VERSION_base(4,8,0)
 import Data.Function ((&))
@@ -1053,8 +1058,13 @@ singular l afb s = case ins b of
   where
     Bazaar b = l sell s
     sell w = Bazaar ($ w)
+#if __GLASGOW_HASKELL__ >= 708
+    ins f = (coerce :: [Identity a] -> [a])
+              (getConst (f (\ra -> Const [Identity ra])))
+#else
     ins f = (unsafeCoerce :: [Identity a] -> [a])
               (getConst (f (\ra -> Const [Identity ra])))
+#endif
     unsafeOuts f = evalState (f (\_ -> state (unconsWithDefault fakeVal)))
       where fakeVal = error "unsafeOuts: not enough elements were supplied"
     unconsWithDefault d []     = (d,[])
