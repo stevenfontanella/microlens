@@ -41,9 +41,6 @@ library
                      , template-haskell >=2.7 && <2.15
                      , th-abstraction >=0.2.1 && <0.4
 
-  if flag(inlining)
-    cpp-options: -DINLINING
-
   ghc-options:
     -Wall -fwarn-tabs
     -O2 -fdicts-cheap -funbox-strict-fields
