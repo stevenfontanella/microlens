@@ -198,6 +198,7 @@ You can use 'each' with these things:
 'each' :: 'Traversal' [a] [b] a b
 
 'each' :: 'Traversal' ('Maybe' a) ('Maybe' b) a b
+'each' :: 'Traversal' ('Either' a a) ('Either' b b) a b  -- since 0.4.11
 
 'each' :: 'Traversal' (a,a) (b,b) a b
 'each' :: 'Traversal' (a,a,a) (b,b,b) a b
@@ -239,11 +240,21 @@ instance Each (Maybe a) (Maybe b) a b where
   each = traverse
   {-# INLINE each #-}
 
+{- |
+@since 0.4.11
+-}
+instance (a~a', b~b') => Each (Either a a') (Either b b') a b where
+  each f (Left a)   = Left <$> f a
+  each f (Right a ) = Right <$> f a
+  {-# INLINE each #-}
+
 #if __GLASGOW_HASKELL__ >= 800
 instance Each (NonEmpty a) (NonEmpty b) a b where
   each = traversed
   {-# INLINE each #-}
 #endif
+
+-- NOTE: when adding new instances of 'Each', update the docs for 'each'.
 
 type family Index (s :: *) :: *
 

@@ -2,6 +2,7 @@
 
 * Added fixity declarations for `+~` and `-~` (thanks to Francesco Ariis).
 * Added `rewriteOf` and `transformOf` (thanks to @quasicomputational).
+* Added an instance `Each (Either a a) (Either b b) a b`, following `lens`'s suit.
 
 # 0.4.10
 
