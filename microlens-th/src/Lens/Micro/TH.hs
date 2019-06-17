@@ -4,18 +4,18 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-#if MIN_VERSION_template_haskell(2,12,0)
-{-# LANGUAGE Safe #-}
-#else
-{-# LANGUAGE Trustworthy #-}
-#endif
-
 #ifndef MIN_VERSION_template_haskell
 #define MIN_VERSION_template_haskell(x,y,z) (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 706)
 #endif
 
 #ifndef MIN_VERSION_containers
 #define MIN_VERSION_containers(x,y,z) 1
+#endif
+
+#if MIN_VERSION_template_haskell(2,12,0)
+{-# LANGUAGE Safe #-}
+#else
+{-# LANGUAGE Trustworthy #-}
 #endif
 
 
