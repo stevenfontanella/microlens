@@ -306,48 +306,56 @@ over l f = runIdentity #. l (Identity #. f)
 {-# INLINE over #-}
 
 
--- | Increment the target(s) of a numerically valued 'Lens' or 'Traversal'.
---
--- >>> (a,b) & _1 +~ c
--- (a + c,b)
---
--- >>> (a,b) & both +~ c
--- (a + c,b + c)
---
--- >>> (1,2) & _2 +~ 1
--- (1,3)
---
--- >>> [(a,b),(c,d)] & traverse.both +~ e
--- [(a + e,b + e),(c + e,d + e)]
---
--- @
--- ('+~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
--- ('+~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
--- @
+{- |
+Increment the target(s) of a numerically valued 'Lens' or 'Traversal'.
+
+>>> (a,b) & _1 +~ c
+(a + c,b)
+
+>>> (a,b) & both +~ c
+(a + c,b + c)
+
+>>> (1,2) & _2 +~ 1
+(1,3)
+
+>>> [(a,b),(c,d)] & traverse.both +~ e
+[(a + e,b + e),(c + e,d + e)]
+
+@
+('+~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
+('+~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
+@
+
+@since 0.4.10
+-}
 (+~) :: Num a => ASetter s t a a -> a -> s -> t
 l +~ n = over l (+ n)
 {-# INLINE (+~) #-}
 
 infixr 4 +~
 
--- | Decrement the target(s) of a numerically valued 'Lens', or 'Traversal'.
---
--- >>> (a,b) & _1 -~ c
--- (a - c,b)
---
--- >>> (a,b) & both -~ c
--- (a - c,b - c)
---
--- >>> _1 -~ 2 $ (1,2)
--- (-1,2)
---
--- >>> mapped.mapped -~ 1 $ [[4,5],[6,7]]
--- [[3,4],[5,6]]
---
--- @
--- ('-~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
--- ('-~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
--- @
+{- |
+Decrement the target(s) of a numerically valued 'Lens', or 'Traversal'.
+
+>>> (a,b) & _1 -~ c
+(a - c,b)
+
+>>> (a,b) & both -~ c
+(a - c,b - c)
+
+>>> _1 -~ 2 $ (1,2)
+(-1,2)
+
+>>> mapped.mapped -~ 1 $ [[4,5],[6,7]]
+[[3,4],[5,6]]
+
+@
+('-~') :: 'Num' a => 'Lens'' s a      -> a -> s -> s
+('-~') :: 'Num' a => 'Traversal'' s a -> a -> s -> s
+@
+
+@since 0.4.10
+-}
 (-~) :: Num a => ASetter s t a a -> a -> s -> t
 l -~ n = over l (subtract n)
 {-# INLINE (-~) #-}
@@ -359,6 +367,8 @@ infixr 4 -~
 
 >>> ("hello", "goodbye") & both <>~ " world!"
 ("hello world!", "goodbye world!")
+
+@since 0.4.9
 -}
 (<>~) :: (Monoid a) => ASetter s t a a -> a -> s -> t
 (<>~) l a = over l (`mappend` a)
@@ -508,6 +518,8 @@ infixr 4 <<.~
 Rewrite by applying a rule everywhere you can. Ensures that the rule cannot be applied anywhere in the result.
 
 Usually 'transformOf' is more appropriate, but 'rewriteOf' can give better compositionality. Given two single transformations @f@ and @g@, you can construct @\\a -> f a '<|>' g a@ which performs both rewrites until a fixed point.
+
+@since 0.4.11
 -}
 rewriteOf :: ASetter a b a b -> (b -> Maybe a) -> a -> b
 rewriteOf l f = go where
@@ -516,6 +528,8 @@ rewriteOf l f = go where
 
 {- |
 Transform every element by recursively applying a given 'ASetter' in a bottom-up manner.
+
+@since 0.4.11
 -}
 transformOf :: ASetter a b a b -> (b -> b) -> a -> b
 transformOf l f = go where
