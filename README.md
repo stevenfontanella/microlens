@@ -60,9 +60,8 @@ Other features:
     generating (lens-compatible) record lenses, which is called
     [microlens-th][].
 
-  * All `INLINE` pragmas sprinkled thru lens were preserved, as well as
-    flags from the `.cabal` file. Performance shouldn't suffer; if it does,
-    it's a bug.
+  * All `INLINE` pragmas sprinkled through lens were preserved. Performance
+    shouldn't suffer; if it does, it's a bug.
 
 [microlens]: http://hackage.haskell.org/package/microlens
 [microlens-mtl]: http://hackage.haskell.org/package/microlens-mtl
@@ -263,7 +262,7 @@ list of those targets. E.g. `(1, 2) ^.. both` is `[1, 2]`).
 I guess the reason for including them all into `lens` (and there's an awful
 lot of them) is somewhere between
 
-  * “they are faster than going thru intermediate lists”
+  * “they are faster than going through intermediate lists”
   * “there are some rare cases when you can use a SomeSpecialisedMonoid but
     can't use `Endo [a]`”
   * “it's nice to be able to say `sumOf (each._1) [(1,"x"),(2,"y")]` instead

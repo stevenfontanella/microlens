@@ -18,7 +18,7 @@ description:
   .
   However, don't use this library if:
   .
-    * You need @Iso@s, @Prism@s, indexed traversals, or actually anything else which isn't defined here (tho some indexed functions are available elsewhere – containers and vector provide them for their types, and <http://hackage.haskell.org/package/ilist ilist> provides indexed functions for lists).
+    * You need @Iso@s, @Prism@s, indexed traversals, or actually anything else which isn't defined here (though some indexed functions are available elsewhere – containers and vector provide them for their types, and <http://hackage.haskell.org/package/ilist ilist> provides indexed functions for lists).
   .
     * You want a library with a clean, understandable implementation (in which case you're looking for <http://hackage.haskell.org/package/lens-simple lens-simple>).
   .

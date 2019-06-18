@@ -4,7 +4,7 @@ synopsis:            True folds and getters for microlens
 description:
   This package provides @Fold@ and @Getter@ that are fully compatible with lens; the downside is that this package depends on contravariant, which in its turn depends on a lot of other packages (but still less than lens).
   .
-  The difference between @Fold@ and @SimpleFold@ is that you can use e.g. @takingWhile@\/@droppingWhile@ and @backwards@ on the former but not on the latter. Most functions from lens that work with @Fold@ would work with @SimpleFold@ as well, tho.
+  The difference between @Fold@ and @SimpleFold@ is that you can use e.g. @takingWhile@\/@droppingWhile@ and @backwards@ on the former but not on the latter. Most functions from lens that work with @Fold@ would work with @SimpleFold@ as well, though.
   .
   Starting from GHC 8.6, this package doesn't depend on contravariant anymore.
   .
