@@ -11,11 +11,8 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE ImplicitParams #-}
 
-#if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE Trustworthy #-}
-#else
+-- Note: this module is marked 'Unsafe' because it exports (#.), which is essentially 'coerce', and Data.Coerce is marked 'Unsafe' in base. As per <https://github.com/ekmett/lens/issues/661>, this is an issue for 'lens' as well but they have opted for 'Trustworthy' instead.
 {-# LANGUAGE Unsafe #-}
-#endif
 
 {- |
 Module      :  Lens.Micro.Internal

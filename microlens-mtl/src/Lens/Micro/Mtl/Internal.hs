@@ -8,13 +8,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures #-}
-
--- Lens.Micro.Internal is either Trustworthy or Unsafe
-#if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE Safe #-}
-#else
 {-# LANGUAGE Trustworthy #-}
-#endif
 
 -- This is needed because ErrorT is deprecated.
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}

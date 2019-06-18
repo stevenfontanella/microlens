@@ -3,16 +3,10 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE Trustworthy #-}
 
 #ifndef MIN_VERSION_base
 #define MIN_VERSION_base(x,y,z) 1
-#endif
-
--- Lens.Micro.Internal is either Trustworthy or Unsafe
-#if __GLASGOW_HASKELL__ >= 708
-{-# LANGUAGE Safe #-}
-#else
-{-# LANGUAGE Trustworthy #-}
 #endif
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
