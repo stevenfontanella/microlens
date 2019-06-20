@@ -1,5 +1,5 @@
 name:                microlens
-version:             0.4.11
+version:             0.4.11.1
 synopsis:            A tiny lens library with no dependencies
 description:
   NOTE: If you're writing an app, you probably want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it has the most features. <http://hackage.haskell.org/package/microlens microlens> is intended more for library writers who want a tiny lens library (after all, lenses are pretty useful for everything, not just for updating records!).

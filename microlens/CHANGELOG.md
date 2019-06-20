@@ -1,3 +1,7 @@
+# 0.4.11.1
+
+* Reverted marking `Lens.Micro.Internal` as `Trustworthy`, see [#122](https://github.com/monadfix/microlens/issues/122).
+
 # 0.4.11
 
 * Added fixity declarations for `+~` and `-~` (thanks to Francesco Ariis).

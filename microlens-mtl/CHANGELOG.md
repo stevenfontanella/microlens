@@ -1,3 +1,7 @@
+# 0.2.0.1
+
+* No more conditional `Safe` (see [#122](https://github.com/monadfix/microlens/issues/122)).
+
 # 0.2.0
 
 * Removed of equality constraints on `Zoom` and `Magnify`, as was done in `lens` earlier. This allows instances of `Zoom` and `Magnify` for `FreeT`. (Thanks to @treeowl.)

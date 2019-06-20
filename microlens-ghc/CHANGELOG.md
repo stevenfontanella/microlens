@@ -1,3 +1,7 @@
+# 0.4.11.1
+
+* No more conditional `Safe` (see [#122](https://github.com/monadfix/microlens/issues/122)).
+
 # 0.4.11
 
 * New minor release (microlens-0.4.11).
