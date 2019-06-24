@@ -41,7 +41,7 @@ Here are the build times for all libraries in the family:
 | microlens-platform |                        1m47s |            4.9s |
 | microlens-contra   |                        1m12s |            2.1s |
 | microlens-aeson    |                        3m47s |            9.2s |
-| microlens-process  |                        9.83s |            3.8s |
+| microlens-process  |                         9.8s |            3.8s |
 | **lens**           |                    **4m10s** |       **1m12s** |
 
 Other features:
