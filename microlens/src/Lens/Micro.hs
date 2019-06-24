@@ -25,6 +25,7 @@ This module provides the essential functionality. There are other packages in th
 Unofficial:
 
 * <http://hackage.haskell.org/package/microlens-aeson microlens-aeson> – a port of <http://hackage.haskell.org/package/lens-aeson lens-aeson>
+* <http://hackage.haskell.org/package/microlens-process microlens-process> - a port of <http://hackage.haskell.org/package/lens-process lens-process>
 
 -}
 module Lens.Micro
