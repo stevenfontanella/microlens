@@ -41,6 +41,7 @@ Here are the build times for all libraries in the family:
 | microlens-platform |                        1m47s |            4.9s |
 | microlens-contra   |                        1m12s |            2.1s |
 | microlens-aeson    |                        3m47s |            9.2s |
+| microlens-process  |                         9.8s |            3.8s |
 | **lens**           |                    **4m10s** |       **1m12s** |
 
 Other features:
@@ -70,6 +71,7 @@ Other features:
 [microlens-platform]: http://hackage.haskell.org/package/microlens-platform
 [microlens-contra]: http://hackage.haskell.org/package/microlens-contra
 [microlens-aeson]: http://hackage.haskell.org/package/microlens-aeson
+[microlens-process]: http://hackage.haskell.org/package/microlens-process
 
 The reason microlens exists is that lens is a huge library with lots of
 dependencies, but lenses are very useful and it's not nice to limit them to
@@ -133,8 +135,10 @@ not.
 Unofficial:
 
   * [microlens-aeson][] – a port of [lens-aeson][]
+  * [microlens-process][] - a port of [lens-process][]
 
 [lens-aeson]: http://hackage.haskell.org/package/lens-aeson
+[lens-process]: http://hackage.haskell.org/package/lens-process
 
 If you're writing a library, use [microlens][] and other packages as needed;
 if you're writing an application, perhaps use [microlens-platform][].
