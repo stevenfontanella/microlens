@@ -1,3 +1,7 @@
+# 0.4.11.2
+
+* Fixed compilation on GHC 8.8 (thanks to @vmchale).
+
 # 0.4.11.1
 
 * Reverted marking `Lens.Micro.Internal` as `Trustworthy`, see [#122](https://github.com/monadfix/microlens/issues/122).

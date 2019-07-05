@@ -1,3 +1,7 @@
+# 0.4.3.2
+
+* Bumped template-haskell version.
+
 # 0.4.3.1
 
 * No more conditional `Safe` (see [#122](https://github.com/monadfix/microlens/issues/122)).
