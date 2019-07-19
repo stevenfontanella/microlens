@@ -31,7 +31,7 @@ import Lens.Micro
 import Lens.Micro.Extras
 import Lens.Micro.Pro.Internal
 import Lens.Micro.TH.Internal
-  (HasTypeVars(..), typeVars, substTypeVars, newNames, conAppsT)
+  (HasTypeVars(..), typeVars, substTypeVars, newNames, conAppsT, inlinePragma)
 
 import Data.Char (isUpper)
 import Data.List
@@ -158,9 +158,11 @@ makeConsPrisms t cons Nothing =
        stab <- computeOpticType t cons con
        let n = prismName conName
        sequenceA
-         [ sigD n (close (stabToType stab))
-         , valD (varP n) (normalB (makeConOpticExp stab cons con)) []
-         ]
+         ( [ sigD n (close (stabToType stab))
+           , valD (varP n) (normalB (makeConOpticExp stab cons con)) []
+           ]
+           ++ inlinePragma n
+         )
 
 
 -- classy prism class and instance
@@ -261,9 +263,11 @@ makeConIso s con =
   do let ty      = computeIsoType s (view nconTypes con)
          defName = prismName (view nconName con)
      sequenceA
-       [ sigD       defName  ty
-       , valD (varP defName) (normalB (makeConIsoExp con)) []
-       ]
+       ( [ sigD       defName  ty
+         , valD (varP defName) (normalB (makeConIsoExp con)) []
+         ] ++
+         inlinePragma defName
+       )
 
 
 -- | Construct prism expression
