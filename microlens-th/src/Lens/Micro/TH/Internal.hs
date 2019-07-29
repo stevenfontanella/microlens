@@ -1,6 +1,10 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE RankNTypes #-}
 
+#ifndef MIN_VERSION_template_haskell
+#define MIN_VERSION_template_haskell(x,y,z) (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 706)
+#endif
+
 -- Language.Haskell.TH was not marked as Safe before template-haskell-2.12.0
 #if MIN_VERSION_template_haskell(2,12,0)
 {-# LANGUAGE Safe #-}
