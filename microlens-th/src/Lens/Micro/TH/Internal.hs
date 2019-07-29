@@ -1,6 +1,12 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE RankNTypes #-}
+
+-- Language.Haskell.TH was not marked as Safe before template-haskell-2.12.0
+#if MIN_VERSION_template_haskell(2,12,0)
 {-# LANGUAGE Safe #-}
+#else
+{-# LANGUAGE Trustworthy #-}
+#endif
 
 {- |
 Module      :  Lens.Micro.TH.Internal
