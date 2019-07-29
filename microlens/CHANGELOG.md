@@ -1,3 +1,7 @@
+# 0.4.11.3
+
+* Exported a `coerce` compatibility shim from `Lens.Micro.Internal`.
+
 # 0.4.11.2
 
 * Fixed compilation on GHC 8.8 (thanks to @vmchale).

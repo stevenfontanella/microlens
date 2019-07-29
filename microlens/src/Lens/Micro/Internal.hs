@@ -11,7 +11,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE ImplicitParams #-}
 
--- Note: this module is marked 'Unsafe' because it exports (#.), which is essentially 'coerce', and Data.Coerce is marked 'Unsafe' in base. As per <https://github.com/ekmett/lens/issues/661>, this is an issue for 'lens' as well but they have opted for 'Trustworthy' instead.
+-- Note: this module is marked 'Unsafe' because it exports 'coerce', and Data.Coerce is marked 'Unsafe' in base. As per <https://github.com/ekmett/lens/issues/661>, this is an issue for 'lens' as well but they have opted for 'Trustworthy' instead.
 {-# LANGUAGE Unsafe #-}
 
 {- |
@@ -36,8 +36,6 @@ module Lens.Micro.Internal
   foldrOf,
   foldMapOf,
   sets,
-  ( #. ),
-  ( .# ),
   phantom,
   Each(..),
   Index,
@@ -56,6 +54,13 @@ module Lens.Micro.Internal
 
   -- * CallStack
   HasCallStack,
+
+  -- * Coerce compatibility shim
+  coerce,
+
+  -- * Coerce-like composition
+  ( #. ),
+  ( .# ),
 )
 where
 
@@ -152,34 +157,6 @@ phantom = Const #. getConst
 noEffect :: Monoid r => Const r a
 noEffect = phantom (pure ())
 {-# INLINE noEffect #-}
-
-------------------------------------------------------------------------------
--- Data.Profunctor.Unsafe
-------------------------------------------------------------------------------
-
--- Note: 'lens' defines a type-restricted version of (#.) to work around a
--- bug, but our version is restricted enough that we don't need it. See
--- <https://github.com/ekmett/lens/commit/cde2fc39c0dba413d1a6f814b47bd14431a5e339>
-
-#if __GLASGOW_HASKELL__ >= 708
-( #. ) :: Coercible c b => (b -> c) -> (a -> b) -> (a -> c)
-( #. ) _ = coerce (\x -> x :: b) :: forall a b. Coercible b a => a -> b
-
-( .# ) :: Coercible b a => (b -> c) -> (a -> b) -> (a -> c)
-( .# ) pbc _ = coerce pbc
-#else
-( #. ) :: (b -> c) -> (a -> b) -> (a -> c)
-( #. ) _ = unsafeCoerce
-
-( .# ) :: (b -> c) -> (a -> b) -> (a -> c)
-( .# ) pbc _ = unsafeCoerce pbc
-#endif
-
-{-# INLINE ( #. ) #-}
-{-# INLINE ( .# ) #-}
-
-infixr 9 #.
-infixl 8 .#
 
 ------------------------------------------------------------------------------
 -- classes
@@ -618,3 +595,41 @@ stripDiacritics = ...
 "hello" :: Lazy.Text
   -}
   lazy   :: Lens' strict lazy
+
+----------------------------------------------------------------------------
+-- Coerce compatibility shim
+----------------------------------------------------------------------------
+
+#if __GLASGOW_HASKELL__ < 708
+coerce :: a -> b
+coerce = unsafeCoerce
+{-# INLINE coerce #-}
+#endif
+
+----------------------------------------------------------------------------
+-- Coerce-like composition
+----------------------------------------------------------------------------
+
+-- Note: 'lens' defines a type-restricted version of (#.) to work around a
+-- bug, but our version is restricted enough that we don't need it. See
+-- <https://github.com/ekmett/lens/commit/cde2fc39c0dba413d1a6f814b47bd14431a5e339>
+
+#if __GLASGOW_HASKELL__ >= 708
+( #. ) :: Coercible c b => (b -> c) -> (a -> b) -> (a -> c)
+( #. ) _ = coerce (\x -> x :: b) :: forall a b. Coercible b a => a -> b
+
+( .# ) :: Coercible b a => (b -> c) -> (a -> b) -> (a -> c)
+( .# ) pbc _ = coerce pbc
+#else
+( #. ) :: (b -> c) -> (a -> b) -> (a -> c)
+( #. ) _ = unsafeCoerce
+
+( .# ) :: (b -> c) -> (a -> b) -> (a -> c)
+( .# ) pbc _ = unsafeCoerce pbc
+#endif
+
+{-# INLINE ( #. ) #-}
+{-# INLINE ( .# ) #-}
+
+infixr 9 #.
+infixl 8 .#
