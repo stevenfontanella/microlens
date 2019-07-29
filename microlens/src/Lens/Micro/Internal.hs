@@ -57,6 +57,7 @@ module Lens.Micro.Internal
 
   -- * Coerce compatibility shim
   coerce,
+  coerce',
 
   -- * Coerce-like composition
   ( #. ),
@@ -601,9 +602,23 @@ stripDiacritics = ...
 ----------------------------------------------------------------------------
 
 #if __GLASGOW_HASKELL__ < 708
+
 coerce :: a -> b
 coerce = unsafeCoerce
 {-# INLINE coerce #-}
+
+coerce' :: a -> b
+coerce' = unsafeCoerce
+{-# INLINE coerce' #-}
+
+#else
+
+-- 'coerce' is already reexported from Data.Coerce
+
+coerce' :: forall a b. Coercible a b => b -> a
+coerce' = coerce (id :: a -> a)
+{-# INLINE coerce' #-}
+
 #endif
 
 ----------------------------------------------------------------------------
