@@ -44,6 +44,7 @@ import           Language.Haskell.TH
 
 #if __GLASGOW_HASKELL__ < 710
 import           Control.Applicative
+import           Data.Monoid
 import           Data.Traversable (traverse)
 #endif
 
