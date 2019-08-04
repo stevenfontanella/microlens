@@ -1,6 +1,11 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE Trustworthy #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE CPP #-}
+
+#if __GLASGOW_HASKELL__ >= 800
+{-# LANGUAGE TypeInType #-}
+#endif
 
 {- |
 Module      :  Lens.Micro.Pro.Internal
@@ -38,6 +43,10 @@ import Data.Functor.Identity
 import Data.Void
 import Data.Tagged
 import Lens.Micro.Internal (coerce, coerce')
+
+#if __GLASGOW_HASKELL__ >= 800
+import GHC.Exts (TYPE)
+#endif
 
 ----------------------------------------------------------------------------
 -- Iso
@@ -78,7 +87,14 @@ instance Profunctor (Exchange a b) where
 
 -- | Extract the two functions, one from @s -> a@ and
 -- one from @b -> t@ that characterize an 'Iso'.
-withIso :: AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
+#if __GLASGOW_HASKELL__ >= 800
+withIso
+  :: forall s t a b rep (r :: TYPE rep)
+   . AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
+#else
+withIso
+  :: AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
+#endif
 withIso ai k = case ai (Exchange id Identity) of
   Exchange sa bt -> k sa (runIdentity #. bt)
 {-# INLINE withIso #-}
