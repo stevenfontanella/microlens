@@ -18,7 +18,7 @@ License     :  BSD-style (see the file LICENSE)
 module Lens.Micro.Mtl
 (
   -- * Getting
-  view, preview,
+  view, views, preview,
   use, preuse,
 
   -- * Setting
@@ -76,6 +76,13 @@ doSomething = do
 view :: MonadReader s m => Getting a s a -> m a
 view l = Reader.asks (getConst #. l Const)
 {-# INLINE view #-}
+
+{- |
+@'views' o f@ is equivalent to @f '<$>' 'view' o@, except it can use f to 'foldMap' non-'Monoid' targets. ('view' will first 'fold' the targets and then apply f.)
+-}
+views :: MonadReader s m => LensLike' (Const b) s a -> (a -> b) -> m b
+views o f = Reader.asks (getConst #. o (Const #. f))
+{-# INLINE views #-}
 
 {- |
 'preview' is a synonym for ('^?'), generalised for 'MonadReader' (just like 'view', which is a synonym for ('^.')).
