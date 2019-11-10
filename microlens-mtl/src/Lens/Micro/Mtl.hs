@@ -19,7 +19,7 @@ module Lens.Micro.Mtl
 (
   -- * Getting
   view, views, preview,
-  use, preuse,
+  use, uses, preuse,
 
   -- * Setting
   (%=), modifying,
@@ -114,6 +114,14 @@ If you need to extract something with a fold or traversal, you need 'preuse'.
 use :: MonadState s m => Getting a s a -> m a
 use l = State.gets (view l)
 {-# INLINE use #-}
+
+{- |
+'uses' is the MonadState equivalent of 'views'.
+'uses' o f = 'State.gets' ('views' o f)
+-}
+uses :: MonadState s m => LensLike' (Const b) s a -> (a -> b) -> m b
+uses o f = State.gets (views o f)
+{-# INLINE uses #-}
 
 {- |
 'preuse' is ('^?') (or 'preview') which implicitly operates on the state – it takes the state and applies a traversal (or fold) to it to extract the 1st element the traversal points at.
