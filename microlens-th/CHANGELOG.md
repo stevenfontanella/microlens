@@ -1,3 +1,7 @@
+# 0.4.3.4
+
+* Backported changes needed for template-haskell-2.15.
+
 # 0.4.3.3
 
 * Exported internal utilities from `Lens.Micro.TH.Internal`.
