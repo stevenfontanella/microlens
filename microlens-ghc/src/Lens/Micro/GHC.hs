@@ -59,6 +59,10 @@ import qualified Data.IntMap as IntMap
 import           Data.IntMap (IntMap)
 import qualified Data.Sequence as Seq
 import           Data.Sequence (Seq)
+import qualified Data.Set as Set
+import           Data.Set (Set)
+import qualified Data.IntSet as IntSet
+import           Data.IntSet (IntSet)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
@@ -89,6 +93,10 @@ type instance Index   (IntMap a) = Int
 type instance IxValue (IntMap a) = a
 type instance Index   (Seq a) = Int
 type instance IxValue (Seq a) = a
+type instance Index   (Set a) = a
+type instance IxValue (Set a) = ()
+type instance Index   IntSet = Int
+type instance IxValue IntSet = ()
 type instance Index   (Tree a) = [Int]
 type instance IxValue (Tree a) = a
 type instance Index   (Array.Array i e) = i
@@ -116,6 +124,18 @@ instance Ixed (Seq a) where
   ix i f m
     | 0 <= i && i < Seq.length m = f (Seq.index m i) <&> \a -> Seq.update i a m
     | otherwise                  = pure m
+  {-# INLINE ix #-}
+
+instance Ord k => Ixed (Set k) where
+  ix k f m = if Set.member k m
+     then f () <&> \() -> Set.insert k m
+     else pure m
+  {-# INLINE ix #-}
+
+instance Ixed IntSet where
+  ix k f m = if IntSet.member k m
+     then f () <&> \() -> IntSet.insert k m
+     else pure m
   {-# INLINE ix #-}
 
 instance Ixed (Tree a) where
@@ -154,17 +174,39 @@ instance Ixed BL.ByteString where
   {-# INLINE ix #-}
 
 instance At (IntMap a) where
+#if MIN_VERSION_containers(0,5,8)
+  at k f = IntMap.alterF f k
+#else
   at k f m = f mv <&> \r -> case r of
     Nothing -> maybe m (const (IntMap.delete k m)) mv
     Just v' -> IntMap.insert k v' m
     where mv = IntMap.lookup k m
+#endif
   {-# INLINE at #-}
 
 instance Ord k => At (Map k a) where
+#if MIN_VERSION_containers(0,5,8)
+  at k f = Map.alterF f k
+#else
   at k f m = f mv <&> \r -> case r of
     Nothing -> maybe m (const (Map.delete k m)) mv
     Just v' -> Map.insert k v' m
     where mv = Map.lookup k m
+#endif
+  {-# INLINE at #-}
+
+instance At IntSet where
+  at k f m = f mv <&> \r -> case r of
+    Nothing -> maybe m (const (IntSet.delete k m)) mv
+    Just () -> IntSet.insert k m
+    where mv = if IntSet.member k m then Just () else Nothing
+  {-# INLINE at #-}
+
+instance Ord k => At (Set k) where
+  at k f m = f mv <&> \r -> case r of
+    Nothing -> maybe m (const (Set.delete k m)) mv
+    Just () -> Set.insert k m
+    where mv = if Set.member k m then Just () else Nothing
   {-# INLINE at #-}
 
 instance (c ~ d) => Each (Map c a) (Map d b) a b where
