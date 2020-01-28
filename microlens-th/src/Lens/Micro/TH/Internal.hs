@@ -101,12 +101,31 @@ instance HasTypeVars Name where
     | otherwise      = f n
 
 instance HasTypeVars Type where
-  typeVarsEx s f (VarT n)            = VarT <$> typeVarsEx s f n
-  typeVarsEx s f (AppT l r)          = AppT <$> typeVarsEx s f l <*> typeVarsEx s f r
-  typeVarsEx s f (SigT t k)          = (`SigT` k) <$> typeVarsEx s f t
-  typeVarsEx s f (ForallT bs ctx ty) = ForallT bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f ty
+  typeVarsEx s f (VarT n)             = VarT <$> typeVarsEx s f n
+  typeVarsEx s f (AppT l r)           = AppT <$> typeVarsEx s f l <*> typeVarsEx s f r
+#if MIN_VERSION_template_haskell(2,8,0)
+  typeVarsEx s f (SigT t k)           = SigT <$> typeVarsEx s f t
+                                             <*> typeVarsEx s f k
+#else
+  typeVarsEx s f (SigT t k)           = (`SigT` k) <$> typeVarsEx s f t
+#endif
+  typeVarsEx s f (ForallT bs ctx ty)  = ForallT bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f ty
        where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
-  typeVarsEx _ _ t                   = pure t
+#if MIN_VERSION_template_haskell(2,11,0)
+  typeVarsEx s f (InfixT  t1 n t2)    = InfixT  <$> typeVarsEx s f t1
+                                                <*> pure n
+                                                <*> typeVarsEx s f t2
+  typeVarsEx s f (UInfixT t1 n t2)    = UInfixT <$> typeVarsEx s f t1
+                                                <*> pure n
+                                                <*> typeVarsEx s f t2
+  typeVarsEx s f (ParensT t)          = ParensT <$> typeVarsEx s f t
+#endif
+#if MIN_VERSION_template_haskell(2,15,0)
+  typeVarsEx s f (AppKindT t k)       = AppKindT <$> typeVarsEx s f t
+                                                 <*> typeVarsEx s f k
+  typeVarsEx s f (ImplicitParamT n t) = ImplicitParamT n <$> typeVarsEx s f t
+#endif
+  typeVarsEx _ _ t                    = pure t
 
 #if !MIN_VERSION_template_haskell(2,10,0)
 instance HasTypeVars Pred where
@@ -115,16 +134,12 @@ instance HasTypeVars Pred where
 #endif
 
 instance HasTypeVars Con where
-  typeVarsEx s f (NormalC n ts)     =
-    NormalC n <$> (traverse . _2) (typeVarsEx s f) ts
-  typeVarsEx s f (RecC n ts)        =
-    RecC n <$> (traverse . _3) (typeVarsEx s f) ts
-  typeVarsEx s f (InfixC l n r)     =
-    InfixC <$> g l <*> pure n <*> g r
-      where g (i, t) = (,) i <$> typeVarsEx s f t
-  typeVarsEx s f (ForallC bs ctx c) =
-    ForallC bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f c
-      where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
+  typeVarsEx s f (NormalC n ts) = NormalC n <$> (traverse . _2) (typeVarsEx s f) ts
+  typeVarsEx s f (RecC n ts) = RecC n <$> (traverse . _3) (typeVarsEx s f) ts
+  typeVarsEx s f (InfixC l n r) = InfixC <$> g l <*> pure n <*> g r
+       where g (i, t) = (,) i <$> typeVarsEx s f t
+  typeVarsEx s f (ForallC bs ctx c) = ForallC bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f c
+       where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
 #if MIN_VERSION_template_haskell(2,11,0)
   typeVarsEx s f (GadtC ns argTys retTy) =
     GadtC ns <$> (traverse . _2) (typeVarsEx s f) argTys
