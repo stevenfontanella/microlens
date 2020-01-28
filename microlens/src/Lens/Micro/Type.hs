@@ -31,6 +31,10 @@ where
 import Control.Applicative
 import Data.Functor.Identity
 
+#if MIN_VERSION_base(4,12,0)
+import Data.Functor.Contravariant
+#endif
+
 #if __GLASGOW_HASKELL__ < 710
 import Data.Monoid
 #endif
