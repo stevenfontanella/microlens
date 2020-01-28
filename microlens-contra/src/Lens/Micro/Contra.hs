@@ -37,9 +37,9 @@ import Lens.Micro.Extras (view)
 import Data.Foldable (traverse_)
 import Data.Functor.Contravariant (phantom, Contravariant)
 
-#if __GLASGOW_HASKELL__ < 710
+# if __GLASGOW_HASKELL__ < 710
 import Control.Applicative
-#endif
+# endif
 
 {- |
 This is the same thing as 'SimpleGetter' but more generalised (so that it would fully match the type used in lens).
