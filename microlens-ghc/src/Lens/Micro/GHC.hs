@@ -19,11 +19,11 @@ License     :  BSD-style (see the file LICENSE)
 
 By importing this module you get all functions and types from <http://hackage.haskell.org/package/microlens microlens>, as well as the following instances:
 
-* 'at' for 'Map' and 'IntMap'
+* 'at' for 'Map', 'Set', 'IntMap' and 'IntSet'
 
 * 'each' and 'ix' for
 
-    * 'Map' and 'IntMap'
+    * 'Map', 'Set', 'IntMap' and 'IntSet'
     * 'Array' and 'UArray'
     * 'Seq'
     * strict 'B.ByteString' and lazy 'BL.ByteString'
@@ -91,12 +91,12 @@ type instance Index   (Map k a) = k
 type instance IxValue (Map k a) = a
 type instance Index   (IntMap a) = Int
 type instance IxValue (IntMap a) = a
-type instance Index   (Seq a) = Int
-type instance IxValue (Seq a) = a
 type instance Index   (Set a) = a
 type instance IxValue (Set a) = ()
 type instance Index   IntSet = Int
 type instance IxValue IntSet = ()
+type instance Index   (Seq a) = Int
+type instance IxValue (Seq a) = a
 type instance Index   (Tree a) = [Int]
 type instance IxValue (Tree a) = a
 type instance Index   (Array.Array i e) = i
