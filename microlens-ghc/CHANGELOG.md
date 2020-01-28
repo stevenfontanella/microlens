@@ -1,3 +1,7 @@
+# 0.4.12
+
+* Added `At` and `Ixed` instances for `Set` and `IntSet` (thanks to @wygulmage).
+
 # 0.4.11.1
 
 * No more conditional `Safe` (see [#122](https://github.com/monadfix/microlens/issues/122)).
