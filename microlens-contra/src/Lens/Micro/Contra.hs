@@ -25,7 +25,7 @@ module Lens.Micro.Contra
 where
 
 
-#if MIN_VERSION_microlens(0,4,12) && (__GLASGOW_HASKELL__ >= 706)
+#if MIN_VERSION_microlens(0,4,12) && (__GLASGOW_HASKELL__ >= 806)
 
 import Lens.Micro
 
