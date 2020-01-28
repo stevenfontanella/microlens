@@ -19,7 +19,7 @@ Module      :  Lens.Micro.Internal
 Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
-This module is needed to give other packages from the microlens family (like <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>) access to functions and classes that don't need to be exported from "Lens.Micro" (because they just clutter the namespace). Also:
+This module is needed to give other packages from the microlens family (like <https://hackage.haskell.org/package/microlens-ghc microlens-ghc>) access to functions and classes that don't need to be exported from "Lens.Micro" (because they just clutter the namespace). Also:
 
   * 'traversed' is here because otherwise there'd be a dependency cycle
   * 'sets' is here because it's used in RULEs
@@ -190,7 +190,7 @@ You can use 'each' with these things:
 'each' :: ('RealFloat' a, 'RealFloat' b) => 'Traversal' ('Complex' a) ('Complex' b) a b
 @
 
-You can also use 'each' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+You can also use 'each' with types from <https://hackage.haskell.org/package/array array>, <https://hackage.haskell.org/package/bytestring bytestring>, and <https://hackage.haskell.org/package/containers containers> by using <https://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <https://hackage.haskell.org/package/vector vector>, <https://hackage.haskell.org/package/text text>, and <https://hackage.haskell.org/package/unordered-containers unordered-containers> by using <https://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   each :: Traversal s t a b
 
@@ -280,7 +280,7 @@ The following instances are provided in this package:
 'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
 @
 
-You can also use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+You can also use 'ix' with types from <https://hackage.haskell.org/package/array array>, <https://hackage.haskell.org/package/bytestring bytestring>, and <https://hackage.haskell.org/package/containers containers> by using <https://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <https://hackage.haskell.org/package/vector vector>, <https://hackage.haskell.org/package/text text>, and <https://hackage.haskell.org/package/unordered-containers unordered-containers> by using <https://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   ix :: Index m -> Traversal' m (IxValue m)
 
@@ -317,7 +317,7 @@ Note that 'at' isn't strict for @Map@, even if you're using @Data.Map.Strict@:
 
 The reason for such behavior is that there's actually no “strict @Map@” type; @Data.Map.Strict@ just provides some strict functions for ordinary @Map@s.
 
-This package doesn't actually provide any instances for 'at', but there are instances for @Map@ and @IntMap@ in <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> and an instance for @HashMap@ in <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+This package doesn't actually provide any instances for 'at', but there are instances for @Map@ and @IntMap@ in <https://hackage.haskell.org/package/microlens-ghc microlens-ghc> and an instance for @HashMap@ in <https://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   at :: Index m -> Lens' m (Maybe (IxValue m))
 
@@ -583,7 +583,7 @@ stripDiacritics = ...
 >>> someText & strict %~ stripDiacritics
 "Paul Erdos" :: Lazy.Text
 
-'strict' works on @ByteString@ and @StateT@\/@WriterT@\/@RWST@ if you use <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, and additionally on @Text@ if you use <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+'strict' works on @ByteString@ and @StateT@\/@WriterT@\/@RWST@ if you use <https://hackage.haskell.org/package/microlens-ghc microlens-ghc>, and additionally on @Text@ if you use <https://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
   strict :: Lens' lazy strict
 

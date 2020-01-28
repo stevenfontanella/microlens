@@ -8,7 +8,7 @@ Module      :  Lens.Micro.Contra
 Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
-This module provides types and functions that require 'Contravariant'; they aren't included in the main microlens package because <http://hackage.haskell.org/package/contravariant contravariant> has a lot of dependencies.
+This module provides types and functions that require 'Contravariant'; they aren't included in the main microlens package because <https://hackage.haskell.org/package/contravariant contravariant> has a lot of dependencies.
 
 Starting from GHC 8.6, 'Contravariant' is included in base, the same functions are conditionally provided by microlens, and this package simply reexports the microlens variants (depending on the microlens version).
 -}

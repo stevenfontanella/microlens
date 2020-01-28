@@ -1,18 +1,18 @@
 # microlens
 
-[![Build status](https://secure.travis-ci.org/monadfix/microlens.svg)](http://travis-ci.org/monadfix/microlens)
+[![Build status](https://secure.travis-ci.org/monadfix/microlens.svg)](https://travis-ci.org/monadfix/microlens)
 ![BSD3 license](https://img.shields.io/badge/license-BSD3-blue.svg)
 
 *A tiny part of the lens library with no dependencies.*
 
-[lens]: http://hackage.haskell.org/package/lens
+[lens]: https://hackage.haskell.org/package/lens
 
 ## If you're completely new to this whole lenses thing
 
 Read [this tutorial][lens-tutorial]. It's for [lens][], but it applies to
 microlens just as well (except for module names).
 
-[lens-tutorial]: http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html
+[lens-tutorial]: https://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html
 
 ## What is microlens?
 
@@ -64,14 +64,14 @@ Other features:
   * All `INLINE` pragmas sprinkled through lens were preserved. Performance
     shouldn't suffer; if it does, it's a bug.
 
-[microlens]: http://hackage.haskell.org/package/microlens
-[microlens-mtl]: http://hackage.haskell.org/package/microlens-mtl
-[microlens-th]: http://hackage.haskell.org/package/microlens-th
-[microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
-[microlens-platform]: http://hackage.haskell.org/package/microlens-platform
-[microlens-contra]: http://hackage.haskell.org/package/microlens-contra
-[microlens-aeson]: http://hackage.haskell.org/package/microlens-aeson
-[microlens-process]: http://hackage.haskell.org/package/microlens-process
+[microlens]: https://hackage.haskell.org/package/microlens
+[microlens-mtl]: https://hackage.haskell.org/package/microlens-mtl
+[microlens-th]: https://hackage.haskell.org/package/microlens-th
+[microlens-ghc]: https://hackage.haskell.org/package/microlens-ghc
+[microlens-platform]: https://hackage.haskell.org/package/microlens-platform
+[microlens-contra]: https://hackage.haskell.org/package/microlens-contra
+[microlens-aeson]: https://hackage.haskell.org/package/microlens-aeson
+[microlens-process]: https://hackage.haskell.org/package/microlens-process
 
 The reason microlens exists is that lens is a huge library with lots of
 dependencies, but lenses are very useful and it's not nice to limit them to
@@ -130,15 +130,15 @@ not.
     lens (the reason they're in a separate library is that those types
     depend on [contravariant][])
 
-[contravariant]: http://hackage.haskell.org/package/contravariant
+[contravariant]: https://hackage.haskell.org/package/contravariant
 
 Unofficial:
 
   * [microlens-aeson][] – a port of [lens-aeson][]
   * [microlens-process][] - a port of [lens-process][]
 
-[lens-aeson]: http://hackage.haskell.org/package/lens-aeson
-[lens-process]: http://hackage.haskell.org/package/lens-process
+[lens-aeson]: https://hackage.haskell.org/package/lens-aeson
+[lens-process]: https://hackage.haskell.org/package/lens-process
 
 If you're writing a library, use [microlens][] and other packages as needed;
 if you're writing an application, perhaps use [microlens-platform][].
@@ -180,11 +180,11 @@ In other words, there's no risk of the following happening:
     lenses and is thus incompatible with lens (it uses different names,
     too). Doesn't actually provide any lenses.
 
-[basic-lens]: http://hackage.haskell.org/package/basic-lens
-[reasonable-lens]: http://hackage.haskell.org/package/reasonable-lens
-[lens-simple]: http://hackage.haskell.org/package/lens-simple
-[lens-family]: http://hackage.haskell.org/package/lens-family
-[data-lens-light]: http://hackage.haskell.org/package/data-lens-light
+[basic-lens]: https://hackage.haskell.org/package/basic-lens
+[reasonable-lens]: https://hackage.haskell.org/package/reasonable-lens
+[lens-simple]: https://hackage.haskell.org/package/lens-simple
+[lens-family]: https://hackage.haskell.org/package/lens-family
+[data-lens-light]: https://hackage.haskell.org/package/data-lens-light
 
 So, I recommend:
 
@@ -303,7 +303,7 @@ lens-compatible *consumers* of data.
 `Profunctor` and I don't want to depend on [profunctors][]. For now
 prisms/isos which are included are actually just traversals.
 
-[profunctors]: http://hackage.haskell.org/package/profunctors
+[profunctors]: https://hackage.haskell.org/package/profunctors
 
 For the same reason nothing indexed is included, since it's impossible to
 get `Conjoined` without adding a pile of dependencies:
@@ -358,8 +358,8 @@ package][microlens-ghc]. There are 2 reasons for this:
 * All those instances actually take quite some time to build (for the same
   reason not all instances for tuples are included in the main package).
 
-[vector]: http://hackage.haskell.org/package/vector
-[array]: http://hackage.haskell.org/package/array
+[vector]: https://hackage.haskell.org/package/vector
+[array]: https://hackage.haskell.org/package/array
 
 ## What about lens-family?
 
@@ -368,7 +368,7 @@ with lens (unless I decide to nitpick and say that its `makeLensesBy` and
 `intAt` aren't present in lens at all), which has few dependencies, and
 which provides Template Haskell in a separate package as well.
 
-[lens-family]: http://hackage.haskell.org/package/lens-family
+[lens-family]: https://hackage.haskell.org/package/lens-family
 
 It looks like lens-family values cleanness and simplicity, which
 unfortunately means that it might've been hard for me (if possible at all)

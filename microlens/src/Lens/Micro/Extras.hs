@@ -33,7 +33,7 @@ The reason it's not in "Lens.Micro" is that @view@ in lens has a more general si
 view :: MonadReader s m => Getting a s a -> m a
 @
 
-So, you would be able to use this 'view' with functions, but not in various reader monads. For most people this shouldn't be an issue; if it is for you, use @view@ from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
+So, you would be able to use this 'view' with functions, but not in various reader monads. For most people this shouldn't be an issue; if it is for you, use @view@ from <https://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
 -}
 view :: Getting a s a -> s -> a
 view l = getConst #. l Const
@@ -51,7 +51,7 @@ The reason it's not in "Lens.Micro" is that @preview@ in lens has a more general
 preview :: MonadReader s m => Getting (First a) s a -> m (Maybe a)
 @
 
-Just like with 'view', you would be able to use this 'preview' with functions, but not in reader monads; if this is an issue for you, use @preview@ from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
+Just like with 'view', you would be able to use this 'preview' with functions, but not in reader monads; if this is an issue for you, use @preview@ from <https://hackage.haskell.org/package/microlens-mtl microlens-mtl>.
 -}
 preview :: Getting (First a) s a -> s -> Maybe a
 preview l = getFirst #. foldMapOf l (First #. Just)

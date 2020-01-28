@@ -2,9 +2,9 @@ name:                microlens
 version:             0.4.12
 synopsis:            A tiny lens library with no dependencies
 description:
-  NOTE: If you're writing an app, you probably want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it has the most features. <http://hackage.haskell.org/package/microlens microlens> is intended more for library writers who want a tiny lens library (after all, lenses are pretty useful for everything, not just for updating records!).
+  NOTE: If you're writing an app, you probably want <https://hackage.haskell.org/package/microlens-platform microlens-platform> – it has the most features. <https://hackage.haskell.org/package/microlens microlens> is intended more for library writers who want a tiny lens library (after all, lenses are pretty useful for everything, not just for updating records!).
   .
-  This library is an extract from <http://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.
+  This library is an extract from <https://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.
   .
   There's a longer readme <https://github.com/monadfix/microlens#readme on Github>. It has a migration guide for lens users, a description of other packages in the family, a discussion of other lens libraries you could use instead, and so on.
   .
@@ -18,23 +18,23 @@ description:
   .
   However, don't use this library if:
   .
-    * You need @Iso@s, @Prism@s, indexed traversals, or actually anything else which isn't defined here (though some indexed functions are available elsewhere – containers and vector provide them for their types, and <http://hackage.haskell.org/package/ilist ilist> provides indexed functions for lists).
+    * You need @Iso@s, @Prism@s, indexed traversals, or actually anything else which isn't defined here (though some indexed functions are available elsewhere – containers and vector provide them for their types, and <https://hackage.haskell.org/package/ilist ilist> provides indexed functions for lists).
   .
-    * You want a library with a clean, understandable implementation (in which case you're looking for <http://hackage.haskell.org/package/lens-simple lens-simple>).
+    * You want a library with a clean, understandable implementation (in which case you're looking for <https://hackage.haskell.org/package/lens-simple lens-simple>).
   .
-  As already mentioned, if you're writing an application which uses lenses more extensively, look at <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it combines features of most other microlens packages (<http://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <http://hackage.haskell.org/package/microlens-th microlens-th>, <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>).
+  As already mentioned, if you're writing an application which uses lenses more extensively, look at <https://hackage.haskell.org/package/microlens-platform microlens-platform> – it combines features of most other microlens packages (<https://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <https://hackage.haskell.org/package/microlens-th microlens-th>, <https://hackage.haskell.org/package/microlens-ghc microlens-ghc>).
   .
-  If you want to export getters or folds and don't mind the <http://hackage.haskell.org/package/contravariant contravariant> dependency, please consider using <http://hackage.haskell.org/package/microlens-contra microlens-contra>.
+  If you want to export getters or folds and don't mind the <https://hackage.haskell.org/package/contravariant contravariant> dependency, please consider using <https://hackage.haskell.org/package/microlens-contra microlens-contra>.
   .
-  If you haven't ever used lenses before, read <http://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html this tutorial>. (It's for lens, but it applies to microlens just as well.)
+  If you haven't ever used lenses before, read <https://hackage.haskell.org/package/lens-tutorial/docs/Control-Lens-Tutorial.html this tutorial>. (It's for lens, but it applies to microlens just as well.)
   .
   Note that microlens has no dependencies starting from GHC 7.10 (base-4.8). Prior to that, it depends on transformers-0.2 or above.
 license:             BSD3
 license-file:        LICENSE
 author:              Edward Kmett, Artyom Kazak
 maintainer:          Monadfix <hi@monadfix.com>
-homepage:            http://github.com/monadfix/microlens
-bug-reports:         http://github.com/monadfix/microlens/issues
+homepage:            https://github.com/monadfix/microlens
+bug-reports:         https://github.com/monadfix/microlens/issues
 -- copyright:
 category:            Data, Lenses
 build-type:          Simple

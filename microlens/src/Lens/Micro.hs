@@ -14,18 +14,18 @@ Module      :  Lens.Micro
 Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
-This module provides the essential functionality. There are other packages in the microlens family – mix and match them at will. If you're writing an app, you want <http://hackage.haskell.org/package/microlens-platform microlens-platform> – it provides the most functionality.
+This module provides the essential functionality. There are other packages in the microlens family – mix and match them at will. If you're writing an app, you want <https://hackage.haskell.org/package/microlens-platform microlens-platform> – it provides the most functionality.
 
-* <http://hackage.haskell.org/package/microlens-mtl microlens-mtl> – (@+=@) and friends, @use@, @zoom@\/@magnify@
-* <http://hackage.haskell.org/package/microlens-th microlens-th> – @makeLenses@ and @makeFields@
-* <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> – everything in microlens + instances to make @each@\/@at@\/@ix@ usable with arrays, @ByteString@, and containers
-* <http://hackage.haskell.org/package/microlens-platform microlens-platform> – microlens-ghc + microlens-mtl + microlens-th + instances for @Text@, @Vector@, and @HashMap@
-* <http://hackage.haskell.org/package/microlens-contra microlens-contra> – @Fold@ and @Getter@ that are exact copies of types in lens
+* <https://hackage.haskell.org/package/microlens-mtl microlens-mtl> – (@+=@) and friends, @use@, @zoom@\/@magnify@
+* <https://hackage.haskell.org/package/microlens-th microlens-th> – @makeLenses@ and @makeFields@
+* <https://hackage.haskell.org/package/microlens-ghc microlens-ghc> – everything in microlens + instances to make @each@\/@at@\/@ix@ usable with arrays, @ByteString@, and containers
+* <https://hackage.haskell.org/package/microlens-platform microlens-platform> – microlens-ghc + microlens-mtl + microlens-th + instances for @Text@, @Vector@, and @HashMap@
+* <https://hackage.haskell.org/package/microlens-contra microlens-contra> – @Fold@ and @Getter@ that are exact copies of types in lens
 
 Unofficial:
 
-* <http://hackage.haskell.org/package/microlens-aeson microlens-aeson> – a port of <http://hackage.haskell.org/package/lens-aeson lens-aeson>
-* <http://hackage.haskell.org/package/microlens-process microlens-process> - a port of <http://hackage.haskell.org/package/lens-process lens-process>
+* <https://hackage.haskell.org/package/microlens-aeson microlens-aeson> – a port of <https://hackage.haskell.org/package/lens-aeson lens-aeson>
+* <https://hackage.haskell.org/package/microlens-process microlens-process> - a port of <https://hackage.haskell.org/package/lens-process lens-process>
 
 -}
 module Lens.Micro
@@ -599,7 +599,7 @@ When ('^.') is used with a traversal, it combines all results using the 'Monoid'
 
 The reason for this is that traversals use 'Applicative', and the 'Applicative' instance for 'Const' uses monoid concatenation to combine “effects” of 'Const'.
 
-A non-operator version of ('^.') is called @view@, and it's a bit more general than ('^.') (it works in @MonadReader@). If you need the general version, you can get it from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>; otherwise there's 'Lens.Micro.Extras.view' available in "Lens.Micro.Extras".
+A non-operator version of ('^.') is called @view@, and it's a bit more general than ('^.') (it works in @MonadReader@). If you need the general version, you can get it from <https://hackage.haskell.org/package/microlens-mtl microlens-mtl>; otherwise there's 'Lens.Micro.Extras.view' available in "Lens.Micro.Extras".
 -}
 (^.) :: s -> Getting a s a -> a
 s ^. l = getConst (l Const s)
@@ -729,7 +729,7 @@ Nothing
 >>> Right 1 ^? _Right
 Just 1
 
-A non-operator version of ('^?') is called @preview@, and – like @view@ – it's a bit more general than ('^?') (it works in @MonadReader@). If you need the general version, you can get it from <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>; otherwise there's 'Lens.Micro.Extras.preview' available in "Lens.Micro.Extras".
+A non-operator version of ('^?') is called @preview@, and – like @view@ – it's a bit more general than ('^?') (it works in @MonadReader@). If you need the general version, you can get it from <https://hackage.haskell.org/package/microlens-mtl microlens-mtl>; otherwise there's 'Lens.Micro.Extras.preview' available in "Lens.Micro.Extras".
 -}
 (^?) :: s -> Getting (First a) s a -> Maybe a
 s ^? l = getFirst (foldMapOf l (First #. Just) s)
@@ -838,13 +838,13 @@ A 'Lens' can only point at a single value inside a structure (unlike a 'Traversa
 
 There are several ways to get lenses for some datatype:
 
-* They can already be provided by the package, by @microlens@, or by some other package like <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
+* They can already be provided by the package, by @microlens@, or by some other package like <https://hackage.haskell.org/package/microlens-platform microlens-platform>.
 
-* They can be provided by some unofficial package (like <http://hackage.haskell.org/package/microlens-aeson microlens-aeson>).
+* They can be provided by some unofficial package (like <https://hackage.haskell.org/package/microlens-aeson microlens-aeson>).
 
 * You can get them by combining already existing lenses.
 
-* You can derive them with Template Haskell (with <http://hackage.haskell.org/package/microlens-th microlens-th>).
+* You can derive them with Template Haskell (with <https://hackage.haskell.org/package/microlens-th microlens-th>).
 
 * You can write them with 'lens' if you have a setter and a getter. It's a simple and good way.
 
@@ -887,7 +887,7 @@ location f (Person age city country) =
   (\\(city', country') -> Person age city' country') '<$>' f (city, country)
 @
 
-You even can choose to use a lens to present /all/ information contained in the structure (in a different way). Such lenses are called @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Iso.html#t:Iso Iso>@ in lens's terminology. For instance (assuming you don't mind functions that can error out), here's a lens which lets you act on the string representation of a value:
+You even can choose to use a lens to present /all/ information contained in the structure (in a different way). Such lenses are called @<https://hackage.haskell.org/package/lens/docs/Control-Lens-Iso.html#t:Iso Iso>@ in lens's terminology. For instance (assuming you don't mind functions that can error out), here's a lens which lets you act on the string representation of a value:
 
 @
 string :: (Read a, Show a) => 'Lens'' a String
@@ -942,7 +942,7 @@ Isos (or isomorphisms) are lenses that convert a value instead of targeting a pa
 from :: Iso' s a -> Iso' a s
 @
 
-However, it's not possible for microlens to export isomorphisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Profunctor Profunctor>@, which resides in the <http://hackage.haskell.org/package/profunctors profunctors> library, which is a somewhat huge dependency. So, all isomorphisms included here are lenses instead (and thus you can't use them in the opposite direction).
+However, it's not possible for microlens to export isomorphisms, because their type depends on @<https://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Profunctor Profunctor>@, which resides in the <https://hackage.haskell.org/package/profunctors profunctors> library, which is a somewhat huge dependency. So, all isomorphisms included here are lenses instead (and thus you can't use them in the opposite direction).
 -}
 
 {- |
@@ -1108,7 +1108,7 @@ singular l afb s = case ins b of
 >>> ([],[3]) & failing (_1.each) (_2.each) .~ 0
 ([],[0])
 
-Note that the resulting traversal won't be valid unless either both traversals don't touch each others' elements, or both traversals return exactly the same results. To see an example of how 'failing' can generate invalid traversals, see <http://stackoverflow.com/questions/27138856/why-does-failing-from-lens-produce-invalid-traversals this Stackoverflow question>.
+Note that the resulting traversal won't be valid unless either both traversals don't touch each others' elements, or both traversals return exactly the same results. To see an example of how 'failing' can generate invalid traversals, see <https://stackoverflow.com/questions/27138856/why-does-failing-from-lens-produce-invalid-traversals this Stackoverflow question>.
 -}
 failing :: Traversal s t a b -> Traversal s t a b -> Traversal s t a b
 failing left right afb s = case pins b of
@@ -1196,7 +1196,7 @@ filtered p f s = if p s then f s else pure s
 {-# INLINE filtered #-}
 
 {- |
-'both' traverses both fields of a tuple. Unlike @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Traversal.html#v:both both>@ from lens, it only works for pairs – not for triples or 'Either'.
+'both' traverses both fields of a tuple. Unlike @<https://hackage.haskell.org/package/lens/docs/Control-Lens-Traversal.html#v:both both>@ from lens, it only works for pairs – not for triples or 'Either'.
 
 >>> ("str","ing") ^. both
 "string"
@@ -1224,7 +1224,7 @@ The reason it's a traversal and not a lens is that there's nothing to traverse w
 >>> [] ^? _head
 Nothing
 
-This package only lets you use '_head' on lists, but if you use <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> you get instances for @ByteString@ and @Seq@, and if you use <http://hackage.haskell.org/package/microlens-platform microlens-platform> you additionally get instances for @Text@ and @Vector@.
+This package only lets you use '_head' on lists, but if you use <https://hackage.haskell.org/package/microlens-ghc microlens-ghc> you get instances for @ByteString@ and @Seq@, and if you use <https://hackage.haskell.org/package/microlens-platform microlens-platform> you additionally get instances for @Text@ and @Vector@.
 -}
 _head :: Cons s s a a => Traversal' s a
 _head = _Cons._1
@@ -1254,7 +1254,7 @@ If you want to traverse each /element/ of the tail, use '_tail' with 'each':
 >>> "I HATE CAPS." & _tail.each %~ toLower
 "I hate caps."
 
-This package only lets you use '_tail' on lists, but if you use <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> you get instances for @ByteString@ and @Seq@, and if you use <http://hackage.haskell.org/package/microlens-platform microlens-platform> you additionally get instances for @Text@ and @Vector@.
+This package only lets you use '_tail' on lists, but if you use <https://hackage.haskell.org/package/microlens-ghc microlens-ghc> you get instances for @ByteString@ and @Seq@, and if you use <https://hackage.haskell.org/package/microlens-platform microlens-platform> you additionally get instances for @Text@ and @Vector@.
 -}
 _tail :: Cons s s a a => Traversal' s s
 _tail = _Cons._2
@@ -1312,7 +1312,7 @@ Left 3
 Left 5
 @
 
-However, it's not possible for microlens to export prisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@ from <http://hackage.haskell.org/package/profunctors profunctors>. So, all prisms included here are traversals instead (and you can't reverse them).
+However, it's not possible for microlens to export prisms, because their type depends on @<https://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@ from <https://hackage.haskell.org/package/profunctors profunctors>. So, all prisms included here are traversals instead (and you can't reverse them).
 -}
 
 {- |

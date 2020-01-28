@@ -17,7 +17,7 @@ Module      :  Lens.Micro.Platform
 Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
-This module is an approximation for @<http://hackage.haskell.org/package/lens/docs/Control-Lens.html Control.Lens>@ from <http://hackage.haskell.org/package/lens lens>; by importing it you get all functions and instances from <http://hackage.haskell.org/package/microlens microlens>, <http://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, as well as the following instances:
+This module is an approximation for @<https://hackage.haskell.org/package/lens/docs/Control-Lens.html Control.Lens>@ from <https://hackage.haskell.org/package/lens lens>; by importing it you get all functions and instances from <https://hackage.haskell.org/package/microlens microlens>, <https://hackage.haskell.org/package/microlens-mtl microlens-mtl>, <https://hackage.haskell.org/package/microlens-ghc microlens-ghc>, as well as the following instances:
 
 * 'at' for 'HashMap'
 
