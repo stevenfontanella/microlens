@@ -137,6 +137,10 @@ import Data.Functor ((<&>))
 import qualified Control.Monad.Fail as Fail
 #endif
 
+#if MIN_VERSION_base(4,12,0)
+import qualified Data.Functor.Contravariant as Contravariant
+#endif
+
 {- $setup
 -- >>> import Data.Char (toUpper)
 -- >>> import Control.Arrow (first, second, left, right)
@@ -569,12 +573,12 @@ A getter always returns exactly 1 element (getters that can return more than one
 {- |
 Turn a 'SimpleGetter' into a true 'Getter'.
 
-Only available starting from GHC 8.6 because it needs 'Contravariant' in base.
+Only available starting from GHC 8.6 because it needs 'Contravariant.Contravariant' in base.
 
 @since 0.4.12
 -}
 fromSimpleGetter :: SimpleGetter s a -> Getter s a
-fromSimpleGetter g f = phantom . f . view g
+fromSimpleGetter g f = Contravariant.phantom . f . (^. g)
 {-# INLINE fromSimpleGetter #-}
 #endif
 
@@ -671,12 +675,12 @@ Nothing
 {- |
 Turn a 'SimpleFold' into a true 'Fold'.
 
-Only available starting from GHC 8.6 because it needs 'Contravariant' in base.
+Only available starting from GHC 8.6 because it needs 'Contravariant.Contravariant' in base.
 
 @since 0.4.12
 -}
 fromSimpleFold :: SimpleFold s a -> Fold s a
-fromSimpleFold g f = phantom . traverse_ f . toListOf g
+fromSimpleFold g f = Contravariant.phantom . F.traverse_ f . toListOf g
 {-# INLINE fromSimpleFold #-}
 #endif
 

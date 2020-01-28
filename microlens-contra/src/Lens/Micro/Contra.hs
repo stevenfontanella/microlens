@@ -25,6 +25,12 @@ module Lens.Micro.Contra
 where
 
 
+#if MIN_VERSION_microlens(0,4,12) && (__GLASGOW_HASKELL__ >= 706)
+
+import Lens.Micro
+
+#else
+
 import Lens.Micro
 import Lens.Micro.Extras (view)
 
@@ -35,8 +41,6 @@ import Data.Functor.Contravariant (phantom, Contravariant)
 import Control.Applicative
 #endif
 
-
-#if !MIN_VERSION_microlens(0,4,12) || (__GLASGOW_HASKELL__ < 706)
 {- |
 This is the same thing as 'SimpleGetter' but more generalised (so that it would fully match the type used in lens).
 -}
@@ -62,4 +66,5 @@ Turn a 'SimpleFold' into a true 'Fold'.
 fromSimpleFold :: SimpleFold s a -> Fold s a
 fromSimpleFold g f = phantom . traverse_ f . toListOf g
 {-# INLINE fromSimpleFold #-}
+
 #endif
