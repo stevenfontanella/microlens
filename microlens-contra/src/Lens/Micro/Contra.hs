@@ -9,6 +9,8 @@ Copyright   :  (C) 2013-2016 Edward Kmett, 2015-2016 Artyom Kazak, 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
 
 This module provides types and functions that require 'Contravariant'; they aren't included in the main microlens package because <http://hackage.haskell.org/package/contravariant contravariant> has a lot of dependencies.
+
+Starting from GHC 8.6, 'Contravariant' is included in base, the same functions are conditionally provided by microlens, and this package simply reexports the microlens variants (depending on the microlens version).
 -}
 module Lens.Micro.Contra
 (
@@ -34,6 +36,7 @@ import Control.Applicative
 #endif
 
 
+#if !MIN_VERSION_microlens(0,4,12) || (__GLASGOW_HASKELL__ < 706)
 {- |
 This is the same thing as 'SimpleGetter' but more generalised (so that it would fully match the type used in lens).
 -}
@@ -59,3 +62,4 @@ Turn a 'SimpleFold' into a true 'Fold'.
 fromSimpleFold :: SimpleFold s a -> Fold s a
 fromSimpleFold g f = phantom . traverse_ f . toListOf g
 {-# INLINE fromSimpleFold #-}
+#endif

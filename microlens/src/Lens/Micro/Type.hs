@@ -14,7 +14,13 @@ module Lens.Micro.Type
 (
   ASetter, ASetter',
   SimpleGetter, Getting,
+#if MIN_VERSION_base(4,12,0)
+  Getter,
+#endif
   SimpleFold,
+#if MIN_VERSION_base(4,12,0)
+  Fold,
+#endif
   Lens, Lens',
   Traversal, Traversal',
   LensLike, LensLike',
@@ -49,6 +55,8 @@ This is a type alias for monomorphic setters which don't change the type of the 
 type ASetter' s a = ASetter s s a a
 
 {- |
+__Note: starting from GHC 8.6, 'Getter' is available and you should use it instead of 'SimpleGetter'. For the time being, microlens-th still generates 'SimpleGetter's instead of 'Getter's.__
+
 A @SimpleGetter s a@ extracts @a@ from @s@; so, it's the same thing as @(s -> a)@, but you can use it in lens chains because its type looks like this:
 
 @
@@ -72,11 +80,22 @@ type Getter s a =
   forall f. (Contravariant f, Functor f) => (a -> f a) -> s -> f s
 @
 
-I'm not currently aware of any functions that take lens's @Getter@ but won't accept 'SimpleGetter', but you should try to avoid exporting 'SimpleGetter's anyway to minimise confusion. Alternatively, look at <http://hackage.haskell.org/package/microlens-contra microlens-contra>, which provides a fully lens-compatible @Getter@.
+I am not currently aware of any functions that take lens's @Getter@ but won't accept 'SimpleGetter', but you should try to avoid exporting 'SimpleGetter's anyway to minimise confusion. Starting from GHC 8.6, microlens provides a proper 'Getter'. If you need to support older GHC versions as well, use <http://hackage.haskell.org/package/microlens-contra microlens-contra>.
 
-Lens users: you can convert a 'SimpleGetter' to @Getter@ by applying @to . view@ to it.
+Lens users: you can convert a 'SimpleGetter' into a @Getter@ by applying @to . view@ to it.
 -}
 type SimpleGetter s a = forall r. Getting r s a
+
+#if MIN_VERSION_base(4,12,0)
+{- |
+Like 'SimpleGetter', but fully generalized – an exact copy of @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Getter.html#t:Getter Getter>@ from lens.
+
+Only available starting from GHC 8.6 because it needs 'Contravariant' in base.
+
+@since 0.4.12
+-}
+type Getter s a = forall f. (Contravariant f, Functor f) => (a -> f a) -> s -> f s
+#endif
 
 {- |
 Functions that operate on getters and folds – such as ('Lens.Micro.^.'), ('Lens.Micro.^..'), ('Lens.Micro.^?') – use @Getter r s a@ (with different values of @r@) to describe what kind of result they need. For instance, ('Lens.Micro.^.') needs the getter to be able to return a single value, and so it accepts a getter of type @Getting a s a@. ('Lens.Micro.^..') wants the getter to gather values together, so it uses @Getting (Endo [a]) s a@ (it could've used @Getting [a] s a@ instead, but it's faster with 'Data.Monoid.Endo'). The choice of @r@ depends on what you want to do with elements you're extracting from @s@.
@@ -84,6 +103,8 @@ Functions that operate on getters and folds – such as ('Lens.Micro.^.'), ('Len
 type Getting r s a = (a -> Const r a) -> s -> Const r s
 
 {- |
+__Note: starting from GHC 8.6, 'Fold' is available and you should use it instead of 'SimpleFold'. For the time being, microlens-th still generates 'SimpleFold's instead of 'Fold's.__
+
 A @SimpleFold s a@ extracts several @a@s from @s@; so, it's pretty much the same thing as @(s -> [a])@, but you can use it with lens operators.
 
 The actual @Fold@ from lens is more general:
@@ -99,11 +120,22 @@ There are several functions in lens that accept lens's @Fold@ but won't accept '
 @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:backwards backwards>@,
 @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldByOf foldByOf>@,
 @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#v:foldMapByOf foldMapByOf>@.
-For this reason, try not to export 'SimpleFold's if at all possible. <http://hackage.haskell.org/package/microlens-contra microlens-contra> provides a fully lens-compatible @Fold@.
+For this reason, try not to export 'SimpleFold's if at all possible. Starting from GHC 8.6, microlens provides a proper 'Fold'. If you need to support older GHC versions as well, use <http://hackage.haskell.org/package/microlens-contra microlens-contra>.
 
-Lens users: you can convert a 'SimpleFold' to @Fold@ by applying @folded . toListOf@ to it.
+Lens users: you can convert a 'SimpleFold' into a @Fold@ by applying @folded . toListOf@ to it.
 -}
 type SimpleFold s a = forall r. Monoid r => Getting r s a
+
+#if MIN_VERSION_base(4,12,0)
+{- |
+Like 'SimpleFold', but fully generalized – an exact copy of @<http://hackage.haskell.org/package/lens/docs/Control-Lens-Fold.html#t:Fold Fold>@ from lens.
+
+Only available starting from GHC 8.6 because it needs 'Contravariant' in base.
+
+@since 0.4.12
+-}
+type Fold s a = forall f. (Contravariant f, Applicative f) => (a -> f a) -> s -> f s
+#endif
 
 {- |
 @Lens s t a b@ is the lowest common denominator of a setter and a getter, something that has the power of both; it has a 'Functor' constraint, and since both 'Const' and 'Identity' are functors, it can be used whenever a getter or a setter is needed.

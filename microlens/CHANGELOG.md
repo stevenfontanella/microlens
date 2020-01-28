@@ -1,3 +1,7 @@
+# 0.4.12
+
+* Added `Getter`, `Fold`, `fromSimpleGetter`, `fromSimpleFold` (available only with GHC 8.6 and later).
+
 # 0.4.11.3
 
 * Exported a `coerce` compatibility shim from `Lens.Micro.Internal`.

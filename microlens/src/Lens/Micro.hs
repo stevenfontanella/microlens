@@ -51,6 +51,10 @@ module Lens.Micro
   -- * Getter: extracts a value from a structure
   -- $getters-note
   SimpleGetter,
+#if MIN_VERSION_base(4,12,0)
+  Getter,
+  fromSimpleGetter,
+#endif
   Getting,
   (^.),
   to,
@@ -58,6 +62,10 @@ module Lens.Micro
   -- * Fold: extracts multiple elements
   -- $folds-note
   SimpleFold,
+#if MIN_VERSION_base(4,12,0)
+  Fold,
+  fromSimpleFold,
+#endif
   (^..), toListOf,
   (^?),
   (^?!),
@@ -557,6 +565,19 @@ Getters can be composed with ('.'):
 A getter always returns exactly 1 element (getters that can return more than one element are called folds and are present in this library as well).
 -}
 
+#if MIN_VERSION_base(4,12,0)
+{- |
+Turn a 'SimpleGetter' into a true 'Getter'.
+
+Only available starting from GHC 8.6 because it needs 'Contravariant' in base.
+
+@since 0.4.12
+-}
+fromSimpleGetter :: SimpleGetter s a -> Getter s a
+fromSimpleGetter g f = phantom . f . view g
+{-# INLINE fromSimpleGetter #-}
+#endif
+
 {- |
 ('^.') applies a getter to a value; in other words, it gets a value out of a structure using a getter (which can be a lens, traversal, fold, etc.).
 
@@ -645,6 +666,19 @@ Nothing
 
 (Unfortunately, this trick won't help you with setting or modifying.)
 -}
+
+#if MIN_VERSION_base(4,12,0)
+{- |
+Turn a 'SimpleFold' into a true 'Fold'.
+
+Only available starting from GHC 8.6 because it needs 'Contravariant' in base.
+
+@since 0.4.12
+-}
+fromSimpleFold :: SimpleFold s a -> Fold s a
+fromSimpleFold g f = phantom . traverse_ f . toListOf g
+{-# INLINE fromSimpleFold #-}
+#endif
 
 {- |
 @s ^.. t@ returns the list of all values that @t@ gets from @s@.
