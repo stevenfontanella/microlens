@@ -1,4 +1,4 @@
-resolver: lts-13.18
+resolver: lts-15.8
 
 packages:
 - microlens
@@ -8,5 +8,4 @@ packages:
 - microlens-th
 - microlens-platform
 
-extra-deps:
-- containers-0.6.0.1
+compiler: ghc-8.10.1
