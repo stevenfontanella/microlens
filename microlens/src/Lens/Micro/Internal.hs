@@ -68,16 +68,13 @@ where
 import Lens.Micro.Type
 
 import Control.Applicative
+import Data.Monoid
 import Data.Foldable as F
 import Data.Functor.Identity
 import Data.Complex
 
 #if __GLASGOW_HASKELL__ >= 800
 import Data.List.NonEmpty (NonEmpty)
-#endif
-
-#if __GLASGOW_HASKELL__ >= 710
-import Data.Monoid
 #endif
 
 #if __GLASGOW_HASKELL__ < 710
