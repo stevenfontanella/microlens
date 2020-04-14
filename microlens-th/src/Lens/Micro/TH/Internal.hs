@@ -35,9 +35,16 @@ module Lens.Micro.TH.Internal
   inlinePragma,
   conAppsT,
   quantifyType, quantifyType',
+
+  -- * Lens functions
+  elemOf,
+  lengthOf,
+  setOf,
+  _ForallT,
 )
 where
 
+import           Data.Monoid
 import qualified Data.Map as Map
 import           Data.Map (Map)
 import qualified Data.Set as Set
@@ -49,7 +56,6 @@ import           Language.Haskell.TH
 
 #if __GLASGOW_HASKELL__ < 710
 import           Control.Applicative
-import           Data.Monoid
 import           Data.Traversable (traverse)
 #endif
 
@@ -103,14 +109,31 @@ instance HasTypeVars Name where
 instance HasTypeVars Type where
   typeVarsEx s f (VarT n)             = VarT <$> typeVarsEx s f n
   typeVarsEx s f (AppT l r)           = AppT <$> typeVarsEx s f l <*> typeVarsEx s f r
+  typeVarsEx s f (ForallT bs ctx ty)  = ForallT bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f ty
+       where s' = s `Set.union` setOf typeVars bs
+  typeVarsEx _ _ t@ConT{}             = pure t
+  typeVarsEx _ _ t@TupleT{}           = pure t
+  typeVarsEx _ _ t@ListT{}            = pure t
+  typeVarsEx _ _ t@ArrowT{}           = pure t
+  typeVarsEx _ _ t@UnboxedTupleT{}    = pure t
 #if MIN_VERSION_template_haskell(2,8,0)
   typeVarsEx s f (SigT t k)           = SigT <$> typeVarsEx s f t
                                              <*> typeVarsEx s f k
 #else
   typeVarsEx s f (SigT t k)           = (`SigT` k) <$> typeVarsEx s f t
 #endif
-  typeVarsEx s f (ForallT bs ctx ty)  = ForallT bs <$> typeVarsEx s' f ctx <*> typeVarsEx s' f ty
-       where s' = s `Set.union` Set.fromList (bs ^.. typeVars)
+#if MIN_VERSION_template_haskell(2,8,0)
+  typeVarsEx _ _ t@PromotedT{}        = pure t
+  typeVarsEx _ _ t@PromotedTupleT{}   = pure t
+  typeVarsEx _ _ t@PromotedNilT{}     = pure t
+  typeVarsEx _ _ t@PromotedConsT{}    = pure t
+  typeVarsEx _ _ t@StarT{}            = pure t
+  typeVarsEx _ _ t@ConstraintT{}      = pure t
+  typeVarsEx _ _ t@LitT{}             = pure t
+#endif
+#if MIN_VERSION_template_haskell(2,10,0)
+  typeVarsEx _ _ t@EqualityT{}        = pure t
+#endif
 #if MIN_VERSION_template_haskell(2,11,0)
   typeVarsEx s f (InfixT  t1 n t2)    = InfixT  <$> typeVarsEx s f t1
                                                 <*> pure n
@@ -119,13 +142,20 @@ instance HasTypeVars Type where
                                                 <*> pure n
                                                 <*> typeVarsEx s f t2
   typeVarsEx s f (ParensT t)          = ParensT <$> typeVarsEx s f t
+  typeVarsEx _ _ t@WildCardT{}        = pure t
+#endif
+#if MIN_VERSION_template_haskell(2,12,0)
+  typeVarsEx _ _ t@UnboxedSumT{}      = pure t
 #endif
 #if MIN_VERSION_template_haskell(2,15,0)
   typeVarsEx s f (AppKindT t k)       = AppKindT <$> typeVarsEx s f t
                                                  <*> typeVarsEx s f k
   typeVarsEx s f (ImplicitParamT n t) = ImplicitParamT n <$> typeVarsEx s f t
 #endif
-  typeVarsEx _ _ t                    = pure t
+#if MIN_VERSION_template_haskell(2,16,0)
+  typeVarsEx s f (ForallVisT bs ty)   = ForallVisT bs <$> typeVarsEx s' f ty
+       where s' = s `Set.union` setOf typeVars bs
+#endif
 
 #if !MIN_VERSION_template_haskell(2,10,0)
 instance HasTypeVars Pred where
@@ -189,3 +219,20 @@ quantifyType' exclude c t = ForallT vs c t
        $ filter (`Set.notMember` exclude)
        $ nub -- stable order
        $ toListOf typeVars t
+
+----------------------------------------------------------------------------
+-- Lens functions which would've been in Lens.Micro if it wasn't “micro”
+----------------------------------------------------------------------------
+
+elemOf :: Eq a => Getting (Endo [a]) s a -> a -> s -> Bool
+elemOf l x s = elem x (s ^.. l)
+
+lengthOf :: Getting (Endo [a]) s a -> s -> Int
+lengthOf l s = length (s ^.. l)
+
+setOf :: Ord a => Getting (Endo [a]) s a -> s -> Set a
+setOf l s = Set.fromList (s ^.. l)
+
+_ForallT :: Traversal' Type ([TyVarBndr], Cxt, Type)
+_ForallT f (ForallT a b c) = (\(x, y, z) -> ForallT x y z) <$> f (a, b, c)
+_ForallT _ other = pure other

@@ -70,7 +70,6 @@ import           Data.Data
 import           Data.Either
 import qualified Data.Map as Map
 import           Data.Map (Map)
-import           Data.Monoid
 import qualified Data.Set as Set
 import           Data.Set (Set)
 import           Data.List (nub, findIndices, stripPrefix, isPrefixOf)
@@ -154,21 +153,6 @@ When updates are forbidden (by using 'generateUpdateableOptics'), or when a fiel
 
 If you want to export true folds, it's recommended that you depend on <http://hackage.haskell.org/package/microlens-contra microlens-contra>, use 'makeLensesFor' to generate 'SimpleFold's with prefixes, and then export versions of those folds with @<http://hackage.haskell.org/package/microlens-contra/docs/Lens-Micro-Contra.html#v:fromSimpleFold fromSimpleFold>@ applied.
 -}
-
--- Lens functions which would've been in Lens.Micro if it wasn't “micro”
-
-elemOf :: Eq a => Getting (Endo [a]) s a -> a -> s -> Bool
-elemOf l x s = elem x (s ^.. l)
-
-lengthOf :: Getting (Endo [a]) s a -> s -> Int
-lengthOf l s = length (s ^.. l)
-
-setOf :: Ord a => Getting (Endo [a]) s a -> s -> Set a
-setOf l s = Set.fromList (s ^.. l)
-
-_ForallT :: Traversal' Type ([TyVarBndr], Cxt, Type)
-_ForallT f (ForallT a b c) = (\(x, y, z) -> ForallT x y z) <$> f (a, b, c)
-_ForallT _ other = pure other
 
 -- Utilities
 

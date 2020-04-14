@@ -1,3 +1,7 @@
+# 0.4.3.5
+
+* Changes needed for template-haskell-2.16.
+
 # 0.4.3.4
 
 * Backported changes needed for template-haskell-2.15.
