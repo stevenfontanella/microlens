@@ -64,6 +64,7 @@ module Lens.Micro
   traverseOf_,
   forOf_,
   has,
+  hasn't,
   folded,
   folding,
 
@@ -760,6 +761,24 @@ True
 has :: Getting Any s a -> s -> Bool
 has l = getAny #. foldMapOf l (\_ -> Any True)
 {-# INLINE has #-}
+
+{- |
+'hasn\'t' checks whether a getter (any getter, including lenses, traversals, and folds) returns 0 values.
+
+Checking whether a list is non-empty:
+
+>>> hasn't each []
+True
+
+You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a replacement for 'Data.Maybe.isNothing', 'Data.Maybe.isJust' and other @isConstructorName@ functions:
+
+>>> hasn't _Left (Left 1)
+False
+-}
+hasn't :: Getting Any s a -> s -> Bool
+hasn't l = not . getAny #. foldMapOf l (\_ -> Any True)
+{-# INLINE hasn't #-}
+
 
 {- |
 'folding' creates a fold out of any function that returns a 'F.Foldable' container (for instance, a list):
