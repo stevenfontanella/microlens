@@ -11,6 +11,8 @@
 
 ## Releasing a new version
 
+When a new **patch** version is released, there is no need to bump anything.
+
 When a new **minor** version is released, bump the following:
 
   * **microlens** → microlens-ghc, microlens-platform
