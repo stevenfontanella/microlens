@@ -1,3 +1,7 @@
+# 0.4.13
+
+* New minor release (microlens-0.4.12.0).
+
 # 0.4.12
 
 * Added `At` and `Ixed` instances for `Set` and `IntSet` (thanks to @wygulmage).

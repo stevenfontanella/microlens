@@ -74,7 +74,7 @@ import Data.Functor.Identity
 import Data.Complex
 
 #if __GLASGOW_HASKELL__ >= 800
-import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty (NonEmpty(..))
 #endif
 
 #if __GLASGOW_HASKELL__ < 710
@@ -247,6 +247,11 @@ type instance IxValue (e -> a) = a
 type instance Index   [a] = Int
 type instance IxValue [a] = a
 
+#if __GLASGOW_HASKELL__ >= 800
+type instance Index   (NonEmpty a) = Int
+type instance IxValue (NonEmpty a) = a
+#endif
+
 class Ixed m where
   {- |
 This traversal lets you access (and update) an arbitrary element in a list, array, @Map@, etc. (If you want to insert or delete elements as well, look at 'at'.)
@@ -274,11 +279,21 @@ maximum0 = 'maximum' 'Lens.Micro.&' 'ix' [] 'Lens.Micro..~' 0
 
 The following instances are provided in this package:
 
+#if __GLASGOW_HASKELL__ >= 800
+@
+'ix' :: 'Int' -> 'Traversal'' [a] a
+
+'ix' :: 'Int' -> 'Traversal'' (NonEmpty a) a
+
+'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
+@
+#else
 @
 'ix' :: 'Int' -> 'Traversal'' [a] a
 
 'ix' :: ('Eq' e) => e -> 'Traversal'' (e -> a) a
 @
+#endif
 
 You can also use 'ix' with types from <http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, and <http://hackage.haskell.org/package/containers containers> by using <http://hackage.haskell.org/package/microlens-ghc microlens-ghc>, or additionally with types from <http://hackage.haskell.org/package/vector vector>, <http://hackage.haskell.org/package/text text>, and <http://hackage.haskell.org/package/unordered-containers unordered-containers> by using <http://hackage.haskell.org/package/microlens-platform microlens-platform>.
   -}
@@ -336,6 +351,15 @@ instance Ixed [a] where
     go (a:as) 0 = (:as) <$> f a
     go (a:as) i = (a:) <$> (go as $! i - 1)
   {-# INLINE ix #-}
+
+#if __GLASGOW_HASKELL__ >= 800
+instance Ixed (NonEmpty a) where
+  ix k f xs0 | k < 0 = pure xs0
+             | otherwise = go xs0 k where
+    go (a:|as) 0 = (:|as) <$> f a
+    go (a:|as) i = (a:|) <$> ix (i - 1) f as
+  {-# INLINE ix #-}
+#endif
 
 class Field1 s t a b | s -> a, t -> b, s b -> t, t a -> s where
   {- |
