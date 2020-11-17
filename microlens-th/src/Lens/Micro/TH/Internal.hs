@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 #ifndef MIN_VERSION_template_haskell
 #define MIN_VERSION_template_haskell(x,y,z) (defined(__GLASGOW_HASKELL__) && __GLASGOW_HASKELL__ >= 706)
@@ -53,6 +54,7 @@ import           Data.List (nub)
 import           Data.Maybe
 import           Lens.Micro
 import           Language.Haskell.TH
+import           Language.Haskell.TH.Datatype.TyVarBndr
 
 #if __GLASGOW_HASKELL__ < 710
 import           Control.Applicative
@@ -64,9 +66,8 @@ class HasName t where
   -- | Extract (or modify) the 'Name' of something
   name :: Lens' t Name
 
-instance HasName TyVarBndr where
-  name f (PlainTV n) = PlainTV <$> f n
-  name f (KindedTV n k) = (`KindedTV` k) <$> f n
+instance HasName (TyVarBndr_ flag) where
+  name = traverseTVName
 
 instance HasName Name where
   name = id
@@ -96,7 +97,7 @@ class HasTypeVars t where
   -- the 'Traversal' laws, when in doubt generate your names with 'newName'.
   typeVarsEx :: Set Name -> Traversal' t Name
 
-instance HasTypeVars TyVarBndr where
+instance HasTypeVars (TyVarBndr_ flag) where
   typeVarsEx s f b
     | Set.member (b^.name) s = pure b
     | otherwise              = name f b
@@ -155,6 +156,9 @@ instance HasTypeVars Type where
 #if MIN_VERSION_template_haskell(2,16,0)
   typeVarsEx s f (ForallVisT bs ty)   = ForallVisT bs <$> typeVarsEx s' f ty
        where s' = s `Set.union` setOf typeVars bs
+#endif
+#if MIN_VERSION_template_haskell(2,17,0)
+  typeVarsEx _ _ t@MulArrowT{}        = pure t
 #endif
 
 #if !MIN_VERSION_template_haskell(2,10,0)
@@ -215,7 +219,7 @@ quantifyType = quantifyType' Set.empty
 quantifyType' :: Set Name -> Cxt -> Type -> Type
 quantifyType' exclude c t = ForallT vs c t
   where
-    vs = map PlainTV
+    vs = map plainTVSpecified
        $ filter (`Set.notMember` exclude)
        $ nub -- stable order
        $ toListOf typeVars t
@@ -233,6 +237,6 @@ lengthOf l s = length (s ^.. l)
 setOf :: Ord a => Getting (Endo [a]) s a -> s -> Set a
 setOf l s = Set.fromList (s ^.. l)
 
-_ForallT :: Traversal' Type ([TyVarBndr], Cxt, Type)
+_ForallT :: Traversal' Type ([TyVarBndrSpec], Cxt, Type)
 _ForallT f (ForallT a b c) = (\(x, y, z) -> ForallT x y z) <$> f (a, b, c)
 _ForallT _ other = pure other
