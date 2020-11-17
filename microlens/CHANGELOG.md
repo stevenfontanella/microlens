@@ -1,3 +1,7 @@
+# 0.4.12.0
+
+* Added instance `Ixed (NonEmpty a)` for GHC >= 8.
+
 # 0.4.11.3
 
 * Exported a `coerce` compatibility shim from `Lens.Micro.Internal`.
