@@ -1,3 +1,7 @@
+# 0.4.3.7
+
+* Changes needed for template-haskell-2.17.
+
 # 0.4.3.6
 
 * Bumped th-abstraction.
