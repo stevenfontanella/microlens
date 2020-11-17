@@ -42,7 +42,7 @@ library
                      , transformers
                      -- lens has >=2.4, but GHC 7.4 shipped with 2.7
                      , template-haskell >=2.7 && <2.18
-                     , th-abstraction >=0.2.1 && <0.5
+                     , th-abstraction >=0.4 && <0.5
 
   ghc-options:
     -Wall -fwarn-tabs
