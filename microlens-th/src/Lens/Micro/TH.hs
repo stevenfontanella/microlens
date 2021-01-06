@@ -744,9 +744,9 @@ makeFieldOpticsForDatatype rules info =
                      return (concat decss)
 
   where
-  tyName = D.datatypeName info
-  s      = D.datatypeType info
-  cons   = D.datatypeCons info
+  tyName = D.datatypeName     info
+  s      = datatypeTypeKinded info
+  cons   = D.datatypeCons     info
 
   -- Traverse the field labels of a normalized constructor
   normFieldLabels :: Traversal [(Name,[(a,Type)])] [(Name,[(b,Type)])] a b
@@ -805,12 +805,13 @@ makeClassyClass className methodName s defs = do
   let ss   = map (stabToS . (^. _2._2)) defs
   (sub,s') <- unifyTypes (s : ss)
   c <- newName "c"
-  let vars = toListOf typeVars s'
+  let vars     = D.freeVariablesWellScoped [s']
+      varNames = map D.tvName vars
       fd   | null vars = []
-           | otherwise = [FunDep [c] vars]
+           | otherwise = [FunDep [c] varNames]
 
 
-  classD (cxt[]) className (map D.plainTV (c:vars)) fd
+  classD (cxt[]) className (D.plainTV c:vars) fd
     $ sigD methodName (return (''Lens' `conAppsT` [VarT c, s']))
     : concat
       [ [sigD defName (return ty)
@@ -819,7 +820,7 @@ makeClassyClass className methodName s defs = do
         inlinePragma defName
       | (TopName defName, (_, stab, _)) <- defs
       , let body = appsE [varE '(.), varE methodName, varE defName]
-      , let ty   = quantifyType' (Set.fromList (c:vars))
+      , let ty   = quantifyType' (Set.fromList (c:varNames))
                                  (stabToContext stab)
                  $ stabToOptic stab `conAppsT`
                        [VarT c, applyTypeSubst sub (stabToA stab)]
@@ -840,8 +841,8 @@ makeClassyInstance rules className methodName s defs = do
     : map return (concat methodss)
 
   where
-  instanceHead = className `conAppsT` (s : map VarT vars)
-  vars         = toListOf typeVars s
+  instanceHead = className `conAppsT` (s : map tvbToType vars)
+  vars         = D.freeVariablesWellScoped [s]
   rules'       = rules { _generateSigs    = False
                        , _generateClasses = False
                        }
