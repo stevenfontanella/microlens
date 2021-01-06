@@ -27,6 +27,7 @@ module Main where
 import Lens.Micro
 import Lens.Micro.TH
 import T799 ()
+import T917 ()
 
 data Bar a b c = Bar { _baz :: (a, b) }
 makeLenses ''Bar
