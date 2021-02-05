@@ -98,6 +98,7 @@ module Lens.Micro
   -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
+  _Show,
 
   -- * Other types
   LensLike, LensLike',
@@ -1381,6 +1382,37 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
+
+{- |
+'_Show' targets the Haskell value in a @String@ using 'Read', or nothing if parsing fails.  Likewise, setting a Haskell value through this prism renders a @String@ using 'Show'.
+
+>>> ["abc","8","def","9"] & mapped . _Show %~ \x -> x + 1 :: Int
+["abc","9","def","10"]
+
+Note that this prism is improper for types that don\'t satisfy @read . show = id@:
+
+>>> "25.9999999" & _Show %~ \x -> x :: Float
+"26.0"
+
+These functions from @base@ can be expressed in terms of '_Show':
+
+  * Unsafely parsing a value from a 'String':
+
+  @
+  'read' = ('^?!' '_Show')
+  @
+
+  * Safely parsing a value from a 'String':
+
+  @
+  'Text.Read.readMaybe' = ('^?' '_Show')
+  @
+-}
+_Show :: (Show a, Read a) => Traversal' String a
+_Show f s = case reads s of
+  [(a,"")] -> show <$> f a
+  _        -> pure s
+{-# INLINE _Show #-}
 
 -- Some of the guts of lens
 
