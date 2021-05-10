@@ -157,15 +157,6 @@ If you want to export true folds, it's recommended that you depend on <http://ha
 
 -- Utilities
 
--- @fromSet@ wasn't always there, and we need compatibility with
--- containers-0.4 to compile on GHC 7.4.
-fromSet :: (k -> v) -> Set.Set k -> Map.Map k v
-#if MIN_VERSION_containers(0,5,0)
-fromSet = Map.fromSet
-#else
-fromSet f x = Map.fromDistinctAscList [ (k,f k) | k <- Set.toAscList x ]
-#endif
-
 -- like 'rewrite' from uniplate
 rewrite :: (Data a, Data b) => (a -> Maybe a) -> b -> b
 rewrite f mbA = case cast mbA of
@@ -734,7 +725,7 @@ makeFieldOpticsForDatatype rules info =
        let allFields  = toListOf (folded . _2 . folded . _1 . folded) fieldCons
        let defCons    = over normFieldLabels (expandName allFields) fieldCons
            allDefs    = setOf (normFieldLabels . folded) defCons
-       sequenceA (fromSet (buildScaffold rules s defCons) allDefs)
+       sequenceA (Map.fromSet (buildScaffold rules s defCons) allDefs)
 
      let defs = Map.toList perDef
      case _classyLenses rules tyName of
@@ -956,7 +947,7 @@ buildStab s categorizedFields =
      let s' = applyTypeSubst subA s
 
      -- compute possible type changes
-     sub <- sequenceA (fromSet (newName . nameBase) unfixedTypeVars)
+     sub <- sequenceA (Map.fromSet (newName . nameBase) unfixedTypeVars)
      let (t,b) = over both (substTypeVars sub) (s',a)
 
      return (s',t,a,b)

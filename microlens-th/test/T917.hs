@@ -18,9 +18,6 @@ import Data.Proxy
 import Data.Kind
 #endif
 
--- Doesn't compile on GHC 7.4 at all
-#if __GLASGOW_HASKELL__ >= 706
-
 -- Like Data.Functor.Const, but redefined to ensure that it is poly-kinded
 -- across all versions of GHC, not just 8.0+
 newtype Constant a (b :: k) = Constant a
@@ -28,7 +25,6 @@ newtype Constant a (b :: k) = Constant a
 data family   T917DataFam (a :: k)
 data instance T917DataFam (a :: *) = MkT917DataFam { _unT917DataFam :: Proxy a }
 $(makeLenses 'MkT917DataFam)
-#endif
 
 {-
 data T917OneA (a :: k -> *) (b :: k -> *) = MkT917OneA
