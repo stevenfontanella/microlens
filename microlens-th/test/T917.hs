@@ -21,7 +21,7 @@ import Data.Kind
 -- Doesn't compile on GHC 7.4 at all
 #if __GLASGOW_HASKELL__ >= 706
 
--- Like Data.Functor.Const, but redfined to ensure that it is poly-kinded
+-- Like Data.Functor.Const, but redefined to ensure that it is poly-kinded
 -- across all versions of GHC, not just 8.0+
 newtype Constant a (b :: k) = Constant a
 

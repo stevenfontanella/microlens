@@ -1,3 +1,7 @@
+# 0.4.3.10
+
+* Port lens commit [fae336e1](https://github.com/ekmett/lens/commit/fae336e191748782cff023540bd25e3582ca93fb), "Close over kind variables when computing fixed type variables", fixing lens issue [#972](https://github.com/ekmett/lens/issues/972).
+
 # 0.4.3.9
 
 * Port lens commit [66e199ee](https://github.com/ekmett/lens/commit/66e199ee07f1aaf589faa2a8c661f6a722679959), fixing lens issue [#945](https://github.com/ekmett/lens/pull/945) — "Make the TH machinery handle PolyKinds more robustly".
