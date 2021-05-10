@@ -41,7 +41,7 @@ library
                      , containers >=0.4.0 && <0.7
                      , transformers
                      -- lens has >=2.4, but GHC 7.4 shipped with 2.7
-                     , template-haskell >=2.7 && <2.18
+                     , template-haskell >=2.7 && <2.19
                      , th-abstraction >=0.4.1 && <0.5
 
   ghc-options:
@@ -55,7 +55,7 @@ library
 test-suite templates
   type: exitcode-stdio-1.0
   main-is: templates.hs
-  other-modules: T799 T917
+  other-modules: T799 T917 T972
   ghc-options: -Wall -threaded
   hs-source-dirs: test
 

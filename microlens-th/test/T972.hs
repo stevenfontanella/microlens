@@ -7,7 +7,6 @@
 #endif
 module T972 where
 
-import Lens.Micro
 import Lens.Micro.TH
 #if __GLASGOW_HASKELL__ >= 800
 import Data.Proxy
