@@ -21,13 +21,15 @@ By importing this module you get all functions and types from <http://hackage.ha
 
 * 'at' for 'Map', 'Set', 'IntMap' and 'IntSet'
 
-* 'each' and 'ix' for
+* 'ix' for
 
     * 'Map', 'Set', 'IntMap' and 'IntSet'
     * 'Array' and 'UArray'
     * 'Seq'
     * strict 'B.ByteString' and lazy 'BL.ByteString'
     * 'Tree'
+    
+* 'each' for the same as above, excluding 'Set' and 'IntSet'
 
 * '_head', '_tail', '_init', '_last' for
 
