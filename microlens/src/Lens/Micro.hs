@@ -1282,7 +1282,7 @@ Focus on the 'lines' of a string.
 @
 countAndMarkEmptyLines :: String -> State Int String
 countAndMarkEmptyLines s = runState (f s) 0 where
-  f = 'traverseOf' (lined . 'filtered' null) $ \_ -> do
+  f = 'traverseOf' (lined . 'filtered' null) $ \\_ -> do
     modify' (+ 1)
     return "# Empty line"
 @
