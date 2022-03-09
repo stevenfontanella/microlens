@@ -1,3 +1,7 @@
+# 0.4.13.0
+
+* Added `_Show`, `worded`, and `lined`.
+
 # 0.4.12.0
 
 * Added instance `Ixed (NonEmpty a)` for GHC >= 8.
