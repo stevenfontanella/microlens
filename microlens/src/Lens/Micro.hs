@@ -93,6 +93,7 @@ module Lens.Micro
   ix,
   _head, _tail, _init, _last,
   mapAccumLOf,
+  worded, lined,
 
   -- * Prism: a traversal iterating over at most 1 element
   -- $prisms-note
@@ -112,6 +113,7 @@ import Lens.Micro.Internal
 import Control.Applicative
 import Control.Monad
 import Data.Functor.Identity
+import Data.List (intercalate)
 import Data.Monoid
 import Data.Maybe
 import Data.Tuple
@@ -1260,6 +1262,37 @@ mapAccumLOf l f acc0 s = swap (runState (l g s) acc0)
   where
     g a = state $ \acc -> swap (f acc a)
 {-# INLINE mapAccumLOf #-}
+
+{- |
+Focus on the 'words' of a string.
+
+>>> "avoid success at all costs" & words . _head %~ toUpper
+"Avoid Success At All Costs"
+
+This violates the traversal laws when whitespace is set or when the source has
+space at the ends or more than one contiguous space anywhere.
+-}
+worded :: Traversal' String String
+worded f = fmap unwords . traverse f . words
+{-# INLINE worded #-}
+
+{- |
+Focus on the 'lines' of a string.
+
+@
+countAndMarkEmptyLines :: String -> State Int String
+countAndMarkEmptyLines s = runState (f s) 0 where
+  f = 'traverseOf' (lined . 'filtered' null) $ \_ -> do
+    modify' (+ 1)
+    return "# Empty line"
+@
+
+This violates the traversal laws when newlines are set or when the source has
+more than one contiguous newline anywhere.
+-}
+lined :: Traversal' String String
+lined f = fmap (intercalate "\n") . traverse f . lines
+{-# INLINE lined #-}
 
 -- Prisms ------------------------------------------------------------------
 
