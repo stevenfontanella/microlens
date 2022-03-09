@@ -121,6 +121,8 @@ import qualified Data.Foldable as F
 
 #if MIN_VERSION_base(4,8,0)
 import Data.Function ((&))
+#else
+import Data.Traversable (traverse)
 #endif
 
 #if MIN_VERSION_base(4,11,0)
