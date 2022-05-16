@@ -1268,7 +1268,7 @@ mapAccumLOf l f acc0 s = swap (runState (l g s) acc0)
 {- |
 Focus on the 'words' of a string.
 
->>> "avoid success at all costs" & words . _head %~ toUpper
+>>> "avoid success at all costs" & worded . _head %~ toUpper
 "Avoid Success At All Costs"
 
 This violates the traversal laws when whitespace is set or when the source has
