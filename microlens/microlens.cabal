@@ -32,7 +32,7 @@ description:
 license:             BSD3
 license-file:        LICENSE
 author:              Edward Kmett, Artyom Kazak
-maintainer:          Monadfix <hi@monadfix.com>
+maintainer:          Steven Fontanella <steven.fontanella@gmail.com>
 homepage:            http://github.com/monadfix/microlens
 bug-reports:         http://github.com/monadfix/microlens/issues
 -- copyright:
