@@ -1,3 +1,7 @@
+# 0.4.14
+
+* New minor release (microlens-0.4.13.0).
+
 # 0.4.13.1
 
 * New patch release (GHC 9.2.1).

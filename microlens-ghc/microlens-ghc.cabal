@@ -1,5 +1,5 @@
 name:                microlens-ghc
-version:             0.4.13.2
+version:             0.4.14.0
 synopsis:            microlens + array, bytestring, containers, transformers
 description:
   Use this package instead of <http://hackage.haskell.org/package/microlens microlens> if you don't mind depending on all dependencies here – @Lens.Micro.GHC@ reexports everything from @Lens.Micro@ and additionally provides orphan instances of microlens classes for packages coming with GHC (<http://hackage.haskell.org/package/array array>, <http://hackage.haskell.org/package/bytestring bytestring>, <http://hackage.haskell.org/package/containers containers>, <http://hackage.haskell.org/package/transfromers transformers>).
@@ -43,7 +43,7 @@ library
                      , base >=4.5 && <5
                      , bytestring >=0.9.2.1 && <0.12
                      , containers >=0.4.0 && <0.7
-                     , microlens ==0.4.12.*
+                     , microlens ==0.4.13.*
                      , transformers >=0.2 && <0.7
 
   ghc-options:

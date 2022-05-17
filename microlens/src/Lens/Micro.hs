@@ -93,11 +93,13 @@ module Lens.Micro
   ix,
   _head, _tail, _init, _last,
   mapAccumLOf,
+  worded, lined,
 
   -- * Prism: a traversal iterating over at most 1 element
   -- $prisms-note
   _Left, _Right,
   _Just, _Nothing,
+  _Show,
 
   -- * Other types
   LensLike, LensLike',
@@ -111,6 +113,7 @@ import Lens.Micro.Internal
 import Control.Applicative
 import Control.Monad
 import Data.Functor.Identity
+import Data.List (intercalate)
 import Data.Monoid
 import Data.Maybe
 import Data.Tuple
@@ -118,6 +121,8 @@ import qualified Data.Foldable as F
 
 #if MIN_VERSION_base(4,8,0)
 import Data.Function ((&))
+#else
+import Data.Traversable (traverse)
 #endif
 
 #if MIN_VERSION_base(4,11,0)
@@ -1260,6 +1265,37 @@ mapAccumLOf l f acc0 s = swap (runState (l g s) acc0)
     g a = state $ \acc -> swap (f acc a)
 {-# INLINE mapAccumLOf #-}
 
+{- |
+Focus on the 'words' of a string.
+
+>>> "avoid success at all costs" & worded . _head %~ toUpper
+"Avoid Success At All Costs"
+
+This violates the traversal laws when whitespace is set or when the source has
+space at the ends or more than one contiguous space anywhere.
+-}
+worded :: Traversal' String String
+worded f = fmap unwords . traverse f . words
+{-# INLINE worded #-}
+
+{- |
+Focus on the 'lines' of a string.
+
+@
+countAndMarkEmptyLines :: String -> State Int String
+countAndMarkEmptyLines s = runState (f s) 0 where
+  f = 'traverseOf' (lined . 'filtered' null) $ \\_ -> do
+    modify' (+ 1)
+    return "# Empty line"
+@
+
+This violates the traversal laws when newlines are set or when the source has
+more than one contiguous newline anywhere.
+-}
+lined :: Traversal' String String
+lined f = fmap (intercalate "\n") . traverse f . lines
+{-# INLINE lined #-}
+
 -- Prisms ------------------------------------------------------------------
 
 {- $prisms-note
@@ -1381,6 +1417,37 @@ _Nothing :: Traversal' (Maybe a) ()
 _Nothing f Nothing = const Nothing <$> f ()
 _Nothing _ j = pure j
 {-# INLINE _Nothing #-}
+
+{- |
+'_Show' targets the Haskell value in a @String@ using 'Read', or nothing if parsing fails.  Likewise, setting a Haskell value through this prism renders a @String@ using 'Show'.
+
+>>> ["abc","8","def","9"] & mapped . _Show %~ \x -> x + 1 :: Int
+["abc","9","def","10"]
+
+Note that this prism is improper for types that don\'t satisfy @read . show = id@:
+
+>>> "25.9999999" & _Show %~ \x -> x :: Float
+"26.0"
+
+These functions from @base@ can be expressed in terms of '_Show':
+
+  * Unsafely parsing a value from a 'String':
+
+  @
+  'read' = ('^?!' '_Show')
+  @
+
+  * Safely parsing a value from a 'String':
+
+  @
+  'Text.Read.readMaybe' = ('^?' '_Show')
+  @
+-}
+_Show :: (Show a, Read a) => Traversal' String a
+_Show f s = case reads s of
+  [(a,"")] -> show <$> f a
+  _        -> pure s
+{-# INLINE _Show #-}
 
 -- Some of the guts of lens
 
