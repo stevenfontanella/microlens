@@ -1,3 +1,7 @@
+# 0.4.3.1
+
+* Bumped `text` upper bound to support 2.0.
+
 # 0.4.3
 
 * New minor release (microlens-0.4.13.0, microlens-ghc-0.4.14).
