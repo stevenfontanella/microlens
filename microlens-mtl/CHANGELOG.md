@@ -1,3 +1,7 @@
+# 0.2.0.2
+
+* Added support for mtl 2.3 and transformers 0.6 per [#152](https://github.com/stevenfontanella/microlens/issues/152).
+
 # 0.2.0.1
 
 * No more conditional `Safe` (see [#122](https://github.com/monadfix/microlens/issues/122)).
