@@ -1,6 +1,9 @@
 # microlens
 
-[![Build status](https://secure.travis-ci.org/monadfix/microlens.svg)](http://travis-ci.org/monadfix/microlens)
+[![Hackage version](https://img.shields.io/hackage/v/microlens.svg?label=Hackage&color=informational)](http://hackage.haskell.org/package/microlens)
+[![microlens on Stackage Nightly](https://stackage.org/package/microlens/badge/nightly)](https://stackage.org/nightly/package/microlens)
+[![Stackage LTS version](https://www.stackage.org/package/microlens/badge/lts?label=Stackage)](https://www.stackage.org/package/microlens)
+[![Cabal build](https://github.com/stevenfontanella/microlens/workflows/Haskell-CI/badge.svg)](https://github.com/stevenfontanella/microlens/actions)
 ![BSD3 license](https://img.shields.io/badge/license-BSD3-blue.svg)
 
 *A tiny part of the lens library with no dependencies.*
