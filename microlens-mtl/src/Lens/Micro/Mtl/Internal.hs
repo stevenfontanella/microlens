@@ -78,13 +78,15 @@ import Lens.Micro.Internal
 import Data.Monoid
 #endif
 
+import Data.Kind (Type)
+
 
 ------------------------------------------------------------------------------
 -- Zoomed
 ------------------------------------------------------------------------------
 
 -- | This type family is used by 'Zoom' to describe the common effect type.
-type family Zoomed (m :: * -> *) :: * -> * -> *
+type family Zoomed (m :: Type -> Type) :: Type -> Type -> Type
 type instance Zoomed (Strict.StateT s z) = Focusing z
 type instance Zoomed (Lazy.StateT s z) = Focusing z
 type instance Zoomed (ReaderT e m) = Zoomed m
@@ -419,7 +421,7 @@ instance Zoom m n s t => Zoom (ExceptT e m) (ExceptT e n) s t where
 ------------------------------------------------------------------------------
 
 -- | This type family is used by 'Magnify' to describe the common effect type.
-type family Magnified (m :: * -> *) :: * -> * -> *
+type family Magnified (m :: Type -> Type) :: Type -> Type -> Type
 type instance Magnified (ReaderT b m) = Effect m
 type instance Magnified ((->)b) = Const
 type instance Magnified (Strict.RWST a w s m) = EffectRWS w s m
