@@ -9,6 +9,9 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE Trustworthy #-}
+#if !MIN_VERSION_base(4, 9, 0)
+{-# LANGUAGE DataKinds #-}
+#endif
 
 -- This is needed because ErrorT is deprecated.
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
@@ -78,7 +81,11 @@ import Lens.Micro.Internal
 import Data.Monoid
 #endif
 
+#if MIN_VERSION_base(4, 9, 0)
 import Data.Kind (Type)
+#else
+type Type = *
+#endif
 
 
 ------------------------------------------------------------------------------
