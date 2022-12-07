@@ -90,6 +90,7 @@ import Unsafe.Coerce
 -- We don't depend on the call-stack package because building an extra
 -- package is likely slower than adding several lines of code here.
 #if MIN_VERSION_base(4,9,0)
+import Data.Kind (Type)
 import GHC.Stack (HasCallStack)
 #elif MIN_VERSION_base(4,8,1)
 import qualified GHC.Stack as GHC
@@ -238,9 +239,13 @@ instance Each (NonEmpty a) (NonEmpty b) a b where
 
 -- NOTE: when adding new instances of 'Each', update the docs for 'each'.
 
+#if MIN_VERSION_base(4,9,0)
+type family Index (s :: Type) :: Type
+type family IxValue (m :: Type) :: Type
+#else
 type family Index (s :: *) :: *
-
 type family IxValue (m :: *) :: *
+#endif
 
 type instance Index   (e -> a) = e
 type instance IxValue (e -> a) = a
