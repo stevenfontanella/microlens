@@ -9,6 +9,9 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE Trustworthy #-}
+#if !MIN_VERSION_base(4, 9, 0)
+{-# LANGUAGE DataKinds #-}
+#endif
 
 -- This is needed because ErrorT is deprecated.
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
@@ -78,13 +81,21 @@ import Lens.Micro.Internal
 import Data.Monoid
 #endif
 
+#if MIN_VERSION_base(4,9,0)
+import Data.Kind (Type)
+#endif
+
 
 ------------------------------------------------------------------------------
 -- Zoomed
 ------------------------------------------------------------------------------
 
 -- | This type family is used by 'Zoom' to describe the common effect type.
+#if MIN_VERSION_base(4,9,0)
+type family Zoomed (m :: Type -> Type) :: Type -> Type -> Type
+#else
 type family Zoomed (m :: * -> *) :: * -> * -> *
+#endif
 type instance Zoomed (Strict.StateT s z) = Focusing z
 type instance Zoomed (Lazy.StateT s z) = Focusing z
 type instance Zoomed (ReaderT e m) = Zoomed m
@@ -419,7 +430,11 @@ instance Zoom m n s t => Zoom (ExceptT e m) (ExceptT e n) s t where
 ------------------------------------------------------------------------------
 
 -- | This type family is used by 'Magnify' to describe the common effect type.
+#if MIN_VERSION_base(4,9,0)
+type family Magnified (m :: Type -> Type) :: Type -> Type -> Type
+#else
 type family Magnified (m :: * -> *) :: * -> * -> *
+#endif
 type instance Magnified (ReaderT b m) = Effect m
 type instance Magnified ((->)b) = Const
 type instance Magnified (Strict.RWST a w s m) = EffectRWS w s m
