@@ -1,5 +1,5 @@
 name:                microlens-contra
-version:             0.1.0.2
+version:             0.1.0.3
 synopsis:            True folds and getters for microlens
 description:
   This package provides @Fold@ and @Getter@ that are fully compatible with lens; the downside is that this package depends on contravariant, which in its turn depends on a lot of other packages (but still less than lens).
