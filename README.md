@@ -250,7 +250,7 @@ functions as long as microlens stays small, so if you plan to adopt
 microlens first and make dozens of requests for function additions later,
 this package is not for you.
 
-[add-example]: https://github.com/monadfix/microlens/issues/79#issuecomment-231720804
+[add-example]: https://github.com/stevenfontanella/microlens/issues/79#issuecomment-231720804
 
 -----------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@ description:
   .
   This library is an extract from <http://hackage.haskell.org/package/lens lens> (with no dependencies). It's not a toy lenses library, unsuitable for “real world”, but merely a small one. It is compatible with lens, and should have same performance. It also has better documentation.
   .
-  There's a longer readme <https://github.com/monadfix/microlens#readme on Github>. It has a migration guide for lens users, a description of other packages in the family, a discussion of other lens libraries you could use instead, and so on.
+  There's a longer readme <https://github.com/stevenfontanella/microlens#readme on Github>. It has a migration guide for lens users, a description of other packages in the family, a discussion of other lens libraries you could use instead, and so on.
   .
   Here are some usecases for this library:
   .
@@ -33,8 +33,8 @@ license:             BSD3
 license-file:        LICENSE
 author:              Edward Kmett, Artyom Kazak
 maintainer:          Steven Fontanella <steven.fontanella@gmail.com>
-homepage:            http://github.com/monadfix/microlens
-bug-reports:         http://github.com/monadfix/microlens/issues
+homepage:            http://github.com/stevenfontanella/microlens
+bug-reports:         http://github.com/stevenfontanella/microlens/issues
 -- copyright:
 category:            Data, Lenses
 build-type:          Simple
@@ -56,7 +56,7 @@ tested-with:         GHC==7.6.3
 
 source-repository head
   type:                git
-  location:            git://github.com/monadfix/microlens.git
+  location:            https://github.com/stevenfontanella/microlens.git
 
 library
   exposed-modules:     Lens.Micro

@@ -8,13 +8,13 @@ description:
   .
   Starting from GHC 8.6, this package doesn't depend on contravariant anymore.
   .
-  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/monadfix/microlens#readme on Github>.
+  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/stevenfontanella/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
 author:              Edward Kmett, Artyom Kazak
 maintainer:          Steven Fontanella <steven.fontanella@gmail.com>
-homepage:            http://github.com/monadfix/microlens
-bug-reports:         http://github.com/monadfix/microlens/issues
+homepage:            http://github.com/stevenfontanella/microlens
+bug-reports:         http://github.com/stevenfontanella/microlens/issues
 category:            Data, Lenses
 build-type:          Simple
 extra-source-files:
@@ -35,7 +35,7 @@ tested-with:         GHC==7.6.3
 
 source-repository head
   type:                git
-  location:            git://github.com/monadfix/microlens.git
+  location:            https://github.com/stevenfontanella/microlens.git
 
 library
   exposed-modules:     Lens.Micro.Contra

@@ -4,13 +4,13 @@ synopsis:            microlens support for Reader/Writer/State from mtl
 description:
   This package contains functions (like 'view' or '+=') which work on 'MonadReader', 'MonadWriter', and 'MonadState' from the mtl package.
   .
-  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/monadfix/microlens#readme on Github>.
+  This package is a part of the <http://hackage.haskell.org/package/microlens microlens> family; see the readme <https://github.com/stevenfontanella/microlens#readme on Github>.
 license:             BSD3
 license-file:        LICENSE
 author:              Edward Kmett, Artyom Kazak
 maintainer:          Steven Fontanella <steven.fontanella@gmail.com>
-homepage:            http://github.com/monadfix/microlens
-bug-reports:         http://github.com/monadfix/microlens/issues
+homepage:            http://github.com/stevenfontanella/microlens
+bug-reports:         http://github.com/stevenfontanella/microlens/issues
 -- copyright:
 category:            Data, Lenses
 build-type:          Simple
@@ -32,7 +32,7 @@ tested-with:         GHC==7.6.3
 
 source-repository head
   type:                git
-  location:            git://github.com/monadfix/microlens.git
+  location:            https://github.com/stevenfontanella/microlens.git
 
 library
   exposed-modules:     Lens.Micro.Mtl
