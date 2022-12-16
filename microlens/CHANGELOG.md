@@ -1,3 +1,8 @@
+# 0.4.13.1
+
+* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
+* [#162](https://github.com/stevenfontanella/microlens/pull/162) Fix GHC warning for depending on StarIsType
+
 # 0.4.13.0
 
 * Added `_Show`, `worded`, and `lined`.

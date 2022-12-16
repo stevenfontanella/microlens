@@ -1,3 +1,8 @@
+# 0.2.0.3
+
+* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
+* [#162](https://github.com/stevenfontanella/microlens/pull/162) Fix GHC warning for depending on StarIsType
+
 # 0.2.0.2
 
 * Added support for mtl 2.3 and transformers 0.6 per [#152](https://github.com/stevenfontanella/microlens/issues/152).

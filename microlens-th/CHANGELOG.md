@@ -1,3 +1,7 @@
+# 0.4.3.11
+
+* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
+
 # 0.4.3.10
 
 * Port lens commit [fae336e1](https://github.com/ekmett/lens/commit/fae336e191748782cff023540bd25e3582ca93fb), "Close over kind variables when computing fixed type variables", fixing lens issue [#972](https://github.com/ekmett/lens/issues/972).

@@ -1,3 +1,7 @@
+# 0.4.14.1
+
+* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
+
 # 0.4.14
 
 * New minor release (microlens-0.4.13.0).
