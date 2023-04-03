@@ -1,3 +1,7 @@
+# 0.4.3.12
+
+* [#164](https://github.com/stevenfontanella/microlens/pull/164), [#165](https://github.com/stevenfontanella/microlens/issues/165) Support template-haskell 2.19 (and GHC 9.6 by extension).
+
 # 0.4.3.11
 
 * [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators

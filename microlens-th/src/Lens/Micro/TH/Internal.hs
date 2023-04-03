@@ -170,6 +170,14 @@ instance HasTypeVars Pred where
   typeVarsEx s f (ClassP n ts) = ClassP n <$> typeVarsEx s f ts
   typeVarsEx s f (EqualP l r)  = EqualP <$> typeVarsEx s f l <*> typeVarsEx s f r
 #endif
+#if MIN_VERSION_template_haskell(2,19,0)
+  typeVarsEx s f (PromotedInfixT  t1 n t2) = PromotedInfixT  <$> typeVarsEx s f t1
+                                                             <*> pure n
+                                                             <*> typeVarsEx s f t2
+  typeVarsEx s f (PromotedUInfixT t1 n t2) = PromotedUInfixT <$> typeVarsEx s f t1
+                                                             <*> pure n
+                                                             <*> typeVarsEx s f t2
+#endif
 
 instance HasTypeVars Con where
   typeVarsEx s f (NormalC n ts) = NormalC n <$> (traverse . _2) (typeVarsEx s f) ts
