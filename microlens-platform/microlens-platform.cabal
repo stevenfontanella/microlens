@@ -30,6 +30,7 @@ tested-with:         GHC==7.6.3
                      GHC==9.0.2
                      GHC==9.2.5
                      GHC==9.4.3
+                     GHC==9.6.1
 
 source-repository head
   type:                git
