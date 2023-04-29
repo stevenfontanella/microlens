@@ -294,6 +294,9 @@ isDataFamily D.Datatype        = False
 isDataFamily D.Newtype         = False
 isDataFamily D.DataInstance    = True
 isDataFamily D.NewtypeInstance = True
+#if MIN_VERSION_th_abstraction(0,5,0)
+isDataFamily D.TypeData        = False
+#endif
 
 ----------------------------------------------------------------------------
 -- Lens functions which would've been in Lens.Micro if it wasn't “micro”
