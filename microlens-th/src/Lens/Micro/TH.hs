@@ -801,8 +801,11 @@ makeClassyClass className methodName s defs = do
       fd   | null vars = []
            | otherwise = [FunDep [c] varNames]
 
-
+#if MIN_VERSION_template_haskell(2,21,0)
+  classD (cxt[]) className (D.plainTV c : D.changeTVFlags D.defaultBndrFlag vars) fd
+#else
   classD (cxt[]) className (D.plainTV c:vars) fd
+#endif
     $ sigD methodName (return (''Lens' `conAppsT` [VarT c, s']))
     : concat
       [ [sigD defName (return ty)
