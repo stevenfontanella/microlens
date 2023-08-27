@@ -1,6 +1,7 @@
 dist/
 dist-newstyle/
-cabal-dev
+.stack-work/
+.ghc.environment.*
 *.o
 *.hi
 *.chi
@@ -10,9 +11,9 @@ cabal-dev
 .cabal-sandbox/
 cabal.sandbox.config
 cabal.config
+cabal-dev
+stack*.yaml.lock
 TAGS
 .DS_Store
 *~
 *#
-.stack-work/
-dist-newstyle/
