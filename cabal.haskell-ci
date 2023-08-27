@@ -1,3 +1,12 @@
 branches: master ci*
 
 haddock: <8.1 || >8.3
+
+constraint-set text-2.1
+  ghc: >= 8.2
+  constraints: text ^>= 2.1
+  tests: True
+  run-tests: True
+
+raw-project
+  allow-newer: text
