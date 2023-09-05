@@ -1,3 +1,7 @@
+# 0.4.3.14
+
+* [#170](https://github.com/stevenfontanella/microlens/issues/170), [#171](https://github.com/stevenfontanella/microlens/pull/171) Support GHC 9.8.
+
 # 0.4.3.13
 
 * [#167](https://github.com/stevenfontanella/microlens/issues/167) Support th-abstraction 0.5.
