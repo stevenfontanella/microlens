@@ -1,3 +1,7 @@
+# 0.4.3.4
+
+* [#171](https://github.com/stevenfontanella/microlens/pull/171) Support text 2.1
+
 # 0.4.3.3
 
 * [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
