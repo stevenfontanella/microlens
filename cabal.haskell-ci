@@ -2,12 +2,3 @@ branches: master
 
 haddock: <8.1 || >8.3
 
--- text-2.1 is covered by GHC 9.8
--- constraint-set text-2.1
---   ghc: >= 8.2
---   constraints: text ^>= 2.1
---   tests: True
---   run-tests: True
---
--- raw-project
---   allow-newer: text
