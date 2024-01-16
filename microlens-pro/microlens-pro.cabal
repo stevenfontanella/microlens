@@ -1,0 +1,52 @@
+name:                   microlens-pro
+version:                0.1.0
+synopsis:               Prisms and isomorphisms for microlens
+description:
+  This package provides lens-compatible 'Prism' and 'Iso'. Consequently, it
+  depends on the rather heavy @profunctors@.
+  .
+  This package is a part of the <http://hackage.haskell.org/package/microlens
+  microlens> family; see the readme <https://github.com/crumbtoo/microlens on
+  Github>.
+license:                BSD3
+license-file:           LICENSE
+author:                 Edward Kmett, Artyom Kazak
+maintainer:             crumbtoo <lomiskiam@gmail.com>
+homepage:               http://github.com/crumbtoo/microlens
+bug-reports:            http://github.com/crumbtoo/microlens/issues
+category:               Data, Lenses
+build-type:             Simple
+extra-source-files:     CHANGELOG.md
+cabal-version:          >=1.10
+
+-- TODO: verify compatibility with earlier GHCs
+tested-with:            GHC==9.8.1
+
+source-repository head
+  type:                 git
+  location:             git://github.com/crumbtoo/microlens.git
+
+library
+  exposed-modules:      Lens.Micro.Pro
+                        Lens.Micro.ProCompat
+                        Lens.Micro.Pro.TH
+                        Lens.Micro.Pro.Internal
+  -- other-modules:
+  -- other-extensions:
+  build-depends:          base >=4.5 && <5
+                        , containers >=0.4.0 && <0.8
+                        , microlens >=0.4.11.3 && <0.5
+                        , microlens-th >=0.4.3.3 && <0.5
+                        , profunctors >=5.2.1 && <6
+                        , tagged >=0.4.4 && <1
+                        , template-haskell >=2.7 && <2.22
+                        , th-abstraction >=0.2.1 && <0.7
+
+  ghc-options:
+    -Wall -fwarn-tabs
+    -O2 -fdicts-cheap -funbox-strict-fields
+    -fmax-simplifier-iterations=10
+
+  hs-source-dirs:      src
+  default-language:    GHC2021
+
