@@ -31,16 +31,21 @@ library
                         Lens.Micro.ProCompat
                         Lens.Micro.Pro.TH
                         Lens.Micro.Pro.Internal
+                        Lens.Micro.Pro.Type
+
   -- other-modules:
   -- other-extensions:
   build-depends:          base >=4.5 && <5
                         , containers >=0.4.0 && <0.8
                         , microlens >=0.4.11.3 && <0.5
                         , microlens-th >=0.4.3.3 && <0.5
+                        , microlens-contra >=0.1.0 && <0.2
+                        , microlens-platform >=0.4.3 && <0.5
                         , profunctors >=5.2.1 && <6
                         , tagged >=0.4.4 && <1
                         , template-haskell >=2.7 && <2.22
                         , th-abstraction >=0.2.1 && <0.7
+                        , mtl >= 2.3.1 && < 2.4
 
   ghc-options:
     -Wall -fwarn-tabs
