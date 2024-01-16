@@ -4,3 +4,4 @@ packages: microlens/
           microlens-mtl/
           microlens-platform/
           microlens-th/
+          microlens-pro/
