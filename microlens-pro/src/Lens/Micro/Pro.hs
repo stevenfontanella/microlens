@@ -51,9 +51,11 @@ module Lens.Micro.Pro
 
     -- * Review
     , AReview
+    , SimpleReview
     , re
     , review
     , (#)
+    , unto
     )
     where
 --------------------------------------------------------------------------------
@@ -68,6 +70,8 @@ import Data.Maybe
 import Data.Tagged
 import Data.Functor.Contravariant
 import Data.Functor.Identity
+import Data.Bifunctor
+import Data.Void
 import Data.Profunctor
 import Data.Profunctor.Unsafe
 import GHC.Exts                     (TYPE)
@@ -428,6 +432,9 @@ nearly a p = prism' (\() -> a) $ guard . p
 
 type AReview t b = Tagged b (Identity b) -> Tagged t (Identity t)
 
+type SimpleReview t b = forall p. (Choice p, Bifunctor p)
+                     => p b (Identity b) -> p t (Identity t)
+
 {-|
 Reverse a 'Prism' or 'Iso' and 'view' it
 
@@ -482,4 +489,11 @@ to :: (s -> a) -> Getter s a
 to k = dimap k (contramap k)
 
 {-# INLINE to #-}
+
+unto :: (Profunctor p, Bifunctor p, Functor f)
+     => (b -> t)
+     -> p a (f b) -> p s (f t)
+unto f = first absurd . lmap absurd . rmap (fmap f)
+
+{-# INLINE unto #-}
 
