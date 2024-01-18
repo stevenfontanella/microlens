@@ -321,16 +321,64 @@ mapping k = withIso k $ \ sa bt -> iso (fmap sa) (fmap bt)
 
 {- $prisms-note
 
-Prisms are traversals that always target 0 or 1 values. Moreover, it's possible
-to reverse a prism, using it to construct a structure instead of peeking into
-it. Here's an example from the lens library:
+If a 'Lens' views and updates individual components of /product/ types, a
+'Prism' views and updates individual components of /sum/ types. For example, you
+may want to update the 'Left' field of an 'Either':
 
->>> over '_Left' (+1) (Left 2)
-Left 3
+>>> Left "salmon" & _Left .~ "orb"
+Left "orb"
+>>> Right "pudding" & _Left .~ "orb"
+Right "pudding"
 
->>> '_Left' '#' 5
-Left 5
+Also similarly to a 'Lens', you might want to view the 'Left' field. However, it
+might not always be there, so we treat it as a traversal with either one or zero
+results.
 
+>>> Right "bass" ^? _Left
+Nothing
+>>> Left "bubbles" ^? _Left
+Just "bubbles"
+
+A unique feature of 'Prism's is that they may be flipped around using 're' to
+construct the larger structure. Maintaining our example of 'Either', remember
+that you can construct the entire 'Either' via the constructor 'Left'.
+
+>>> :t re _Left
+re _Left :: Getter b (Either b c)
+>>> view (re _Left) "bungo"
+Left "bungo"
+
+This @'view' ('re' l)@ idiom isn't the prettiest, so we define @'review' =
+'view' . 're'@ as shorthand. 'review' also has an infix synonym, '(#)'.
+
+>>> :t _Just
+_Just :: Prism (Maybe a) (Maybe b) a b
+>>> review _Just "bilbo"
+Just "bilbo"
+>>> _Just # "bilbo"
+Just "bilbo"
+
+As is the whole point of optics, prisms may of course be composed with other
+optics:
+
+@
+type Thing = Either (Maybe String) (Maybe (Either [Bool] Int))
+thing :: Thing
+thing = Right (Just (Left [True,False]))
+@
+>>> thing & _Right . _Just . _Left . each %~ not
+Right (Just (Left [False,True]))
+
+-}
+
+{- |
+Generate a 'Prism' out of a constructor and a selector. You may initially wonder
+why the selector function returns an 'Either t a' rather than the more obvious
+choice of 'Maybe a'. This is to allow @s@ and @t@ to differ — see 'prism''.
+
+@
+_Left = prism Left $ either Right (Left . Right)
+@
 -}
 
 prism :: (b -> t) -> (s -> Either t a) -> Prism s t a b
@@ -338,36 +386,97 @@ prism bt seta = dimap seta (either pure (fmap bt)) . right'
 
 {-# INLINE prism #-}
 
+{- |
+Generate a 'Prism' out of a constructor and a selector.
+
+@
+_Nothing = prism Left $ either Right (Left . Right)
+@
+-}
+
 prism' :: (b -> s) -> (s -> Maybe a) -> Prism s s a b
 prism' bs sma = prism bs (\s -> maybe (Left s) Right (sma s))
 
 {-# INLINE prism' #-}
+
+{- |
+Clone a Prism so that you can reuse the same monomorphically typed Prism for
+different purposes.
+Cloning a 'Prism' is one way to make sure you aren't given something weaker,
+such as a 'Traversal' and can be used as a way to pass around lenses that have
+to be monomorphic in f.
+-}
 
 clonePrism :: APrism s t a b -> Prism s t a b
 clonePrism k = withPrism k $ \bt sta -> prism bt sta
 
 {-# INLINE clonePrism #-}
 
+{- |
+Convert a 'Prism' into the constructor and selector that characterise it. See:
+'prism'.
+-}
 withPrism :: APrism s t a b -> ((b -> t) -> (s -> Either t a) -> r) -> r
 withPrism k f = case coerce (k (Market Identity Right)) of
     Market bt seta -> f bt seta
 
 {-# INLINE withPrism #-}
 
+{- |
+Focus the 'Just' of a 'Maybe'. This might seem redundant, as:
+
+>>> Just "pikyben" ^? _Just
+Just "pikyben"
+
+but '_Just' proves useful when composing with other optics.
+-}
+
 _Just :: Prism (Maybe a) (Maybe b) a b
 _Just = prism Just $ maybe (Left Nothing) Right
 
 {-# INLINE _Just #-}
 
+{- |
+'_Nothing' focuses the 'Nothing' in a 'Maybe'.
+
+>>> Nothing ^? _Nothing 
+Just ()
+>>> Just "wassa" ^? _Nothing 
+Nothing
+>>> 'has' _Nothing (Just "something")
+False
+-}
 _Nothing :: Prism' (Maybe a) ()
 _Nothing = prism' (const Nothing) $ maybe (Just ()) (const Nothing)
 
 {-# INLINE _Nothing #-}
 
+{- |
+Focus the 'Left' component of an 'Either'
+
+>>> Left "doge" ^? _Left
+Just "doge"
+>>> Right "soge" ^? _Left
+Nothing
+>>> review _Left "quoge"
+Left "quoge"
+-}
+
 _Left :: Prism (Either a c) (Either b c) a b
 _Left = prism Left $ either Right (Left . Right)
 
 {-# INLINE _Left #-}
+
+{- |
+Focus the 'Right' component of an 'Either'
+
+>>> Left "doge" ^? _Right
+Nothing
+>>> Right "soge" ^? _Right
+Just "soge"
+>>> review _Right "quoge"
+Right "quoge"
+-}
 
 _Right :: Prism (Either c a) (Either c b) a b
 _Right = prism Right $ either (Left . Left) Right
@@ -430,7 +539,21 @@ nearly a p = prism' (\() -> a) $ guard . p
 
 {-# INLINE nearly #-}
 
+{- |
+If you see this in a signature for a function, the function is expecting a
+Review. This usually means a 'Prism' or an 'Iso'.
+-}
 type AReview t b = Tagged b (Identity b) -> Tagged t (Identity t)
+
+{- |
+[@Review@](https://hackage.haskell.org/package/lens-5.2.3/docs/Control-Lens-Type.html#t:Review),
+from lens, is limited form of 'Prism' that can only be used for 're' operations.
+
+Similarly to 'SimpleGetter' from microlens, microlens-pro does not define 'Review' and opts for
+a less general 'SimplerReview' in order to avoid a
+[distributive](https://hackage.haskell.org/package/distributive-0.6.2.1)
+dependency.
+-}
 
 type SimpleReview t b = forall p. (Choice p, Bifunctor p)
                      => p b (Identity b) -> p t (Identity t)
@@ -447,7 +570,7 @@ review ≡ view . re
 Just "sploink"
 @
 
-'review' is often used with the @((->)r)@ monad:
+'review' is often used with the function monad, @((->)r)@:
 
 @
 review :: AReview t b -> b -> t
