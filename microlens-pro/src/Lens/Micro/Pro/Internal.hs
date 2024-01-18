@@ -14,6 +14,9 @@ module Lens.Micro.Pro.Internal
 
     , Exchange(..), Exchange'
     , Market(..), Market'
+
+    , Iso, Iso'
+    , Prism, Prism'
     )
     where
 --------------------------------------------------------------------------------
