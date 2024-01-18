@@ -1,35 +1,59 @@
+{-|
+Module      : Lens.Micro.Pro
+Copyright   : (C) 2013-2016 Edward Kmett, 2018 Monadfix
+License     : BSD-style (see the file LICENSE)
+
+This module is home to lens definitions that require
+[profunctors](https://hackage.haskell.org/package/profunctors), most notably
+'Iso' and 'Prism'. Depending on 'profunctors' is quite the to bear — one
+that includes all dependencies of @microlens-platform@. For this reason,
+@microlens-pro@ ships with a compatiblity module "Lens.Micro.ProCompat" which
+re-exports the entirety of "Lens.Micro.Platform", but with the profunctor-less
+definitions hidden and overridden with profunctor'd definitions from this module.
+
+-}
 {-# LANGUAGE DefaultSignatures #-}
 module Lens.Micro.Pro
     (
     -- * Iso: Losslessly convert between types
+    -- $isos-note
       Iso, Iso'
+    -- ** Constructing Isos
     , iso
     , from
-    , strict, lazy
+    , non, non'
+    -- ** Common Isos
     , _Show
+    , strict, lazy
     , enum
-    , anon, non, non'
     , coerced
+    , mapping
+    -- ** Miscellaneous
     , AnIso, AnIso'
     , cloneIso
     , withIso
 
-    -- * Prism: A traversal targeting exactly one or zero values
+    -- * Prism: A traversal with zero or one targets
+    -- $prisms-note
     , Prism, Prism'
+    -- ** Constructing Prisms
     , prism, prism'
+    , nearly
+    , only
+    -- ** Common Prisms
     , _Left, _Right
     , _Just, _Nothing
     , _Empty
-    , only
+    -- ** Miscellaneous
     , APrism, APrism'
     , clonePrism
     , withPrism
 
     -- * Review
     , AReview
+    , re
     , review
     , (#)
-    , re
     )
     where
 --------------------------------------------------------------------------------
@@ -47,6 +71,13 @@ import Data.Functor.Identity
 import Data.Profunctor
 import Data.Profunctor.Unsafe
 import GHC.Exts                     (TYPE)
+
+-- implement instances
+import qualified Data.Text
+import qualified Data.Text.Lazy
+import qualified Data.HashMap.Strict
+import qualified Data.Map
+import qualified Data.Vector
 --------------------------------------------------------------------------------
 
 -- | This type is used for effecient "deconstruction" of an 'Iso'. From the
@@ -70,6 +101,29 @@ cloneIso :: AnIso s t a b -> Iso s t a b
 cloneIso k = withIso k $ \sa bt -> iso sa bt
 
 {-# INLINE cloneIso #-}
+
+{- $isos-note
+
+Isos (or isomorphisms) are lenses that convert a value instead of targeting a
+part of it; in other words, inside of every list lives a reversed list, inside
+of every strict @Text@ lives a lazy @Text@, and inside of every @(a, b)@ lives a
+@(b, a)@. Since an isomorphism doesn't lose any information, it's possible to
+/reverse/ it and use it in the opposite direction by using @from@:
+
+@
+from :: Iso' s a -> Iso' a s
+from :: Iso s t a b -> Iso t s b a
+@
+
+The isomorphisms defined in this module are true lens-compatible isos. Many of
+them share names with the lens-__incompatible__ definitions from
+[Lens.Micro](https://hackage.haskell.org/package/microlens-0.4.13.1/docs/Lens-Micro.html#g:5)
+and
+[Lens.Micro.Platform](https://hackage.haskell.org/package/microlens-platform-0.4.3.4/docs/Lens-Micro-Platform.html).
+For convenience, we provide a module "Lens.Micro.ProCompat" which emulates
+Lens.Micro.Platform, but uses the lens-compatible isos.
+
+-}
 
 -- | Construct an 'Iso' from two inverse functions. See the documentation for
 -- 'from' for a summary of the behaviour expected of the 'Iso' you create.
@@ -102,18 +156,112 @@ withIso ai k = case ai (Exchange id Identity) of
 
 {-# INLINE withIso #-}
 
+{- |
+Lawful instances of 'Show' and 'Read' give rise to this isomorphism.
+
+@
+>>> 123 & from _Show %~ reverse
+321
+>>> "123" & _Show %~ (*2)
+"246"
+@
+-}
 _Show :: (Read a, Show a) => Iso' String a
 _Show = iso read show
+
+{-# INLINE _Show #-}
+
+{- |
+'enum' is a questionable inclusion, as many (most) 'Enum' instances throw
+errors for out-of-bounds integers, but it is occasionally useful when used with
+that information in mind. Handle with care!
+
+>>> 97 ^. enum :: Char
+'a'
+>>> (-1) ^. enum :: Char
+*** Exception: Prelude.chr: bad argument: (-1)
+>>> [True,False] ^. mapping (from enum)
+[1,0]
+-}
 
 enum :: (Enum a) => Iso' Int a
 enum = iso toEnum fromEnum
 
-anon :: a -> (a -> Bool) -> Iso' (Maybe a) a
-anon a p = iso (fromMaybe a) go where
-  go b | p b       = Nothing
-       | otherwise = Just b
+{-# INLINE enum #-}
 
-{-# INLINE anon #-}
+{- |
+'non' lets you “relabel” a 'Maybe' by equating 'Nothing' to an arbitrary value
+(which you can choose):
+
+>>> Just 1 ^. non 0 1
+
+>>> Nothing ^. non 0 0
+
+The most useful thing about 'non' is that relabeling also works in other
+direction. If you try to 'set' the “forbidden” value, it'll be turned to
+'Nothing':
+
+>>> Just 1 & non 0 .~ 0 Nothing
+
+Setting anything else works just fine:
+
+>>> Just 1 & non 0 .~ 5 Just 5
+
+Same happens if you try to modify a value:
+
+>>> Just 1 & non 0 %~ subtract 1 Nothing
+
+>>> Just 1 & non 0 %~ (+ 1) Just 2
+
+'non' is often useful when combined with 'at'. For instance, if you have a map
+of songs and their playcounts, it makes sense not to store songs with 0 plays in
+the map; 'non' can act as a filter that wouldn't pass such entries.
+
+Decrease playcount of a song to 0, and it'll be gone:
+
+>>> fromList [("Soon",1),("Yesterday",3)] & at "Soon" . non 0 %~ subtract 1
+fromList [("Yesterday",3)]
+
+Try to add a song with 0 plays, and it won't be added:
+
+>>> fromList [("Yesterday",3)] & at "Soon" . non 0 .~ 0
+fromList [("Yesterday",3)]
+
+But it will be added if you set any other number:
+
+>>> fromList [("Yesterday",3)] & at "Soon" . non 0 .~ 1
+fromList [("Soon",1),("Yesterday",3)]
+
+'non' is also useful when working with nested maps. Here a nested map is created
+when it's missing:
+
+>>> Map.empty & at "Dez Mona" . non Map.empty . at "Soon" .~ Just 1
+fromList [("Dez Mona",fromList [("Soon",1)])]
+
+and here it is deleted when its last entry is deleted (notice that 'non' is used
+twice here):
+
+>>> fromList [("Dez Mona",fromList [("Soon",1)])] & at "Dez Mona" . non Map.empty . at "Soon" . non 0 %~ subtract 1
+fromList []
+
+To understand the last example better, observe the flow of values in it:
+
+* the map goes into @at \"Dez Mona\"@ * the nested map (wrapped into @Just@)
+goes into @non Map.empty@ * @Just@ is unwrapped and the nested map goes into @at
+\"Soon\"@ * @Just 1@ is unwrapped by @non 0@
+
+Then the final value – i.e. 1 – is modified by @subtract 1@ and the result
+(which is 0) starts flowing backwards:
+
+* @non 0@ sees the 0 and produces a @Nothing@
+
+* @at \"Soon\"@ sees @Nothing@ and deletes the corresponding value from the map
+
+* the resulting empty map is passed to @non Map.empty@, which sees that it's
+empty and thus produces @Nothing@
+
+* @at \"Dez Mona\"@ sees @Nothing@ and removes the key from the map
+-}
 
 non :: (Eq a) => a -> Iso' (Maybe a) a
 non a = non' $ only a
@@ -128,12 +276,58 @@ non' p = iso (fromMaybe def) go where
 
 {-# INLINE non' #-}
 
+{- |
+Coercible types have the same runtime representation, i.e. they are isomorphic.
+
+>>> (Sum 123 :: Sum Int) ^. coerced :: Int
+123
+-}
+
 coerced :: forall s t a b. (Coercible s a, Coercible t b) => Iso s t a b
 coerced l = rmap (fmap coerce) l .# coerce
 
 {-# INLINE coerced #-}
 
+{- |
+An isomorphism holds when lifted into a functor. For example, if a list contains
+a bunch of @a@'s which are each isomorphic to a @b@, the whole list of @a@'s is
+isomorphic to a list of @b@'s.
+
+>>> ["1","2","3"] ^. mapping _Show :: [Int]
+[1,2,3]
+>>> ([1,2,3] :: [Int]) ^. from (mapping _Show)
+["1","2","3"]
+
+This also hold across different functors:
+
+>>> let l = mapping @[] @Maybe _Show
+>>> :t l
+l :: (Read b, Show b) => Iso [String] (Maybe String) [b] (Maybe b)
+>>> ["1","2","3"] & l %~ Just . sum
+Just "6"
+-}
+
+mapping :: (Functor f, Functor g) => AnIso s t a b -> Iso (f s) (g t) (f a) (g b)
+mapping k = withIso k $ \ sa bt -> iso (fmap sa) (fmap bt)
+
+{-# INLINE mapping #-}
+
 --------------------------------------------------------------------------------
+
+
+{- $prisms-note
+
+Prisms are traversals that always target 0 or 1 values. Moreover, it's possible
+to reverse a prism, using it to construct a structure instead of peeking into
+it. Here's an example from the lens library:
+
+>>> over '_Left' (+1) (Left 2)
+Left 3
+
+>>> '_Left' '#' 5
+Left 5
+
+-}
 
 prism :: (b -> t) -> (s -> Either t a) -> Prism s t a b
 prism bt seta = dimap seta (either pure (fmap bt)) . right'
@@ -182,31 +376,107 @@ class AsEmpty a where
     _Empty = only mempty
     {-# INLINE _Empty #-}
 
+instance AsEmpty [a] where
+    _Empty = nearly [] null
+    {-# INLINE _Empty #-}
+
+instance AsEmpty (Data.Map.Map k v) where
+    _Empty = nearly Data.Map.empty Data.Map.null
+    {-# INLINE _Empty #-}
+
+instance AsEmpty (Maybe a) where
+    _Empty = _Nothing
+    {-# INLINE _Empty #-}
+
+instance AsEmpty (Data.HashMap.Strict.HashMap k v) where
+    _Empty = nearly Data.HashMap.Strict.empty Data.HashMap.Strict.null
+    {-# INLINE _Empty #-}
+
+instance AsEmpty (Data.Vector.Vector a) where
+    _Empty = nearly Data.Vector.empty Data.Vector.null
+    {-# INLINE _Empty #-}
+
+instance AsEmpty Data.Text.Text where
+    _Empty = nearly Data.Text.empty Data.Text.null
+    {-# INLINE _Empty #-}
+
+instance AsEmpty Data.Text.Lazy.Text where
+    _Empty = nearly Data.Text.Lazy.empty Data.Text.Lazy.null
+    {-# INLINE _Empty #-}
+
 only :: Eq a => a -> Prism' a ()
 only a = prism' (\() -> a) $ guard . (a ==)
 
 {-# INLINE only #-}
 
+{- |
+>>> ["something"] ^? nearly [] null
+Nothing
+>>> [] ^? nearly [] null
+Just ()
+
+>>> ["one","two"] ^? nearly [] (even . length)
+Just ()
+>>> ["one","two","three"] ^? nearly [] (even . length)
+Nothing
+-}
+
+nearly :: a -> (a -> Bool) -> Prism' a ()
+nearly a p = prism' (\() -> a) $ guard . p
+
+{-# INLINE nearly #-}
+
 type AReview t b = Tagged b (Identity b) -> Tagged t (Identity t)
+
+{-|
+Reverse a 'Prism' or 'Iso' and 'view' it
+
+@
+review ≡ view . re
+@
+
+@
+>>> review _Just "sploink"
+Just "sploink"
+@
+
+'review' is often used with the @((->)r)@ monad:
+
+@
+review :: AReview t b -> b -> t
+@
+-}
 
 review :: MonadReader b m => AReview t b -> m t
 review p = asks (runIdentity #. unTagged #. p .# Tagged .# Identity)
 
 {-# INLINE review #-}
 
+{-|
+Reverse a 'Prism' or 'Iso' turning it into a getter. 're' is a weaker version of
+'from', in that you can't flip it back around after reversing it the first time.
+
+>>> "hello worms" ^. re _Just
+Just "hello worms"
+-}
+
 re :: AReview t b -> Getter b t
 re p = to (runIdentity #. unTagged #. p .# Tagged .# Identity)
 
 {-# INLINE re #-}
 
--- | An infix synonym for 'review'
+-- | An infix synonym of 'review'
 (#) :: AReview t b -> b -> t
 (#) p = runIdentity #. unTagged #. p .# Tagged .# Identity
+
+infixr 8 #
 {-# INLINE (#) #-}
 
 -- TODO: `to` is temporarily defined here. This should be in microlens-contra,
 -- or better yet, microlens as Contravariant has been in base since at least ghc
--- 8.6.5
+-- 8.6.5. This definition isn't perfect either -- the version from lens is:
+--
+-- to :: (Profunctor p, Contravariant f) => (s -> a) -> Optic' p f s a
 
 to :: (s -> a) -> Getter s a
 to k = dimap k (contramap k)
