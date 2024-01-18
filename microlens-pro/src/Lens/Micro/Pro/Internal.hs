@@ -33,6 +33,25 @@ data Exchange a b s t = Exchange (s -> a) (b -> t)
 
 type Exchange' a s = Exchange a a s s
 
+instance Functor (Exchange a b s) where
+    fmap f (Exchange sa bt) = Exchange sa (f . bt)
+    {-# INLINE fmap #-}
+
+instance Profunctor (Exchange a b) where
+    dimap f g (Exchange sa bt) = Exchange (sa . f) (g . bt)
+    lmap f (Exchange sa bt) = Exchange (sa . f) bt
+    rmap f (Exchange sa bt) = Exchange sa (f . bt)
+
+    {-# INLINE dimap #-}
+    {-# INLINE lmap #-}
+    {-# INLINE rmap #-}
+
+    (#.) _ = coerce
+    (.#) p _ = coerce p
+
+    {-# INLINE (#.) #-}
+    {-# INLINE (.#) #-}
+
 -- | This type is used internally by the Prism code to provide efficient access
 --   to the two parts of a Prism.
 data Market a b s t = Market (b -> t) (s -> Either t a)
@@ -42,21 +61,21 @@ instance Functor (Market a b s) where
   {-# INLINE fmap #-}
 
 instance Profunctor (Market a b) where
-  dimap f g (Market bt seta) =
-      Market (g . bt) (either (Left . g) Right . seta . f)
+    dimap f g (Market bt seta) =
+        Market (g . bt) (either (Left . g) Right . seta . f)
 
-  lmap f (Market bt seta) = Market bt (seta . f)
-  rmap f (Market bt seta) = Market (f . bt) (either (Left . f) Right . seta)
+    lmap f (Market bt seta) = Market bt (seta . f)
+    rmap f (Market bt seta) = Market (f . bt) (either (Left . f) Right . seta)
 
-  {-# INLINE rmap #-}
-  {-# INLINE lmap #-}
-  {-# INLINE dimap #-}
+    {-# INLINE rmap #-}
+    {-# INLINE lmap #-}
+    {-# INLINE dimap #-}
 
-  (#.) _ = coerce
-  (.#) p _ = coerce p
+    (#.) _ = coerce
+    (.#) p _ = coerce p
 
-  {-# INLINE (#.) #-}
-  {-# INLINE (.#) #-}
+    {-# INLINE (#.) #-}
+    {-# INLINE (.#) #-}
 
 instance Choice (Market a b) where
     left' (Market bt seta) = Market (Left . bt) $ \sc -> case sc of
