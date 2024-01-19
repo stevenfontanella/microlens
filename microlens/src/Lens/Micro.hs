@@ -21,6 +21,7 @@ This module provides the essential functionality. There are other packages in th
 * <http://hackage.haskell.org/package/microlens-ghc microlens-ghc> – everything in microlens + instances to make @each@\/@at@\/@ix@ usable with arrays, @ByteString@, and containers
 * <http://hackage.haskell.org/package/microlens-platform microlens-platform> – microlens-ghc + microlens-mtl + microlens-th + instances for @Text@, @Vector@, and @HashMap@
 * <http://hackage.haskell.org/package/microlens-contra microlens-contra> – @Fold@ and @Getter@ that are exact copies of types in lens
+* <http://hackage.haskell.org/package/microlens-pro microlens-pro> – microlens-platform + @Iso@ and @Prism@
 
 Unofficial:
 
@@ -910,6 +911,8 @@ from :: Iso' s a -> Iso' a s
 @
 
 However, it's not possible for microlens to export isomorphisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Profunctor Profunctor>@, which resides in the <http://hackage.haskell.org/package/profunctors profunctors> library, which is a somewhat huge dependency. So, all isomorphisms included here are lenses instead (and thus you can't use them in the opposite direction).
+
+Should you find yourself in need of true lens-compatible isos, consider <https://hackage.haskell.org/package/microlens-pro microlens-pro>, or just lens :^).
 -}
 
 {- |
@@ -1311,6 +1314,8 @@ Left 5
 @
 
 However, it's not possible for microlens to export prisms, because their type depends on @<http://hackage.haskell.org/package/profunctors/docs/Data-Profunctor.html#t:Choice Choice>@ from <http://hackage.haskell.org/package/profunctors profunctors>. So, all prisms included here are traversals instead (and you can't reverse them).
+
+Should you find yourself in need of true lens-compatible prisms, consider <https://hackage.haskell.org/package/microlens-pro microlens-pro>, or just lens :^).
 -}
 
 {- |
