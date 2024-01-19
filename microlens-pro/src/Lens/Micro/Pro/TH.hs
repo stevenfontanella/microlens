@@ -19,6 +19,8 @@
 Module      :  Lens.Micro.Pro.TH
 Copyright   :  (C) 2014-2016 Eric Mertens, Edward Kmett; 2018 Monadfix
 License     :  BSD-style (see the file LICENSE)
+
+Template Haskell functions to automatically define prisms.
 -}
 module Lens.Micro.Pro.TH
 (

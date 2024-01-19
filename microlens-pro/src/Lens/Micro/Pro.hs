@@ -10,7 +10,6 @@ that includes all dependencies of @microlens-platform@. For this reason,
 @microlens-pro@ ships with a compatiblity module "Lens.Micro.ProCompat" which
 re-exports the entirety of "Lens.Micro.Platform", but with the profunctor-less
 definitions hidden and overridden with profunctor'd definitions from this module.
-
 -}
 {-# LANGUAGE DefaultSignatures #-}
 module Lens.Micro.Pro
@@ -20,7 +19,9 @@ module Lens.Micro.Pro
       Iso, Iso'
     -- ** Constructing Isos
     , iso
+    -- ** Iso Combinators
     , from
+    , under
     , non, non'
     -- ** Common Isos
     , _Show
@@ -28,6 +29,7 @@ module Lens.Micro.Pro
     , enum
     , coerced
     , mapping
+    , packed, unpacked
     -- ** Miscellaneous
     , AnIso, AnIso'
     , cloneIso
@@ -38,6 +40,7 @@ module Lens.Micro.Pro
     , Prism, Prism'
     -- ** Constructing Prisms
     , prism, prism'
+    -- ** Prism Combinators
     , nearly
     , only
     -- ** Common Prisms
@@ -77,11 +80,11 @@ import Data.Profunctor.Unsafe
 import GHC.Exts                     (TYPE)
 
 -- implement instances
-import qualified Data.Text
-import qualified Data.Text.Lazy
-import qualified Data.HashMap.Strict
-import qualified Data.Map
-import qualified Data.Vector
+import qualified Data.Text                as Text
+import qualified Data.Text.Lazy           as Text.Lazy
+import qualified Data.HashMap.Strict      as HashMap.Strict
+import qualified Data.Map                 as Map
+import qualified Data.Vector              as Vector
 --------------------------------------------------------------------------------
 
 -- | This type is used for effecient "deconstruction" of an 'Iso'. From the
@@ -95,11 +98,19 @@ type AnIso s t a b = Exchange a b a (Identity b)
 
 type AnIso' s a = AnIso s s a a
 
+-- | This type is used for effecient "deconstruction" of a 'Prism'. From the
+-- user's perspective, a function with an 'AnPrism' as an argument is simply
+-- expecting a normal 'Prism'.
+
 type APrism s t a b = Market a b a (Identity b) -> Market a b s (Identity t)
+
+-- | Monomorphic 'APrism'.
 
 type APrism' s a = Market a a a (Identity a) -> Market a a s (Identity s)
 
--- | Extract the 'Iso' underlying every 'AnIso'
+-- | Convert 'AnIso' to 'Iso'. This is useful when you need to store an
+-- isomorphism as a data type inside a container and later reconstitute it as an
+-- overloaded function.
 
 cloneIso :: AnIso s t a b -> Iso s t a b
 cloneIso k = withIso k $ \sa bt -> iso sa bt
@@ -119,6 +130,14 @@ from :: Iso' s a -> Iso' a s
 from :: Iso s t a b -> Iso t s b a
 @
 
+Isos are constructed from a pair of inverse functions. For example, assume
+lawful instances of 'Show' and 'Read':
+
+@
+show . read = id
+read . show = id
+@
+
 The isomorphisms defined in this module are true lens-compatible isos. Many of
 them share names with the lens-__incompatible__ definitions from
 [Lens.Micro](https://hackage.haskell.org/package/microlens-0.4.13.1/docs/Lens-Micro.html#g:5)
@@ -129,8 +148,7 @@ Lens.Micro.Platform, but uses the lens-compatible isos.
 
 -}
 
--- | Construct an 'Iso' from two inverse functions. See the documentation for
--- 'from' for a summary of the behaviour expected of the 'Iso' you create.
+-- | Construct an 'Iso' from two inverse functions.
 
 iso :: (s -> a) -> (b -> t) -> Iso s t a b
 iso sa bt = dimap sa (fmap bt)
@@ -149,6 +167,18 @@ from :: AnIso s t a b -> Iso b a t s
 from l = withIso l $ \sa bt -> iso bt sa
 
 {-# INLINE from #-}
+
+{- |
+Shorthand for @'Lens.Micro.over' '.' 'from'@, e.g.
+
+@
+s & 'over' ('from' l) f ≡ s & 'under' l f
+@
+-}
+under :: AnIso s t a b -> (t -> s) -> b -> a
+under k = withIso k $ \ sa bt ts -> sa . ts . bt
+
+{-# INLINE under #-}
 
 -- | Extract the two functions, @s -> a@ and one @b -> t@ that characterize an
 --   'Iso'.
@@ -170,6 +200,7 @@ Lawful instances of 'Show' and 'Read' give rise to this isomorphism.
 "246"
 @
 -}
+
 _Show :: (Read a, Show a) => Iso' String a
 _Show = iso read show
 
@@ -271,6 +302,18 @@ non :: (Eq a) => a -> Iso' (Maybe a) a
 non a = non' $ only a
 
 {-# INLINE non #-}
+
+{- |
+'non', but instead of equality with a value, 'non'' equates 'Nothing' to
+anything a 'Prism' of your choice doesn't match.
+
+>>> Just [] & non' _Empty .~ [1,2,3]
+Just [1,2,3]
+>>> Just [] & non' _Empty .~ []
+Nothing
+
+See 'non' for cases this may be useful.
+-}
 
 non' :: APrism' a () -> Iso' (Maybe a) a
 non' p = iso (fromMaybe def) go where
@@ -402,9 +445,10 @@ prism' bs sma = prism bs (\s -> maybe (Left s) Right (sma s))
 {- |
 Clone a Prism so that you can reuse the same monomorphically typed Prism for
 different purposes.
+
 Cloning a 'Prism' is one way to make sure you aren't given something weaker,
 such as a 'Traversal' and can be used as a way to pass around lenses that have
-to be monomorphic in f.
+to be monomorphic in @f@.
 -}
 
 clonePrism :: APrism s t a b -> Prism s t a b
@@ -416,6 +460,7 @@ clonePrism k = withPrism k $ \bt sta -> prism bt sta
 Convert a 'Prism' into the constructor and selector that characterise it. See:
 'prism'.
 -}
+
 withPrism :: APrism s t a b -> ((b -> t) -> (s -> Either t a) -> r) -> r
 withPrism k f = case coerce (k (Market Identity Right)) of
     Market bt seta -> f bt seta
@@ -484,6 +529,12 @@ _Right = prism Right $ either (Left . Left) Right
 {-# INLINE _Right #-}
 
 class AsEmpty a where
+    {- |
+    A prism that matches the empty structure.
+
+    >>> has _Empty []
+    True
+    -}
     _Empty :: Prism' a ()
     default _Empty :: (Monoid a, Eq a) => Prism' a ()
     _Empty = only mempty
@@ -493,29 +544,38 @@ instance AsEmpty [a] where
     _Empty = nearly [] null
     {-# INLINE _Empty #-}
 
-instance AsEmpty (Data.Map.Map k v) where
-    _Empty = nearly Data.Map.empty Data.Map.null
+instance AsEmpty (Map.Map k v) where
+    _Empty = nearly Map.empty Map.null
     {-# INLINE _Empty #-}
 
 instance AsEmpty (Maybe a) where
     _Empty = _Nothing
     {-# INLINE _Empty #-}
 
-instance AsEmpty (Data.HashMap.Strict.HashMap k v) where
-    _Empty = nearly Data.HashMap.Strict.empty Data.HashMap.Strict.null
+instance AsEmpty (HashMap.Strict.HashMap k v) where
+    _Empty = nearly HashMap.Strict.empty HashMap.Strict.null
     {-# INLINE _Empty #-}
 
-instance AsEmpty (Data.Vector.Vector a) where
-    _Empty = nearly Data.Vector.empty Data.Vector.null
+instance AsEmpty (Vector.Vector a) where
+    _Empty = nearly Vector.empty Vector.null
     {-# INLINE _Empty #-}
 
-instance AsEmpty Data.Text.Text where
-    _Empty = nearly Data.Text.empty Data.Text.null
+instance AsEmpty Text.Text where
+    _Empty = nearly Text.empty Text.null
     {-# INLINE _Empty #-}
 
-instance AsEmpty Data.Text.Lazy.Text where
-    _Empty = nearly Data.Text.Lazy.empty Data.Text.Lazy.null
+instance AsEmpty Text.Lazy.Text where
+    _Empty = nearly Text.Lazy.empty Text.Lazy.null
     {-# INLINE _Empty #-}
+
+{- |
+A prism that matches equality with a value:
+
+>>> 1 ^? only 2
+Nothing
+>>> 1 ^? only 1
+Just 1
+-}
 
 only :: Eq a => a -> Prism' a ()
 only a = prism' (\() -> a) $ guard . (a ==)
@@ -523,14 +583,12 @@ only a = prism' (\() -> a) $ guard . (a ==)
 {-# INLINE only #-}
 
 {- |
->>> ["something"] ^? nearly [] null
-Nothing
->>> [] ^? nearly [] null
-Just ()
+@'nearly' a p@ is a prism that matches "loose equality" with @a@ by assuming @p
+x@ is true iff @x ≡ a@.
 
->>> ["one","two"] ^? nearly [] (even . length)
-Just ()
->>> ["one","two","three"] ^? nearly [] (even . length)
+>>> nearly [] null # ()
+[]
+>>> [1,2,3,4] ^? nearly [] null
 Nothing
 -}
 
@@ -613,10 +671,45 @@ to k = dimap k (contramap k)
 
 {-# INLINE to #-}
 
+{- |
+Construct a 'Review' out of a constructor. Consider this more pleasant type
+signature:
+
+@
+unto :: (b -> t) -> Review' t b
+@
+
+Pardon the actual type signature — microlens defines neither @Optic@ (used in
+lens'
+[@unto@](https://hackage.haskell.org/package/lens-5.2.3/docs/Control-Lens-Combinators.html#v:unto)) nor @Review'@. Here we simply expand the definition of @Optic@.
+-}
 unto :: (Profunctor p, Bifunctor p, Functor f)
      => (b -> t)
      -> p a (f b) -> p s (f t)
 unto f = first absurd . lmap absurd . rmap (fmap f)
 
 {-# INLINE unto #-}
+
+--------------------------------------------------------------------------------
+
+instance IsText String where
+    packed = id
+    unpacked = id
+
+    {-# INLINE packed #-}
+    {-# INLINE unpacked #-}
+
+instance IsText Text.Text where
+    packed = iso Text.pack Text.unpack
+    unpacked = iso Text.unpack Text.pack
+
+    {-# INLINE packed #-}
+    {-# INLINE unpacked #-}
+
+instance IsText Text.Lazy.Text where
+    packed = iso Text.Lazy.pack Text.Lazy.unpack
+    unpacked = iso Text.Lazy.unpack Text.Lazy.pack
+
+    {-# INLINE packed #-}
+    {-# INLINE unpacked #-}
 
