@@ -5,6 +5,14 @@ description:
   This package provides lens-compatible 'Prism' and 'Iso'. Consequently, it
   depends on the rather heavy @profunctors@.
   .
+  Thank you to the <https://hackage.haskell.org/package/lens lens> contributors
+  for the original code and some docs,
+  <https://cohomolo.gy Emily Pillmore> and
+  <https://mroman42.github.io/cosmoi Mario Román> for
+  <https://golem.ph.utexas.edu/category/2020/01/profunctor_optics_the_categori.html this post>
+  which inspired documentation, and Wikibooks contributors for
+  <https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references#Isos this article>.
+  .
   This package is a part of the
   <https://hackage.haskell.org/package/microlens microlens> family; see the
   readme <https://github.com/crumbtoo/microlens on Github>.
@@ -55,6 +63,7 @@ library
     -Wall -fwarn-tabs
     -O2 -fdicts-cheap -funbox-strict-fields
     -fmax-simplifier-iterations=10
+    -Wno-orphans
 
   hs-source-dirs:      src
   default-language:    GHC2021

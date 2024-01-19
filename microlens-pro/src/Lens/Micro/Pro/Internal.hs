@@ -3,8 +3,8 @@ Module      : Lens.Micro.Pro.Internal
 Copyright   : (C) 2013-2016 Edward Kmett, 2018 Monadfix
 License     : BSD-style (see the file LICENSE)
 
-Definitions used internally by microlens. If you're going to use these, only do
-so for your own types!
+Definitions used internally by microlens. If you're going to use these, only
+define instances for your own types, and don't export an API using these!
 -}
 {-# LANGUAGE FunctionalDependencies #-}
 module Lens.Micro.Pro.Internal
@@ -98,9 +98,15 @@ instance Choice (Market a b) where
 
 type Market' a s = Market a a s s
 
--- TODO: IsText is up for discussion
-
 class IsText t where
+
+    -- | 'packed' lets you convert between 'String' and @Text@ (strict or lazy).
+    -- It can be used as a replacement for @pack@ or as a way to modify some
+    -- 'String' if you have a function like @Text -> Text@.
+
     packed   :: Iso' String t
+
+    -- | 'unpacked' is like 'packed' but works in the opposite direction.
+
     unpacked :: Iso' t String
 
