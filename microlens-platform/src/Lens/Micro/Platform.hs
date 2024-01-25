@@ -55,8 +55,10 @@ import Lens.Micro.Platform.Internal
 import Data.Hashable
 import Data.Int
 import Data.Monoid
+import Data.Functor (($>))
 
 import Data.HashMap.Lazy as HashMap
+import Data.HashSet as HashSet
 import Data.Vector as Vector
 import Data.Vector.Primitive as Prim
 import Data.Vector.Storable as Storable
@@ -72,6 +74,9 @@ import Control.Applicative
 
 
 type instance Index   (HashMap k a) = k
+type instance IxValue (HashMap k a) = a
+type instance Index   (HashSet a) = a
+type instance IxValue (HashSet a) = ()
 type instance IxValue (HashMap k a) = a
 type instance Index   (Vector.Vector a) = Int
 type instance IxValue (Vector.Vector a) = a
@@ -97,6 +102,16 @@ instance (Eq k, Hashable k) => At (HashMap k a) where
     Nothing -> maybe m (const (HashMap.delete k m)) mv
     Just v' -> HashMap.insert k v' m
     where mv = HashMap.lookup k m
+  {-# INLINE at #-}
+
+instance (Eq k, Hashable k) => Ixed (HashSet k) where
+  ix k f m = if HashSet.member k m
+     then f () $> m
+     else pure m
+  {-# INLINE ix #-}
+
+instance (Eq k, Hashable k) => At (HashSet k) where
+  at k f s = HashSet.fromMap <$> HashMap.alterF f k (HashSet.toMap s)
   {-# INLINE at #-}
 
 instance Ixed (Vector.Vector a) where
