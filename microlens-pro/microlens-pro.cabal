@@ -15,7 +15,7 @@ description:
   .
   This package is a part of the
   <https://hackage.haskell.org/package/microlens microlens> family; see the
-  readme <https://github.com/stevenfontanell/microlens on Github>.
+  readme <https://github.com/stevenfontanella/microlens on Github>.
 license:                BSD3
 license-file:           LICENSE
 author:                 Edward Kmett, Artyom Kazak, crumbtoo <lomiskiam@gmail.com>
