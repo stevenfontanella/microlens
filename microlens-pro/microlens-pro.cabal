@@ -55,16 +55,26 @@ library
                         , tagged >=0.4.4 && <1
                         , template-haskell >=2.7 && <2.22
                         , th-abstraction >=0.6.0 && <0.7
-                        , mtl >=2.3.1 && <2.4
-                        , text >=2.0.2 && < 2.1
-                        , vector >=0.13.1 && <0.14
+                        , mtl >=2.2.2 && <2.4
+                        , text >=1.2 && <2.2
+                        , vector >=0.12.0 && <0.14
+  default-extensions:
+    RankNTypes
+    PolyKinds
+    KindSignatures
+    FlexibleInstances
+
+  if impl(ghc <= 8.6.5)
+    build-depends:      contravariant >=0.1.0 && <1.5.6
 
   ghc-options:
     -Wall -fwarn-tabs
     -O2 -fdicts-cheap -funbox-strict-fields
     -fmax-simplifier-iterations=10
-    -Wno-orphans
+  if impl(ghc >= 8.6.5)
+    ghc-options:
+      -Wno-orphans
 
   hs-source-dirs:      src
-  default-language:    GHC2021
+  default-language:    Haskell2010
 
