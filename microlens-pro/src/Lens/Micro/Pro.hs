@@ -692,7 +692,7 @@ unto f = first absurd . lmap absurd . rmap (fmap f)
 
 --------------------------------------------------------------------------------
 
-instance IsText String where
+instance IsText [Char] where
     packed = id
     unpacked = id
 
