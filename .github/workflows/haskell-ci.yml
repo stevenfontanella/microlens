@@ -210,6 +210,7 @@ jobs:
           echo "packages: $GITHUB_WORKSPACE/source/microlens-mtl" >> cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/microlens-platform" >> cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/microlens-th" >> cabal.project
+          echo "packages: $GITHUB_WORKSPACE/source/microlens-pro" >> cabal.project
           cat cabal.project
       - name: sdist
         run: |
@@ -233,6 +234,8 @@ jobs:
           echo "PKGDIR_microlens_platform=${PKGDIR_microlens_platform}" >> "$GITHUB_ENV"
           PKGDIR_microlens_th="$(find "$GITHUB_WORKSPACE/unpacked" -maxdepth 1 -type d -regex '.*/microlens-th-[0-9.]*')"
           echo "PKGDIR_microlens_th=${PKGDIR_microlens_th}" >> "$GITHUB_ENV"
+          PKGDIR_microlens_pro="$(find "$GITHUB_WORKSPACE/unpacked" -maxdepth 1 -type d -regex '.*/microlens-pro-[0-9.]*')"
+          echo "PKGDIR_microlens_pro=${PKGDIR_microlens_pro}" >> "$GITHUB_ENV"
           rm -f cabal.project cabal.project.local
           touch cabal.project
           touch cabal.project.local
@@ -242,6 +245,7 @@ jobs:
           echo "packages: ${PKGDIR_microlens_mtl}" >> cabal.project
           echo "packages: ${PKGDIR_microlens_platform}" >> cabal.project
           echo "packages: ${PKGDIR_microlens_th}" >> cabal.project
+          echo "packages: ${PKGDIR_microlens_pro}" >> cabal.project
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package microlens" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package microlens-contra" >> cabal.project ; fi
@@ -254,9 +258,11 @@ jobs:
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package microlens-th" >> cabal.project ; fi
           if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
+          if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "package microlens-pro" >> cabal.project ; fi
+          if [ $((HCNUMVER >= 80200)) -ne 0 ] ; then echo "    ghc-options: -Werror=missing-methods" >> cabal.project ; fi
           cat >> cabal.project <<EOF
           EOF
-          $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: $_ installed\n" unless /^(microlens|microlens-contra|microlens-ghc|microlens-mtl|microlens-platform|microlens-th)$/; }' >> cabal.project.local
+          $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: $_ installed\n" unless /^(microlens|microlens-contra|microlens-ghc|microlens-mtl|microlens-platform|microlens-th|microlens-pro)$/; }' >> cabal.project.local
           cat cabal.project
           cat cabal.project.local
       - name: dump install plan
@@ -295,6 +301,8 @@ jobs:
           cd ${PKGDIR_microlens_platform} || false
           ${CABAL} -vnormal check
           cd ${PKGDIR_microlens_th} || false
+          ${CABAL} -vnormal check
+          cd ${PKGDIR_microlens_pro} || false
           ${CABAL} -vnormal check
       - name: haddock
         run: |
