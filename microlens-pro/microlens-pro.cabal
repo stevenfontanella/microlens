@@ -15,13 +15,13 @@ description:
   .
   This package is a part of the
   <https://hackage.haskell.org/package/microlens microlens> family; see the
-  readme <https://github.com/crumbtoo/microlens on Github>.
+  readme <https://github.com/stevenfontanell/microlens on Github>.
 license:                BSD3
 license-file:           LICENSE
-author:                 Edward Kmett, Artyom Kazak
-maintainer:             crumbtoo <lomiskiam@gmail.com>
-homepage:               http://github.com/crumbtoo/microlens
-bug-reports:            http://github.com/crumbtoo/microlens/issues
+author:                 Edward Kmett, Artyom Kazak, crumbtoo <lomiskiam@gmail.com>
+maintainer:             Steven Fontanella <steven.fontanella@gmail.com>
+homepage:               http://github.com/stevenfontanella/microlens
+bug-reports:            http://github.com/stevenfontanella/microlens/issues
 category:               Data, Lenses
 build-type:             Simple
 extra-source-files:     CHANGELOG.md
@@ -33,7 +33,7 @@ tested-with:            GHC==9.8.1
 
 source-repository head
   type:                 git
-  location:             git://github.com/crumbtoo/microlens.git
+  location:             git://github.com/stevenfontanella/microlens.git
 
 library
   exposed-modules:      Lens.Micro.Pro
