@@ -1,14 +1,18 @@
+# 0.4.3.5
+
+* [#131](https://github.com/stevenfontanella/microlens/issues/131) Add `At` and `Ixed` instance for `HashSet`.
+
 # 0.4.3.4
 
-* [#171](https://github.com/stevenfontanella/microlens/pull/171) Support text 2.1
+* [#171](https://github.com/stevenfontanella/microlens/pull/171) Support text 2.1.
 
 # 0.4.3.3
 
-* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
+* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators.
 
 # 0.4.3.2
 
-* [#156](https://github.com/stevenfontanella/microlens/pull/156) Add a missing upper bound for text dependency
+* [#156](https://github.com/stevenfontanella/microlens/pull/156) Add a missing upper bound for text dependency.
 
 # 0.4.3.1
 
