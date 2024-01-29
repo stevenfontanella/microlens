@@ -12,6 +12,7 @@ re-exports the entirety of "Lens.Micro.Platform", but with the profunctor-less
 definitions hidden and overridden with profunctor'd definitions from this module.
 -}
 {-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE CPP #-}
 module Lens.Micro.Pro
     (
     -- * Iso: Losslessly convert between types
@@ -77,7 +78,12 @@ import Data.Bifunctor
 import Data.Void
 import Data.Profunctor
 import Data.Profunctor.Unsafe
+
+#ifdef MIN_VERSION_GLASGOW_HASKELL
+#   if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
 import GHC.Exts                     (TYPE)
+#   endif
+#endif
 
 -- implement instances
 import qualified Data.Text                as Text
@@ -183,8 +189,14 @@ under k = withIso k $ \ sa bt ts -> sa . ts . bt
 -- | Extract the two functions, @s -> a@ and one @b -> t@ that characterize an
 --   'Iso'.
 
+#ifdef MIN_VERSION_GLASGOW_HASKELL
+#   if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
 withIso :: forall s t a b rep (r :: TYPE rep).
              AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
+#   else
+withIso :: AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
+#   endif
+#endif
 withIso ai k = case ai (Exchange id Identity) of
     Exchange sa bt -> k sa (runIdentity #. bt)
 
