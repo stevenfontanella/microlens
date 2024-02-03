@@ -623,7 +623,7 @@ type AReview t b = Tagged b (Identity b) -> Tagged t (Identity t)
 from lens, is limited form of 'Prism' that can only be used for 're' operations.
 
 Similarly to 'SimpleGetter' from microlens, microlens-pro does not define 'Review' and opts for
-a less general 'SimplerReview' in order to avoid a
+a less general 'SimpleReview' in order to avoid a
 [distributive](https://hackage.haskell.org/package/distributive-0.6.2.1)
 dependency.
 -}
