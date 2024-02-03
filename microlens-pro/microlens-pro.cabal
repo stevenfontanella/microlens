@@ -7,8 +7,8 @@ description:
   .
   Thank you to the <https://hackage.haskell.org/package/lens lens> contributors
   for the original code and some docs,
-  <https://cohomolo.gy Emily Pillmore> and
-  <https://mroman42.github.io/cosmoi Mario Román> for
+  Emily Pillmore (<https://cohomolo.gy link>) and
+  Mario Rom&#225;n (<https://mroman42.github.io/cosmoi link>) for
   <https://golem.ph.utexas.edu/category/2020/01/profunctor_optics_the_categori.html this post>
   which inspired documentation, and Wikibooks contributors for
   <https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references#Isos this article>.
@@ -27,9 +27,19 @@ build-type:             Simple
 extra-source-files:     CHANGELOG.md
 cabal-version:          >=1.10
 
--- TODO: verify compatibility with earlier GHCs
-tested-with:            GHC==9.8.1
-                        GHC==9.6.2
+tested-with:
+                     GHC==9.8.1
+                     GHC==9.6.3
+                     GHC==9.4.7
+                     GHC==9.2.8
+                     GHC==9.0.2
+                     GHC==8.10.7
+                     GHC==8.8.4
+                     GHC==8.6.5
+                     GHC==8.4.4
+                     GHC==8.2.2
+                     GHC==8.0.2
+                     GHC==7.10.3
 
 source-repository head
   type:                 git
