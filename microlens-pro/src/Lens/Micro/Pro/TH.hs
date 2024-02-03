@@ -11,10 +11,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 #endif
 
-#ifndef MIN_VERSION_template_haskell
-#define MIN_VERSION_template_haskell(x,y,z) 1
-#endif
-
 {- |
 Module      :  Lens.Micro.Pro.TH
 Copyright   :  (C) 2014-2016 Eric Mertens, Edward Kmett; 2018 Monadfix
