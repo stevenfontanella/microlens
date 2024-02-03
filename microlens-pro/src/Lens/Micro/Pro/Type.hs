@@ -17,12 +17,15 @@ import Data.Profunctor
 --------------------------------------------------------------------------------
 
 {- |
-The type signature of 'iso' provides a nice interpretation of 'Iso', where to
-map some @a -> b@ over your structure, you first apply a @s -> a@, and
-afterwards apply a @b -> t@ to return to your original structure:
+The type signature of 'Lens.Micro.Pro.iso' provides a nice interpretation of
+'Iso'. If you want to apply a function @a -> b@ to a type @s@, you'd have to
+convert with @s -> a@, apply your function @a -> b@, and convert back with
+@b -> t@.
 
 @
-'iso' :: (s -> a) -> (b -> t) -> Iso s t a b
+'Lens.Micro.Pro.iso' :: (s -> a) -> (b -> t) -> Iso s t a b
+-- or, put monomorphically
+'Lens.Micro.Pro.iso' :: (s -> a) -> (a -> s) -> Iso' s a
 @
 -}
 
