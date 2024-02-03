@@ -1,4 +1,4 @@
-{-|
+{- |
 Module      : Lens.Micro.ProCompat
 Copyright   : (C) 2013-2016 Edward Kmett, 2018 Monadfix
 License     : BSD-style (see the file LICENSE)

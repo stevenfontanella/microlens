@@ -11,8 +11,14 @@ that includes all dependencies of @microlens-platform@. For this reason,
 re-exports the entirety of "Lens.Micro.Platform", but with the profunctor-less
 definitions hidden and overridden with profunctor'd definitions from this module.
 -}
+
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE CPP #-}
+
+#ifndef MIN_VERSION_GLASGOW_HASKELL
+#   define MIN_VERSION_GLASGOW_HASKELL(x,y,z,z2) 1
+#endif
+
 module Lens.Micro.Pro
     (
     -- * Iso: Losslessly convert between types
@@ -79,10 +85,8 @@ import Data.Void
 import Data.Profunctor
 import Data.Profunctor.Unsafe
 
-#ifdef MIN_VERSION_GLASGOW_HASKELL
-#   if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
+#if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
 import GHC.Exts                     (TYPE)
-#   endif
 #endif
 
 -- implement instances
@@ -93,9 +97,10 @@ import qualified Data.Map                 as Map
 import qualified Data.Vector              as Vector
 --------------------------------------------------------------------------------
 
--- | This type is used for effecient "deconstruction" of an 'Iso'. From the
--- user's perspective, a function with an 'AnIso' as an argument is simply
--- expecting a normal 'Iso'.
+{- | This type is used for efficient "deconstruction" of an 'Iso', reifying
+the type into a concrete pair of inverse functions. From the user's perspective,
+a function with an 'AnIso' as an argument is simply expecting a normal 'Iso'.
+-}
 
 type AnIso s t a b = Exchange a b a (Identity b)
                   -> Exchange a b s (Identity t)
@@ -189,13 +194,11 @@ under k = withIso k $ \ sa bt ts -> sa . ts . bt
 -- | Extract the two functions, @s -> a@ and one @b -> t@ that characterize an
 --   'Iso'.
 
-#ifdef MIN_VERSION_GLASGOW_HASKELL
-#   if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
+#if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
 withIso :: forall s t a b rep (r :: TYPE rep).
              AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
-#   else
+#else
 withIso :: AnIso s t a b -> ((s -> a) -> (b -> t) -> r) -> r
-#   endif
 #endif
 withIso ai k = case ai (Exchange id Identity) of
     Exchange sa bt -> k sa (runIdentity #. bt)
@@ -427,9 +430,9 @@ Right (Just (Left [False,True]))
 -}
 
 {- |
-Generate a 'Prism' out of a constructor and a selector. You may initially wonder
+Generate a 'Prism' out of a constructor and a selector. You may wonder
 why the selector function returns an 'Either t a' rather than the more obvious
-choice of 'Maybe a'. This is to allow @s@ and @t@ to differ — see 'prism''.
+choice of 'Maybe a'; This is to allow @s@ and @t@ to differ — see 'prism''.
 
 @
 _Left = prism Left $ either Right (Left . Right)

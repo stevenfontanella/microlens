@@ -30,8 +30,10 @@ class Strict lazy strict | lazy -> strict, strict -> lazy where
     strict :: Iso' lazy   strict
     lazy   :: Iso' strict lazy
 
--- | This type is used internally by the 'Iso' code to provide efficient access
---   to the two parts of an Iso.
+{- | This type is used internally to provide efficient access
+to the two inverse functions behind an 'Iso'.
+-}
+
 data Exchange a b s t = Exchange (s -> a) (b -> t)
 
 type Exchange' a s = Exchange a a s s
@@ -55,8 +57,10 @@ instance Profunctor (Exchange a b) where
     {-# INLINE (#.) #-}
     {-# INLINE (.#) #-}
 
--- | This type is used internally by the Prism code to provide efficient access
---   to the two parts of a Prism.
+{- | This type is used internally by the Prism code to provide efficient access
+to the two parts of a Prism, i.e. a constructor and a selector — see:
+'Lens.Micro.Pro.prism'.
+-}
 data Market a b s t = Market (b -> t) (s -> Either t a)
 
 instance Functor (Market a b s) where
