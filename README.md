@@ -72,6 +72,7 @@ Other features:
 [microlens-th]: http://hackage.haskell.org/package/microlens-th
 [microlens-ghc]: http://hackage.haskell.org/package/microlens-ghc
 [microlens-platform]: http://hackage.haskell.org/package/microlens-platform
+[microlens-pro]: http://hackage.haskell.org/package/microlens-pro
 [microlens-contra]: http://hackage.haskell.org/package/microlens-contra
 [microlens-aeson]: http://hackage.haskell.org/package/microlens-aeson
 [microlens-process]: http://hackage.haskell.org/package/microlens-process
@@ -129,6 +130,7 @@ not.
     `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
   * [microlens-platform][] – microlens-ghc + microlens-mtl + microlens-th +
     instances for `Text`, `Vector`, and `HashMap`
+  * [microlens-pro][] – `Prism`s and `Iso`s along with related definitions (e.g. `only`, `non`, `review`, etc.)
   * [microlens-contra][] – `Fold` and `Getter` that are copies of types in
     lens (the reason they're in a separate library is that those types
     depend on [contravariant][])
@@ -207,8 +209,7 @@ So, I recommend:
 I hate it when people advertise things without also describing their
 disadvantages, so I'll list the ones I can think of here.
 
-  * No prisms, no isomorphisms, no indexed traversals, and probably never
-    will be.
+  * No indexed traversals.
 
   * This package doesn't actually let you write everything full lens-style
     (for instance, there are few operators, myriads of functions generalised
@@ -302,13 +303,7 @@ lens-compatible *consumers* of data.
 
 -----------------------------------------------------------------------------
 
-`Prism` and `Iso` aren't included, as their definitions depend on
-`Profunctor` and I don't want to depend on [profunctors][]. For now
-prisms/isos which are included are actually just traversals.
-
-[profunctors]: http://hackage.haskell.org/package/profunctors
-
-For the same reason nothing indexed is included, since it's impossible to
+Nothing indexed is included since it's impossible to
 get `Conjoined` without adding a pile of dependencies:
 
 ~~~
@@ -322,30 +317,6 @@ class ( Choice p, Corepresentable p
       => Conjoined p
 
 class Conjoined p => Indexable i p
-~~~
-
-There'd definitely be prisms if `Profunctor` and `Choice` were in base, but
-[it's complicated][profunctor-base]. Another option is creating a package
-containing only classes (`Profunctor`, `Choice`, `Contravariant`, etc) and
-letting everyone else depend on it, but that leads to a proliferation of
-packages (I still think it'd be a good thing to do in this case, but,
-admittedly, I've also spent more time complaining about it than the issue
-actually deserves).
-
-[profunctor-base]: https://www.reddit.com/r/haskell/comments/3kbj9r/edward_kmett_the_unreasonable_effectiveness_of/cuwucle
-
-For now, if you need to export prisms, you can either depend on [lens][] or
-just depend on [profunctors][] and define `Prism` locally:
-
-~~~ haskell
--- Shouldn't be exported by your library.
-type Prism s t a b =
-    forall p f. (Choice p, Applicative f) =>
-    p a (f b) -> p s (f t)
-
-prism :: (b -> t) -> (s -> Either t a) -> Prism s t a b
-prism bt seta = dimap seta (either pure (fmap bt)) . right'
-{-# INLINE prism #-}
 ~~~
 
 -----------------------------------------------------------------------------
