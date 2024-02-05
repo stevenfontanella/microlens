@@ -25,8 +25,6 @@ module Lens.Micro.Pro.TH
 )
 where
 
-import Lens.Micro
-import Lens.Micro.Extras
 import Lens.Micro.Pro
 import Lens.Micro.TH.Internal
   (HasTypeVars(..), typeVars, substTypeVars, newNames, conAppsT, inlinePragma)

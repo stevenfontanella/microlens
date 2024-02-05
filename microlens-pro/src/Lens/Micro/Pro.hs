@@ -7,9 +7,9 @@ This module is home to lens definitions that require
 [profunctors](https://hackage.haskell.org/package/profunctors), most notably
 'Iso' and 'Prism'. Depending on 'profunctors' is quite the to bear — one
 that includes all dependencies of @microlens-platform@. For this reason,
-@microlens-pro@ ships with a compatiblity module "Lens.Micro.ProCompat" which
-re-exports the entirety of "Lens.Micro.Platform", but with the profunctor-less
-definitions hidden and overridden with profunctor'd definitions from this module.
+@microlens-pro@ re-exports the entirety of "Lens.Micro.Platform", but
+with the profunctor-less definitions hidden and overridden with profunctor'd
+definitions from this module.
 -}
 
 {-# LANGUAGE DefaultSignatures #-}
@@ -66,10 +66,11 @@ module Lens.Micro.Pro
     , review
     , (#)
     , unto
+
+    , module Lens.Micro.Platform
     )
     where
 --------------------------------------------------------------------------------
-import Lens.Micro                   (has)
 import Lens.Micro.Contra
 import Lens.Micro.Pro.Type
 import Lens.Micro.Pro.Internal
@@ -88,6 +89,12 @@ import Data.Profunctor.Unsafe
 #if MIN_VERSION_GLASGOW_HASKELL(8,4,4,0)
 import GHC.Exts                     (TYPE)
 #endif
+
+-- For re-export hiding conflicting names
+import Lens.Micro.Platform hiding
+    ( _Left, _Right, _Just, _Nothing, _Show
+    , strict, lazy, packed, unpacked, non
+    )
 
 -- implement instances
 import qualified Data.Text                as Text
@@ -154,8 +161,8 @@ them share names with the lens-__incompatible__ definitions from
 [Lens.Micro](https://hackage.haskell.org/package/microlens-0.4.13.1/docs/Lens-Micro.html#g:5)
 and
 [Lens.Micro.Platform](https://hackage.haskell.org/package/microlens-platform-0.4.3.4/docs/Lens-Micro-Platform.html).
-For convenience, we provide a module "Lens.Micro.ProCompat" which emulates
-Lens.Micro.Platform, but uses the lens-compatible isos.
+For convenience, we re-export Lens.Micro.Platform, but with non-lens-compatible
+isos hidden and replaced with lens-compatbile ones.
 
 -}
 
@@ -664,7 +671,7 @@ Just "hello worms"
 -}
 
 re :: AReview t b -> Getter b t
-re p = to (runIdentity #. unTagged #. p .# Tagged .# Identity)
+re p = toInternal (runIdentity #. unTagged #. p .# Tagged .# Identity)
 
 {-# INLINE re #-}
 
@@ -675,16 +682,17 @@ re p = to (runIdentity #. unTagged #. p .# Tagged .# Identity)
 infixr 8 #
 {-# INLINE (#) #-}
 
+-- Not exported
 -- TODO: `to` is temporarily defined here. This should be in microlens-contra,
 -- or better yet, microlens as Contravariant has been in base since at least ghc
 -- 8.6.5. This definition isn't perfect either -- the version from lens is:
 --
 -- to :: (Profunctor p, Contravariant f) => (s -> a) -> Optic' p f s a
 
-to :: (s -> a) -> Getter s a
-to k = dimap k (contramap k)
+toInternal :: (s -> a) -> Getter s a
+toInternal k = dimap k (contramap k)
 
-{-# INLINE to #-}
+{-# INLINE toInternal #-}
 
 {- |
 Construct a 'Review' out of a constructor. Consider this more pleasant type
