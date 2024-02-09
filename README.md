@@ -31,7 +31,7 @@ container types.
 **If you're writing an app, you should probably use [microlens-platform][]
 and not microlens.** You'll get additional functions, instances,
 `makeLenses`, and other useful things. microlens is mostly for library
-writers and for toying with lenses.
+writers and for toying with lenses. See [Which microlens library should I use?](#which-microlens-library-should-i-use) for more.
 
 Here are the build times for all libraries in the family:
 
@@ -83,11 +83,17 @@ applications and bigger packages. (I'm not talking about exporting lenses,
 I'm talking about using lenses to write code.) microlens attempts to be a
 library that would be a nearly *unquestionable* win for some people.
 
-## Migration guide
+## Which microlens library should I use?
+
+If you don't know where to start, start with [microlens-platform][] and change later if necessary.
+If you need [`Prism`](https://hackage.haskell.org/package/microlens-pro/docs/Lens-Micro-Pro.html#t:Prism)s or [`Iso`](https://hackage.haskell.org/package/microlens-pro/docs/Lens-Micro-Pro.html#t:Iso)s, use [microlens-pro][] instead.
+If you're a library author or otherwise want a low dependency footprint, start with [microlens][] and only add others when needed (likely you will want [microlens-th][] to conveniently generate lenses for your datatypes).
+
+## Migrate from [lens][]
 
 [ilist]: https://github.com/aelve/ilist
 
-  * If you use `ALens`, indexed traversals, prisms, isomorphisms, or
+  * If you use `ALens`, indexed traversals, or
     `Wrapped`, you won't be able to migrate (although some indexed functions
     are available elsewhere – containers and vector provide them, and
     [ilist][] provides indexed functions for lists).
@@ -130,7 +136,7 @@ not.
     `each`/`at`/`ix` usable with arrays, `ByteString`, and containers
   * [microlens-platform][] – microlens-ghc + microlens-mtl + microlens-th +
     instances for `Text`, `Vector`, and `HashMap`
-  * [microlens-pro][] – `Prism`s and `Iso`s along with related definitions (e.g. `only`, `non`, `review`, etc.)
+  * [microlens-pro][] – [`Prism`](https://hackage.haskell.org/package/microlens-pro/docs/Lens-Micro-Pro.html#t:Prism)s and [`Iso`](https://hackage.haskell.org/package/microlens-pro/docs/Lens-Micro-Pro.html#t:Iso)s along with related definitions (e.g. `only`, `non`, `review`, etc.)
   * [microlens-contra][] – `Fold` and `Getter` that are copies of types in
     lens (the reason they're in a separate library is that those types
     depend on [contravariant][])
