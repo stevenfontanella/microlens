@@ -17,9 +17,10 @@ extra-source-files:
   CHANGELOG.md
 cabal-version:       >=1.10
 tested-with:
-                     GHC==9.8.1
-                     GHC==9.6.3
-                     GHC==9.4.7
+                     GHC==9.10.0
+                     GHC==9.8.2
+                     GHC==9.6.4
+                     GHC==9.4.8
                      GHC==9.2.8
                      GHC==9.0.2
                      GHC==8.10.7
@@ -41,10 +42,10 @@ library
   -- other-extensions:
   build-depends:       base >=4.5 && <5
                      , microlens >=0.4.0 && <0.5
-                     , containers >=0.5 && <0.7
+                     , containers >=0.5 && <0.8
                      , transformers
-                     , template-haskell >=2.8 && <2.22
-                     , th-abstraction >=0.4.1 && <0.7
+                     , template-haskell >=2.8 && <2.23
+                     , th-abstraction >=0.4.1 && <0.8
 
   ghc-options:
     -Wall -fwarn-tabs
