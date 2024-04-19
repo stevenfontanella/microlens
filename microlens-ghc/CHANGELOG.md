@@ -1,10 +1,14 @@
+# 0.4.14.3
+
+* [#180](https://github.com/stevenfontanella/microlens/pull/180) [#181](https://github.com/stevenfontanella/microlens/pull/181) Support GHC 9.10.
+
 # 0.4.14.2
 
-* [#171](https://github.com/stevenfontanella/microlens/pull/171) Support bytestring 0.12
+* [#171](https://github.com/stevenfontanella/microlens/pull/171) Support bytestring 0.12.
 
 # 0.4.14.1
 
-* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
+* [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators.
 
 # 0.4.14
 

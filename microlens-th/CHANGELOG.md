@@ -1,3 +1,7 @@
+# 0.4.3.15
+
+* [#180](https://github.com/stevenfontanella/microlens/pull/180) [#181](https://github.com/stevenfontanella/microlens/pull/181) Support GHC 9.10.
+
 # 0.4.3.14
 
 * [#170](https://github.com/stevenfontanella/microlens/issues/170), [#171](https://github.com/stevenfontanella/microlens/pull/171) Support GHC 9.8.
