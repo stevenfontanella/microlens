@@ -62,8 +62,8 @@ library
                         , microlens-platform >=0.4.3 && <0.5
                         , profunctors >=5.2.1 && <6
                         , tagged >=0.4.4 && <1
-                        , template-haskell >=2.7 && <2.22
-                        , th-abstraction >=0.6.0 && <0.7
+                        , template-haskell >=2.7 && <2.23
+                        , th-abstraction >=0.6.0 && <0.8
                         , mtl >=2.2.2 && <2.4
                         , text >=1.2 && <2.2
                         , vector >=0.12.0 && <0.14
