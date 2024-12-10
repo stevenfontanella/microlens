@@ -44,7 +44,7 @@ library
                      , microlens >=0.4.0 && <0.5
                      , containers >=0.5 && <0.8
                      , transformers
-                     , template-haskell >=2.8 && <2.23
+                     , template-haskell >=2.8 && <2.24
                      , th-abstraction >=0.4.1 && <0.8
 
   ghc-options:

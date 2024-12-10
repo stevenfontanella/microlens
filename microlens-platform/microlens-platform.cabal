@@ -42,7 +42,7 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.5 && <5
-                     , hashable >=1.1.2.3 && <1.5
+                     , hashable >=1.1.2.3 && <1.6
                      , microlens ==0.4.13.*
                      , microlens-ghc ==0.4.14.*
                      , microlens-mtl ==0.2.0.*
