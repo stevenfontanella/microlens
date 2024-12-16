@@ -5,3 +5,15 @@ packages: microlens/
           microlens-platform/
           microlens-th/
           microlens-pro/
+
+tests: True
+test-show-details: direct
+
+if impl (ghc >= 9.12)
+  allow-newer:
+    , assoc:base
+    , hashable:base
+    , bytestring:template-haskell
+    , indexed-traversable:base
+    , unordered-containers:template-haskell
+    , splitmix:base

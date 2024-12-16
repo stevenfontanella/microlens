@@ -28,8 +28,10 @@ extra-source-files:     CHANGELOG.md
 cabal-version:          >=1.10
 
 tested-with:
-                     GHC==9.8.2
-                     GHC==9.6.4
+                     GHC==9.12.1
+                     GHC==9.10.1
+                     GHC==9.8.4
+                     GHC==9.6.6
                      GHC==9.4.8
                      GHC==9.2.8
                      GHC==9.0.2
@@ -39,7 +41,6 @@ tested-with:
                      GHC==8.4.4
                      GHC==8.2.2
                      GHC==8.0.2
-                     GHC==7.10.3
 
 source-repository head
   type:                 git
@@ -62,7 +63,7 @@ library
                         , microlens-platform >=0.4.3 && <0.5
                         , profunctors >=5.2.1 && <6
                         , tagged >=0.4.4 && <1
-                        , template-haskell >=2.7 && <2.23
+                        , template-haskell >=2.7 && <2.24
                         , th-abstraction >=0.6.0 && <0.8
                         , mtl >=2.2.2 && <2.4
                         , text >=1.2 && <2.2
