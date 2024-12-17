@@ -1,3 +1,7 @@
+# 0.4.3.6
+
+* [#182](https://github.com/stevenfontanella/microlens/pull/182) Support GHC 9.12.
+
 # 0.4.3.5
 
 * [#131](https://github.com/stevenfontanella/microlens/issues/131) Add `At` and `Ixed` instance for `HashSet`.

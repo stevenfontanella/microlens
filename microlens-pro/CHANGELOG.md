@@ -1,3 +1,7 @@
+# 0.2.0.2
+
+* [#182](https://github.com/stevenfontanella/microlens/pull/182) Support GHC 9.12.
+
 # 0.2.0.1
 
 * [#180](https://github.com/stevenfontanella/microlens/pull/180) [#181](https://github.com/stevenfontanella/microlens/pull/181) Support GHC 9.10.
