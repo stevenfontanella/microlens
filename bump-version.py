@@ -3,7 +3,7 @@ import pathlib
 import re
 
 def get_curr_version(cabal_contents, file_name):
-    match = re.search("version:\s*([\d.]+)", cabal_contents)
+    match = re.search(r"version:\s*([\d.]+)", cabal_contents)
     if match is None:
         raise ValueError(f"No version found in {file_name}")
     return match.group(1)
