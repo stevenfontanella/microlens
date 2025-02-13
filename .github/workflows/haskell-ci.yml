@@ -177,6 +177,11 @@ jobs:
       - name: update cabal index
         run: |
           $CABAL v2-update -v
+      - name: cache (tools)
+        uses: actions/cache/restore@v4
+        with:
+          key: ${{ runner.os }}-${{ matrix.compiler }}-tools-1bd389c0
+          path: ~/.haskell-ci-tools
       - name: install cabal-plan
         run: |
           mkdir -p $HOME/.cabal/bin
@@ -186,6 +191,16 @@ jobs:
           rm -f cabal-plan.xz
           chmod a+x $HOME/.cabal/bin/cabal-plan
           cabal-plan --version
+      - name: install doctest
+        run: |
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then $CABAL --store-dir=$HOME/.haskell-ci-tools/store v2-install $ARG_COMPILER --ignore-project -j2 doctest --constraint='doctest ^>=0.22.0' ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest --version ; fi
+      - name: save cache (tools)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ runner.os }}-${{ matrix.compiler }}-tools-1bd389c0
+          path: ~/.haskell-ci-tools
       - name: checkout
         uses: actions/checkout@v4
         with:
@@ -277,6 +292,22 @@ jobs:
       - name: tests
         run: |
           $CABAL v2-test $ARG_COMPILER $ARG_TESTS $ARG_BENCH all --test-show-details=direct
+      - name: doctest
+        run: |
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XTypeOperators src ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens_contra} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XTypeOperators src ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens_ghc} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XTypeOperators src ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens_mtl} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XTypeOperators src ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens_platform} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XTypeOperators src ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens_th} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XTypeOperators src ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then cd ${PKGDIR_microlens_pro} || false ; fi
+          if [ $((HCNUMVER < 90000)) -ne 0 ] ; then doctest  -XHaskell2010 -XRankNTypes -XPolyKinds -XKindSignatures -XFlexibleInstances src ; fi
       - name: cabal check
         run: |
           cd ${PKGDIR_microlens} || false
