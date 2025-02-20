@@ -39,6 +39,7 @@ module Lens.Micro.Mtl
   (<<%=), (<<.=),
 
   -- * Zooming
+  Zoomed,
   zoom,
   magnify,
 )

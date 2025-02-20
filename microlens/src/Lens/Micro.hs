@@ -46,8 +46,11 @@ module Lens.Micro
   (?~),
   (<%~), (<<%~), (<<.~),
   mapped,
+  mapMOf,
   rewriteOf,
+  rewriteMOf,
   transformOf,
+  transformMOf,
 
   -- * Getter: extracts a value from a structure
   -- $getters-note
@@ -67,6 +70,10 @@ module Lens.Micro
   has,
   folded,
   folding,
+  foldMapOf,
+  anyOf,
+  allOf,
+  noneOf,
 
   -- * Lens: a combined getter-and-setter
   -- $lenses-note
@@ -95,6 +102,7 @@ module Lens.Micro
   _head, _tail, _init, _last,
   mapAccumLOf,
   worded, lined,
+  cosmosOf,
 
   -- * Prism: a traversal iterating over at most 1 element
   -- $prisms-note
@@ -460,6 +468,16 @@ mapped = sets fmap
 {-# INLINE mapped #-}
 
 {- |
+Map each element of a structure targeted by a Lens to a monadic action, evaluate these actions from left to right, and collect the results.
+
+>>> mapMOf both (\x -> [x, x + 1]) (1,3)
+[(1,3),(1,4),(2,3),(2,4)]
+-}
+mapMOf :: LensLike (WrappedMonad m) s t a b -> (a -> m b) -> s -> m t
+mapMOf = coerce
+{-# INLINE mapMOf #-}
+
+{- |
 This is a version of ('%~') which modifies the structure and returns it along with the new value:
 
 >>> (1, 2) & _1 <%~ negate
@@ -533,6 +551,17 @@ rewriteOf l f = go where
 {-# INLINE rewriteOf #-}
 
 {- |
+Rewrite by applying a monadic rule everywhere you can. Ensures that the rule cannot be applied anywhere in the result.
+-}
+rewriteMOf
+    :: Monad m
+    => LensLike (WrappedMonad m) a b a b -> (b -> m (Maybe a)) -> a -> m b
+rewriteMOf l f = go
+  where
+    go = transformMOf l (\x -> f x >>= maybe (return x) go)
+{-# INLINE rewriteMOf #-}
+
+{- |
 Transform every element by recursively applying a given 'ASetter' in a bottom-up manner.
 
 @since 0.4.11
@@ -541,6 +570,16 @@ transformOf :: ASetter a b a b -> (b -> b) -> a -> b
 transformOf l f = go where
   go = f . over l go
 {-# INLINE transformOf #-}
+
+{- |
+Transform every element by recursively applying a given 'ASetter' in a bottom-up manner with a monadic effect.
+-}
+transformMOf
+    :: Monad m => LensLike (WrappedMonad m) a b a b -> (b -> m b) -> a -> m b
+transformMOf l f = go
+  where
+    go t = mapMOf l go t >>= f
+{-# INLINE transformMOf #-}
 
 -- Getting -----------------------------------------------------------------
 
@@ -776,6 +815,51 @@ has l = getAny #. foldMapOf l (\_ -> Any True)
 folding :: F.Foldable f => (s -> f a) -> SimpleFold s a
 folding sfa agb = phantom . F.traverse_ agb . sfa
 {-# INLINE folding #-}
+
+{- |
+Returns 'True' if any value returned by a getter (any getter, including lenses,
+traversals, and folds) satisfies a predicate.
+
+>>> anyOf each (=='x') ['x','x']
+True
+>>> anyOf each (=='x') ['x','y']
+True
+>>> anyOf each (=='x') ['y','y']
+False
+-}
+anyOf :: Getting Any s a -> (a -> Bool) -> s -> Bool
+anyOf l f = getAny #. foldMapOf l (Any #. f)
+{-# INLINE anyOf #-}
+
+{- |
+Returns 'True' if any value returned by a getter (any getter, including lenses,
+traversals, and folds) satisfies a predicate.
+
+>>> allOf each (=='x') ['x','x']
+True
+>>> allOf each (=='x') ['x','y']
+False
+>>> allOf each (=='x') ['y','y']
+False
+-}
+allOf :: Getting All s a -> (a -> Bool) -> s -> Bool
+allOf l f = getAll #. foldMapOf l (All #. f)
+{-# INLINE allOf #-}
+
+{- |
+Returns 'True' if no value returned by a getter (any getter, including lenses,
+traversals, and folds) satisfies a predicate.
+
+>>> noneOf each (=='x') ['x','x']
+False
+>>> noneOf each (=='x') ['x','y']
+False
+>>> noneOf each (=='x') ['y','y']
+True
+-}
+noneOf :: Getting Any s a -> (a -> Bool) -> s -> Bool
+noneOf l f = not . anyOf l f
+{-# INLINE noneOf #-}
 
 -- Lenses ------------------------------------------------------------------
 
@@ -1298,6 +1382,13 @@ more than one contiguous newline anywhere.
 lined :: Traversal' String String
 lined f = fmap (intercalate "\n") . traverse f . lines
 {-# INLINE lined #-}
+
+{- |
+Given a Traversal that knows how to locate immediate children, traverse all of the transitive descendants of a node, including itself.
+-}
+cosmosOf :: Traversal a t a t -> Traversal a t a b'
+cosmosOf d f s = f s *> d (cosmosOf d f) s
+{-# INLINE cosmosOf #-}
 
 -- Prisms ------------------------------------------------------------------
 
