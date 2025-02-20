@@ -1,3 +1,7 @@
+# 0.4.14.0
+
+* Add optics `mapMOf`, `rewriteMOf`, `transformMOf`, `anyOf`, `allOf`, `noneOf`, `foldMapOf`, and `cosmosOf`.
+
 # 0.4.13.1
 
 * [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators

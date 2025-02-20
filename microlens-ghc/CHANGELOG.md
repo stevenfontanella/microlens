@@ -1,3 +1,7 @@
+# 0.4.15.0
+
+* New minor release (microlens-0.4.14.0).
+
 # 0.4.14.3
 
 * [#180](https://github.com/stevenfontanella/microlens/pull/180) [#181](https://github.com/stevenfontanella/microlens/pull/181) Support GHC 9.10.

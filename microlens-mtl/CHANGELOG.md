@@ -1,3 +1,7 @@
+# 0.2.1.0
+
+* Export `Zoomed` type family.
+
 # 0.2.0.3
 
 * [#161](https://github.com/stevenfontanella/microlens/pull/161) Fix GHC 9.4 warning for using `~` without TypeOperators
