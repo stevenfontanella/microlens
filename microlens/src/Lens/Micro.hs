@@ -803,7 +803,7 @@ You can also use it with e.g. '_Left' (and other 0-or-1 traversals) as a replace
 True
 -}
 has :: Getting Any s a -> s -> Bool
-has l = anyOf l (const True)
+has l = getAny #. foldMapOf l (\_ -> Any True)
 {-# INLINE has #-}
 
 {- |
