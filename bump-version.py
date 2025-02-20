@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 import re
+from itertools import *
 
 def get_curr_version(cabal_contents, file_name):
     match = re.search(r"version:\s*([\d.]+)", cabal_contents)
@@ -18,8 +19,11 @@ def increment_version(version, type):
 
     if type == 'major':
         major = str(int(major) + 1)
+        minor = 0
+        patch = ["0"]
     elif type == 'minor':
         minor = str(int(minor) + 1)
+        patch = ["0"]
     elif type == 'patch':
         if not patch:
             patch = ["1"]
@@ -74,14 +78,14 @@ def dependencies_to_update(library, type):
             to_update += ["microlens-platform"]
     return to_update
 
-def main(library, type):
-    for lib in map(pathlib.Path, dependencies_to_update(library, type)):
+def main(libraries, type):
+    for lib in map(pathlib.Path, set(chain.from_iterable(map(lambda library: dependencies_to_update(library, type), libraries)))):
         bump_version(lib, type)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("library", type=pathlib.Path)
     parser.add_argument("type", choices=["major", "minor", "patch"])
+    parser.add_argument("library", nargs='+', type=pathlib.Path)
     args = parser.parse_args()
 
     main(args.library, args.type)
