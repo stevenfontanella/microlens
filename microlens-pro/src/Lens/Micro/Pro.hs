@@ -158,9 +158,9 @@ read . show = id
 
 The isomorphisms defined in this module are true lens-compatible isos. Many of
 them share names with the lens-__incompatible__ definitions from
-[Lens.Micro](https://hackage.haskell.org/package/microlens-0.4.13.1/docs/Lens-Micro.html#g:5)
+[Lens.Micro](https://hackage.haskell.org/package/microlens/docs/Lens-Micro.html#g:5)
 and
-[Lens.Micro.Platform](https://hackage.haskell.org/package/microlens-platform-0.4.3.4/docs/Lens-Micro-Platform.html).
+[Lens.Micro.Platform](https://hackage.haskell.org/package/microlens-platform/docs/Lens-Micro-Platform.html).
 For convenience, we re-export Lens.Micro.Platform, but with non-lens-compatible
 isos hidden and replaced with lens-compatbile ones.
 
@@ -626,12 +626,12 @@ Review. This usually means a 'Prism' or an 'Iso'.
 type AReview t b = Tagged b (Identity b) -> Tagged t (Identity t)
 
 {- |
-[@Review@](https://hackage.haskell.org/package/lens-5.2.3/docs/Control-Lens-Type.html#t:Review),
+[@Review@](https://hackage.haskell.org/package/lens/docs/Control-Lens-Type.html#t:Review),
 from lens, is limited form of 'Prism' that can only be used for 're' operations.
 
 Similarly to 'SimpleGetter' from microlens, microlens-pro does not define 'Review' and opts for
 a less general 'SimpleReview' in order to avoid a
-[distributive](https://hackage.haskell.org/package/distributive-0.6.2.1)
+[distributive](https://hackage.haskell.org/package/distributive)
 dependency.
 -}
 
@@ -704,7 +704,7 @@ unto :: (b -> t) -> Review' t b
 
 Pardon the actual type signature — microlens defines neither @Optic@ (used in
 lens'
-[@unto@](https://hackage.haskell.org/package/lens-5.2.3/docs/Control-Lens-Combinators.html#v:unto)) nor @Review'@. Here we simply expand the definition of @Optic@.
+[@unto@](https://hackage.haskell.org/package/lens/docs/Control-Lens-Combinators.html#v:unto)) nor @Review'@. Here we simply expand the definition of @Optic@.
 -}
 unto :: (Profunctor p, Bifunctor p, Functor f)
      => (b -> t)
