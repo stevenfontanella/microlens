@@ -1,3 +1,7 @@
+# 0.2.0.3
+
+* [#186](https://github.com/stevenfontanella/microlens/issues/186) Export [`AsEmpty`](https://hackage.haskell.org/package/microlens-pro/docs/Lens-Micro-Pro.html#t:AsEmpty) typeclass.
+
 # 0.2.0.2
 
 * [#182](https://github.com/stevenfontanella/microlens/pull/182) Support GHC 9.12.
