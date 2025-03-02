@@ -53,7 +53,7 @@ module Lens.Micro.Pro
     -- ** Common Prisms
     , _Left, _Right
     , _Just, _Nothing
-    , _Empty
+    , AsEmpty (..)
     -- ** Miscellaneous
     , APrism, APrism'
     , clonePrism
