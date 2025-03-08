@@ -24,6 +24,7 @@
 -----------------------------------------------------------------------------
 module Main where
 
+import Data.Kind (Type)
 import Lens.Micro
 import Lens.Micro.TH
 import T799 ()
@@ -465,7 +466,7 @@ data UserTable = UserTable
 data OtherTable = OtherTable
 
 class CRUDTable a where
-  data TableRow a :: *
+  data TableRow a :: Type
 
 instance CRUDTable UserTable where
   data TableRow UserTable =
