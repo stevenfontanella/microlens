@@ -1,3 +1,7 @@
+# 0.4.3.17
+
+* Allow building with containers 0.8.
+
 # 0.4.3.16
 
 * [#182](https://github.com/stevenfontanella/microlens/pull/182) Support GHC 9.12.

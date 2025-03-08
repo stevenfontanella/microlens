@@ -1,3 +1,7 @@
+# 0.4.15.1
+
+* Allow building with containers 0.8.
+
 # 0.4.15.0
 
 * New minor release (microlens-0.4.14.0).

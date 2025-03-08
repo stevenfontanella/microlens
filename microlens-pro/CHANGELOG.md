@@ -1,3 +1,7 @@
+# 0.2.0.4
+
+* Allow building with containers 0.8.
+
 # 0.2.0.3
 
 * [#186](https://github.com/stevenfontanella/microlens/issues/186) Export [`AsEmpty`](https://hackage.haskell.org/package/microlens-pro/docs/Lens-Micro-Pro.html#t:AsEmpty) typeclass.
