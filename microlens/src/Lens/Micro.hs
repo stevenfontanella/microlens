@@ -80,7 +80,8 @@ module Lens.Micro
   Lens, Lens',
   lens,
   at,
-  _1, _2, _3, _4, _5,
+
+  module Lens.Micro.FieldN,
 
   -- * Iso: a lens that only changes the representation
   -- $isos-note
@@ -115,7 +116,7 @@ module Lens.Micro
 )
 where
 
-
+import Lens.Micro.FieldN
 import Lens.Micro.Type
 import Lens.Micro.Internal
 
