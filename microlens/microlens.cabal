@@ -65,6 +65,7 @@ library
                        Lens.Micro.Extras
                        Lens.Micro.Internal
                        Lens.Micro.Type
+                       Lens.Micro.FieldN
   -- other-modules:
   -- other-extensions:
 
