@@ -1,3 +1,7 @@
+# 0.5.0.0
+
+* Move definitions for Field<N> e.g. `Field1` from `Lens.Micro.Interal` to `Lens.Micro`. This is a breaking change for users of these classes and instances. To upgrade, update your imports, e.g. `import Lens.Micro.Internal (Field1(..))` -> `import Lens.Micro (Field1(..))`.
+
 # 0.4.14.0
 
 * Add optics `mapMOf`, `rewriteMOf`, `transformMOf`, `anyOf`, `allOf`, `noneOf`, `foldMapOf`, and `cosmosOf`.

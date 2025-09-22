@@ -1,3 +1,7 @@
+# 0.4.3.18
+
+* Bump version for microlens 0.5.
+
 # 0.4.3.17
 
 * Allow building with containers 0.8.

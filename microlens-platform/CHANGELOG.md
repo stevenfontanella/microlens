@@ -1,3 +1,7 @@
+# 0.4.4.2
+
+* Bump version for microlens 0.5.
+
 # 0.4.4.0
 
 * New minor release (microlens-0.4.14.0, microlens-mtl-0.2.1.0).

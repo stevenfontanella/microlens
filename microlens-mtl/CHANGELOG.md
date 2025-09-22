@@ -1,3 +1,7 @@
+# 0.2.1.1
+
+* Bump version for microlens 0.5.
+
 # 0.2.1.0
 
 * Export `Zoomed` type family.
