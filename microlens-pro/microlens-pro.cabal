@@ -1,5 +1,5 @@
 name:                   microlens-pro
-version:                0.2.0.4
+version:                0.2.0.5
 synopsis:               Prisms and isomorphisms for microlens
 description:
   This package provides lens-compatible 'Prism' and 'Iso'. Consequently, it
@@ -57,7 +57,7 @@ library
   build-depends:          base >=4.5 && <5
                         , containers >=0.4.0 && <0.9
                         , unordered-containers >=0.2.4 && <0.3
-                        , microlens >=0.4.11.3 && <0.5
+                        , microlens >=0.5.0.0 && <0.6
                         , microlens-th >=0.4.3.3 && <0.5
                         , microlens-contra >=0.1.0 && <0.2
                         , microlens-platform >=0.4.3 && <0.5
